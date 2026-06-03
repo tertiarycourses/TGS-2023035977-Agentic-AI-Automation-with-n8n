@@ -1,0 +1,12 @@
+# OS
+.DS_Store
+
+# Playwright MCP artifacts
+.playwright-mcp/
+
+# Secrets (never commit)
+.env
+*.env
+
+# Logs / temp
+*.log

@@ -1,0 +1,178 @@
+{
+  "name": "Activity: Improved Flyer with Conditonal Route",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Bowling Party Attendnce",
+        "formDescription": "Bowling Party Attendnce",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name"
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Tel",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Are you attending the bowling party",
+              "fieldType": "radio",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Message",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -416,
+        144
+      ],
+      "id": "2e451055-1d46-4454-9d5e-7746008d0f07",
+      "name": "On form submission",
+      "webhookId": "850da3df-5949-48ea-8ce6-ab6d4294b03a"
+    },
+    {
+      "parameters": {
+        "sendTo": "angch@tertiaryinfotech.com",
+        "subject": "Operation Request",
+        "message": "=Hi Operation Team <br> <br>\n\nThere is new operation request. The details are below: <br>\n\nName:{{ $json.Name }} <br>\nEmail:{{ $json.Email }} <br>\nTel:{{ $json.Tel }} <br>\nDepartment:{{ $json.Department }} <br>\nMessage:{{ $json.Message }} <br> <br>\n\nThanks <br>\nOperation",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fcad970b-9e36-4467-8fdf-a236a32f809e",
+      "name": "Send a message",
+      "webhookId": "0f29ae1a-811c-4aaf-bd65-dfb93b2929cc"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e911173e-f026-4981-a11d-a1ad464c09b9",
+              "leftValue": "={{ $json['Are you attending the bowling party'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -208,
+        144
+      ],
+      "id": "e5721ea5-a85d-4962-8f1d-769073ce2228",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        0,
+        240
+      ],
+      "id": "09748c32-4557-4439-9b76-63ca6bad0fcf",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Name": "Alfred",
+          "Email": "test@test.com",
+          "Tel": 12345678,
+          "Message": "test",
+          "Are you attending the bowling party": "No",
+          "submittedAt": "2026-06-02T13:45:19.941+08:00",
+          "formMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "cd58ea1d-8be3-473c-bd30-a042cd124c19",
+  "meta": {
+    "instanceId": "dd9d815cb100cab73a9cd63cc3f30fd090e73e9edbdc09a51a025bdf1bf015af"
+  },
+  "id": "rHS2jI1FzUlyTHXl",
+  "tags": []
+}

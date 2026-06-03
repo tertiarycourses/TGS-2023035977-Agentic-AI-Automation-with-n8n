@@ -1,0 +1,354 @@
+{
+  "name": "My workflow 4",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Bowling Party Attendnce",
+        "formDescription": "Bowling Party Attendnce",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name"
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Tel",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Are you attending the bowling party",
+              "fieldType": "radio",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Message",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -416,
+        144
+      ],
+      "id": "af444e20-71c7-49ac-bd75-e56bf7a64a9c",
+      "name": "On form submission",
+      "webhookId": "885684c6-9652-443d-b9e9-cb195a2ecde6"
+    },
+    {
+      "parameters": {
+        "sendTo": "angch@tertiaryinfotech.com",
+        "subject": "Operation Request",
+        "message": "=Hi Operation Team <br> <br>\n\nThere is new operation request. The details are below: <br>\n\nName:{{ $json.Name }} <br>\nEmail:{{ $json.Email }} <br>\nTel:{{ $json.Tel }} <br>\nDepartment:{{ $json.Department }} <br>\nMessage:{{ $json.Message }} <br> <br>\n\nThanks <br>\nOperation",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3ce80ad3-cb28-4cbe-b97d-623764c42c44",
+      "name": "Send a message",
+      "webhookId": "0f29ae1a-811c-4aaf-bd65-dfb93b2929cc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "uhG3BLRoIaea1Xw6",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e911173e-f026-4981-a11d-a1ad464c09b9",
+              "leftValue": "={{ $json['Are you attending the bowling party'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -208,
+        144
+      ],
+      "id": "f58f0e3c-99f2-47c7-8c34-c312640b5b7d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "feyqPycg2ORnNKrC",
+          "mode": "list",
+          "cachedResultName": "Bowling Party",
+          "cachedResultUrl": "/projects/koXyebnPoyxlBtCG/datatables/feyqPycg2ORnNKrC"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Attending": true,
+            "Name": "={{ $('On form submission').item.json.Name }}",
+            "Email": "={{ $('On form submission').item.json.Email }}",
+            "Tel": "={{ $('On form submission').item.json.Tel }}",
+            "Message": "={{ $('On form submission').item.json.Message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tel",
+              "displayName": "Tel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Attending",
+              "displayName": "Attending",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "024dd000-339e-4992-9195-8780d3d0c332",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "feyqPycg2ORnNKrC",
+          "mode": "list",
+          "cachedResultName": "Bowling Party",
+          "cachedResultUrl": "/projects/koXyebnPoyxlBtCG/datatables/feyqPycg2ORnNKrC"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Attending": false,
+            "Name": "={{ $('On form submission').item.json.Name }}",
+            "Email": "={{ $('On form submission').item.json.Email }}",
+            "Tel": "={{ $('On form submission').item.json.Tel }}",
+            "Message": "={{ $('On form submission').item.json.Message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tel",
+              "displayName": "Tel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Attending",
+              "displayName": "Attending",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        240
+      ],
+      "id": "ff53e7df-298b-4687-b12e-66c9cc45e1a8",
+      "name": "Insert row1"
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Name": "Alfred",
+          "Email": "test@test.com",
+          "Tel": 12345678,
+          "Message": "test",
+          "Are you attending the bowling party": "No",
+          "submittedAt": "2026-06-02T13:45:19.941+08:00",
+          "formMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "84806fd1-f2c2-432c-b351-2cb4cf2f3fdd",
+  "meta": {
+    "instanceId": "72386ec49aabc7888a0253dc75f915608a7f52a065ef1f3b10b68ae24500c004"
+  },
+  "id": "oUV3891FcXPlMY0Z",
+  "tags": []
+}

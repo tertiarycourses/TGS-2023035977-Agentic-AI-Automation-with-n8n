@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Qualcomm · Operations Mission Control</title>
+<style>
+  :root {
+    --bg: #05070d;
+    --panel: #0c111c;
+    --panel-2: #111827;
+    --line: #1c2738;
+    --accent: #3b82f6;
+    --accent-2: #38bdf8;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --text: #e6edf6;
+    --muted: #7d8aa0;
+    --font: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(59,130,246,0.12), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(56,189,248,0.10), transparent 55%),
+      var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(8,11,18,0.7);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .logo {
+    width: 42px; height: 42px; border-radius: 11px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: grid; place-items: center;
+    font-weight: 800; font-size: 20px; color: #04101f;
+    box-shadow: 0 6px 22px rgba(59,130,246,0.45);
+  }
+  .brand h1 { font-size: 17px; letter-spacing: 0.3px; }
+  .brand p { font-size: 11.5px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+
+  .status-pills { display: flex; gap: 10px; align-items: center; }
+  .pill {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12px; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 13px; background: var(--panel);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
+  .dot.pulse { animation: pulse 1.8s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+  .clock { font-variant-numeric: tabular-nums; color: var(--text); }
+
+  /* ---------- Layout ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 18px;
+    padding: 22px 28px;
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+  @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px;
+  }
+  .panel h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 1.4px;
+    color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .panel h2::before { content: ""; width: 4px; height: 14px; border-radius: 3px; background: var(--accent-2); }
+
+  /* ---------- KPI cards ---------- */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+  @media (max-width: 620px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; padding: 14px 15px;
+    position: relative; overflow: hidden;
+  }
+  .kpi .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .kpi .value { font-size: 26px; font-weight: 700; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .kpi .delta { font-size: 11.5px; margin-top: 4px; }
+  .up { color: var(--green); } .down { color: var(--red); } .warn { color: var(--amber); }
+  .kpi::after {
+    content: ""; position: absolute; right: -20px; bottom: -20px;
+    width: 70px; height: 70px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(56,189,248,0.18), transparent 70%);
+  }
+
+  /* ---------- Section head + sync ---------- */
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .section-head .big { font-size: 18px; letter-spacing: 0.3px; color: var(--text); text-transform: none; }
+  .section-head .big::before { display: none; }
+  .sync-btn {
+    background: var(--panel); border: 1px solid var(--line); color: var(--text);
+    border-radius: 10px; padding: 9px 14px; font-size: 12.5px; font-weight: 600;
+    cursor: pointer; transition: 0.15s; font-family: var(--font);
+  }
+  .sync-btn:hover { border-color: var(--accent); background: rgba(59,130,246,0.1); }
+  .sync-btn:disabled { opacity: 0.6; cursor: progress; }
+  .sync-btn.spin { animation: none; }
+  .sync-btn .ico { display: inline-block; }
+  .sync-btn.loading .ico { animation: spin 0.9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 620px) { .two-col { grid-template-columns: 1fr; } }
+  .empty { color: var(--muted); font-size: 12.5px; padding: 6px 0; }
+
+  /* ---------- Bars ---------- */
+  .bars { display: flex; flex-direction: column; gap: 13px; }
+  .bar-row { display: grid; grid-template-columns: 130px 1fr 48px; align-items: center; gap: 12px; font-size: 13px; }
+  .bar-track { height: 9px; background: #0a0f1a; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+  .bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+  .bar-fill.g { background: linear-gradient(90deg, #10b981, #34d399); }
+  .bar-fill.a { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+  .bar-fill.r { background: linear-gradient(90deg, #dc2626, #f87171); }
+  .bar-val { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* ---------- Activity feed ---------- */
+  .feed { display: flex; flex-direction: column; gap: 11px; margin-top: 4px; max-height: 220px; overflow-y: auto; }
+  .feed-item { display: flex; gap: 10px; font-size: 12.5px; align-items: flex-start; }
+  .feed-item time { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tag { font-size: 10px; padding: 2px 7px; border-radius: 5px; font-weight: 600; white-space: nowrap; }
+  .tag.ok { background: rgba(52,211,153,0.15); color: var(--green); }
+  .tag.al { background: rgba(248,113,113,0.15); color: var(--red); }
+  .tag.in { background: rgba(56,189,248,0.15); color: var(--accent-2); }
+
+  /* ---------- Chatbot ---------- */
+  .chat-panel {
+    display: flex; flex-direction: column;
+    /* Fixed to the viewport height instead of growing with the conversation. */
+    height: calc(100vh - 110px);
+    position: sticky; top: 90px;
+    overflow: hidden;
+  }
+  @media (max-width: 1024px) {
+    /* Single-column layout: let it size to the viewport without sticking. */
+    .chat-panel { position: static; height: calc(100vh - 90px); }
+  }
+  .chat-head { display: flex; align-items: center; gap: 11px; margin-bottom: 14px; }
+  .chat-avatar {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: grid; place-items: center; font-size: 18px;
+  }
+  .chat-head .meta { flex: 1; }
+  .chat-head .meta h3 { font-size: 14px; }
+  .chat-head .meta span { font-size: 11.5px; color: var(--green); display: flex; align-items: center; gap: 5px; }
+  .gear {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 9px;
+    width: 34px; height: 34px; font-size: 15px; cursor: pointer; color: var(--text);
+    transition: 0.15s;
+  }
+  .gear:hover { border-color: var(--accent); background: rgba(59,130,246,0.1); }
+
+  .webhook-bar {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 13px; margin-bottom: 14px;
+  }
+  .webhook-bar.hidden { display: none; }
+  .webhook-bar label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); display: block; margin-bottom: 7px; }
+  .webhook-row { display: flex; gap: 8px; }
+  .webhook-row input {
+    flex: 1; background: var(--bg); border: 1px solid var(--line); border-radius: 9px;
+    padding: 9px 11px; color: var(--text); font-size: 12.5px; font-family: var(--font); outline: none;
+  }
+  .webhook-row input:focus { border-color: var(--accent); }
+  .webhook-row button {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); border: none;
+    border-radius: 9px; padding: 0 16px; color: #04101f; font-weight: 700; font-size: 12.5px; cursor: pointer;
+  }
+  .webhook-bar small { display: block; margin-top: 8px; font-size: 11px; color: var(--muted); }
+  .webhook-bar small.err { color: var(--red); }
+  .webhook-bar small.ok { color: var(--green); }
+  .dot.off { background: var(--amber); box-shadow: 0 0 10px var(--amber); }
+
+  /* ---------- Knowledge Base upload ---------- */
+  .kb-upload {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 13px; margin-bottom: 14px;
+  }
+  .kb-upload label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); display: flex; align-items: center; gap: 6px; margin-bottom: 9px; }
+  .kb-upload label .kb-ico { font-size: 13px; }
+  .dropzone {
+    border: 1.5px dashed var(--line); border-radius: 10px;
+    padding: 16px 12px; text-align: center; cursor: pointer;
+    transition: 0.15s; background: var(--bg);
+  }
+  .dropzone:hover, .dropzone.drag { border-color: var(--accent); background: rgba(59,130,246,0.08); }
+  .dropzone .dz-main { font-size: 12.5px; color: var(--text); }
+  .dropzone .dz-main b { color: var(--accent-2); }
+  .dropzone .dz-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .kb-file {
+    display: none; align-items: center; gap: 9px; margin-top: 10px;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 8px 11px;
+  }
+  .kb-file.show { display: flex; }
+  .kb-file .fi { font-size: 16px; }
+  .kb-file .fmeta { flex: 1; min-width: 0; }
+  .kb-file .fname { font-size: 12.5px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kb-file .fsize { font-size: 10.5px; color: var(--muted); }
+  .kb-file .fclear { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 15px; line-height: 1; }
+  .kb-file .fclear:hover { color: var(--red); }
+  .kb-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .kb-upload-btn {
+    flex: 1; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border: none;
+    border-radius: 9px; padding: 9px 14px; color: #04101f; font-weight: 700; font-size: 12.5px;
+    cursor: pointer; font-family: var(--font); transition: 0.15s;
+  }
+  .kb-upload-btn:hover { filter: brightness(1.08); }
+  .kb-upload-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .kb-status { display: block; margin-top: 9px; font-size: 11px; color: var(--muted); }
+  .kb-status.err { color: var(--red); }
+  .kb-status.ok { color: var(--green); }
+  .kb-bar-track { height: 5px; background: #0a0f1a; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); margin-top: 9px; display: none; }
+  .kb-bar-track.show { display: block; }
+  .kb-bar-fill { height: 100%; width: 0%; border-radius: 6px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 0.2s; }
+
+  .messages {
+    flex: 1 1 0; min-height: 0; /* allow internal scroll inside the fixed-height panel */
+    overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+    padding: 6px 4px; margin-bottom: 14px;
+  }
+  .msg { display: flex; gap: 9px; max-width: 88%; }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg .bubble {
+    padding: 10px 13px; border-radius: 13px; font-size: 13.5px; line-height: 1.5;
+    border: 1px solid var(--line);
+  }
+  .msg.bot .bubble { background: var(--panel-2); border-top-left-radius: 4px; }
+  .msg.user .bubble {
+    background: linear-gradient(135deg, var(--accent), #2563eb);
+    border-top-right-radius: 4px; color: #fff; border-color: transparent;
+  }
+  .msg .ic { width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; display: grid; place-items: center; font-size: 14px; background: var(--panel); border: 1px solid var(--line); }
+
+  .typing .bubble { display: flex; gap: 4px; align-items: center; }
+  .typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: bounce 1.2s infinite; }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-5px); opacity: 1; } }
+
+  .suggestions { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+  .chip {
+    font-size: 11.5px; padding: 6px 11px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+    cursor: pointer; transition: 0.15s;
+  }
+  .chip:hover { color: var(--text); border-color: var(--accent); background: rgba(59,130,246,0.1); }
+
+  .composer { display: flex; gap: 9px; }
+  .composer input {
+    flex: 1; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 11px; padding: 12px 14px; color: var(--text); font-size: 13.5px; font-family: var(--font);
+    outline: none; transition: 0.15s;
+  }
+  .composer input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+  .composer button {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border: none; border-radius: 11px; padding: 0 18px; color: #04101f;
+    font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.15s;
+  }
+  .composer button:hover { filter: brightness(1.08); }
+  .composer button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  ::-webkit-scrollbar { width: 7px; height: 7px; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">Q</div>
+      <div>
+        <h1>Qualcomm · Operations Mission Control</h1>
+        <p>Global Network &amp; Fab Telemetry</p>
+      </div>
+    </div>
+    <div class="status-pills">
+      <div class="pill"><span class="dot pulse"></span> All Systems Operational</div>
+      <div class="pill">🛰️ <span id="region">APAC · SG</span></div>
+      <div class="pill">🕓 <span class="clock" id="clock">--:--:--</span></div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: Workforce Overview (live from database) -->
+    <div>
+      <div class="section-head">
+        <h2 class="big">Workforce Overview</h2>
+        <button type="button" id="sync-btn" class="sync-btn">⟳ Sync from Database</button>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="label">Total Staff</div>
+          <div class="value" id="kpi-total">—</div>
+          <div class="delta" id="kpi-total-sub">live from data table</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Female</div>
+          <div class="value" id="kpi-female">—</div>
+          <div class="delta up" id="kpi-female-sub">—</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Male</div>
+          <div class="value" id="kpi-male">—</div>
+          <div class="delta" id="kpi-male-sub">—</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Departments</div>
+          <div class="value" id="kpi-dept">—</div>
+          <div class="delta" id="kpi-dept-sub">unique</div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:18px;">
+        <h2>Gender Distribution</h2>
+        <div class="bars" id="bars-gender"><div class="empty">Click "Sync from Database" to load.</div></div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <h2>Department / Role</h2>
+          <div class="bars" id="bars-dept"><div class="empty">—</div></div>
+        </div>
+        <div class="panel">
+          <h2>Food Preference</h2>
+          <div class="bars" id="bars-food"><div class="empty">—</div></div>
+        </div>
+      </div>
+
+      <div class="two-col" style="margin-top:18px;">
+        <div class="panel">
+          <h2>Attending</h2>
+          <div class="bars" id="bars-attending"><div class="empty">—</div></div>
+        </div>
+        <div class="panel">
+          <h2>Location / Status</h2>
+          <div class="bars" id="bars-location"><div class="empty">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Chatbot -->
+    <div class="panel chat-panel">
+      <div class="chat-head">
+        <div class="chat-avatar">🤖</div>
+        <div class="meta">
+          <h3>Mission Control Assistant</h3>
+          <span><span class="dot" id="conn-dot"></span> <span id="conn-text">Connected to n8n automation</span></span>
+        </div>
+        <button type="button" class="gear" id="reset" title="Reset chat &amp; start a new session">🔄</button>
+        <button type="button" class="gear" id="gear" title="Configure webhook URL">⚙️</button>
+      </div>
+
+      <div class="webhook-bar" id="webhook-bar">
+        <label>n8n Production Webhook URL</label>
+        <div class="webhook-row">
+          <input id="webhook-input" type="text" placeholder="https://your-n8n.cloud/webhook/..." />
+          <button type="button" id="webhook-save">Save</button>
+        </div>
+        <small id="webhook-hint">Paste your production URL and click Save. Stored locally in this browser.</small>
+      </div>
+
+      <div class="kb-upload" id="kb-upload">
+        <label><span class="kb-ico">📚</span> Upload SOP to Knowledge Base</label>
+        <div class="webhook-row" style="margin-bottom:11px;">
+          <input id="kb-url-input" type="text" placeholder="https://your-n8n.cloud/webhook/..." />
+          <button type="button" id="kb-url-save">Save</button>
+        </div>
+        <div class="dropzone" id="dropzone">
+          <div class="dz-main">Drop a file here or <b>browse</b></div>
+          <div class="dz-sub">PDF, Word (.docx), or .txt — added to the RAG vector store</div>
+          <input id="kb-file-input" type="file" accept=".pdf,.doc,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" hidden />
+        </div>
+        <div class="kb-file" id="kb-file">
+          <span class="fi">📄</span>
+          <div class="fmeta">
+            <div class="fname" id="kb-fname">—</div>
+            <div class="fsize" id="kb-fsize">—</div>
+          </div>
+          <button type="button" class="fclear" id="kb-clear" title="Remove file">✕</button>
+        </div>
+        <div class="kb-bar-track" id="kb-bar-track"><div class="kb-bar-fill" id="kb-bar-fill"></div></div>
+        <div class="kb-actions">
+          <button type="button" class="kb-upload-btn" id="kb-upload-btn" disabled>⬆ Upload to Knowledge Base</button>
+        </div>
+        <small class="kb-status" id="kb-status">Indexes your HR SOP document so the assistant can answer policy questions.</small>
+      </div>
+
+      <div class="messages" id="messages">
+        <div class="msg bot">
+          <div class="ic">🤖</div>
+          <div class="bubble">Welcome to Qualcomm Mission Control. I'm wired into your n8n automation engine. Ask me about telemetry, alerts, or trigger an operations workflow.</div>
+        </div>
+      </div>
+
+      <div class="suggestions" id="suggestions">
+        <div class="chip">Show current alerts</div>
+        <div class="chip">Run daily yield report</div>
+        <div class="chip">Status of Austin Fab</div>
+        <div class="chip">Restart edge sync</div>
+      </div>
+
+      <form class="composer" id="composer" autocomplete="off">
+        <input id="input" type="text" placeholder="Ask Mission Control or trigger a workflow…" />
+        <button type="submit" id="send">Send</button>
+      </form>
+    </div>
+  </div>
+
+<script>
+  // Webhook URL is NOT hardcoded — the user enters their production URL in the UI.
+  const STORAGE_KEY = "mc_webhook_url";
+  let WEBHOOK_URL = localStorage.getItem(STORAGE_KEY) || "";
+
+  const messages = document.getElementById("messages");
+  const form = document.getElementById("composer");
+  const input = document.getElementById("input");
+  const sendBtn = document.getElementById("send");
+
+  const webhookBar = document.getElementById("webhook-bar");
+  const webhookInput = document.getElementById("webhook-input");
+  const webhookSave = document.getElementById("webhook-save");
+  const webhookHint = document.getElementById("webhook-hint");
+  const connDot = document.getElementById("conn-dot");
+  const connText = document.getElementById("conn-text");
+  const gear = document.getElementById("gear");
+
+  // Reflect connection state in the header + show/hide the config bar
+  function refreshConnState() {
+    if (WEBHOOK_URL) {
+      connDot.classList.remove("off");
+      connText.textContent = "Connected to n8n automation";
+      webhookInput.value = WEBHOOK_URL;
+      webhookBar.classList.add("hidden");
+    } else {
+      connDot.classList.add("off");
+      connText.textContent = "No webhook configured — paste your production URL";
+      webhookBar.classList.remove("hidden");
+    }
+  }
+
+  function saveWebhook() {
+    const url = webhookInput.value.trim();
+    if (!/^https?:\/\/.+/i.test(url)) {
+      webhookHint.textContent = "Please enter a valid http(s) URL.";
+      webhookHint.className = "err";
+      return;
+    }
+    WEBHOOK_URL = url;
+    localStorage.setItem(STORAGE_KEY, url);
+    webhookHint.textContent = "✅ Saved. You can now chat with Mission Control.";
+    webhookHint.className = "ok";
+    refreshConnState();
+  }
+
+  webhookSave.addEventListener("click", saveWebhook);
+  webhookInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); saveWebhook(); } });
+  gear.addEventListener("click", () => webhookBar.classList.toggle("hidden"));
+  refreshConnState();
+
+  // Live clock
+  function tick() {
+    const d = new Date();
+    document.getElementById("clock").textContent = d.toLocaleTimeString("en-GB");
+  }
+  setInterval(tick, 1000); tick();
+
+  // Add a message bubble
+  function addMessage(text, who) {
+    const wrap = document.createElement("div");
+    wrap.className = "msg " + who;
+    wrap.innerHTML = `<div class="ic">${who === "user" ? "🧑‍🚀" : "🤖"}</div><div class="bubble"></div>`;
+    wrap.querySelector(".bubble").textContent = text;
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+    return wrap;
+  }
+
+  // Typing indicator
+  function addTyping() {
+    const wrap = document.createElement("div");
+    wrap.className = "msg bot typing";
+    wrap.innerHTML = `<div class="ic">🤖</div><div class="bubble"><span></span><span></span><span></span></div>`;
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+    return wrap;
+  }
+
+  // Extract a readable reply from whatever n8n returns
+  function parseReply(data) {
+    if (data == null) return "✅ Workflow triggered.";
+    if (typeof data === "string") return data || "✅ Workflow triggered.";
+    return (
+      data.reply || data.message || data.output || data.text ||
+      data.answer || data.response ||
+      (Array.isArray(data) && data[0] && (data[0].reply || data[0].message || data[0].output)) ||
+      JSON.stringify(data, null, 2)
+    );
+  }
+
+  async function sendToN8n(message) {
+    const typing = addTyping();
+    sendBtn.disabled = true;
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message,
+          chatInput: message, // alias so an AI Agent reading {{ $json.body.chatInput }} also works
+          source: "qualcomm-mission-control",
+          sessionId: currentSession,
+          timestamp: new Date().toISOString()
+        })
+      });
+
+      // Read as text first, then try to parse JSON. An empty body with a
+      // JSON content-type would make res.json() throw, so never call it blindly.
+      const raw = await res.text();
+      let data = raw;
+      if (raw && raw.trim()) {
+        try { data = JSON.parse(raw); } catch { data = raw; }
+      } else {
+        data = null; // empty body
+      }
+
+      typing.remove();
+      if (!res.ok) {
+        addMessage(`⚠️ Webhook responded with ${res.status}. The workflow may not be active.`, "bot");
+        return;
+      }
+      if (data == null) {
+        addMessage("✅ Workflow triggered, but it returned no content. Add a \"Respond to Webhook\" node in n8n that returns { \"reply\": \"...\" } to get an answer here.", "bot");
+        return;
+      }
+      addMessage(parseReply(data), "bot");
+    } catch (err) {
+      typing.remove();
+      addMessage("⚠️ Couldn't reach the n8n webhook. Check that the workflow is active and CORS is allowed.", "bot");
+      console.error(err);
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    if (!WEBHOOK_URL) {
+      webhookBar.classList.remove("hidden");
+      webhookHint.textContent = "Enter your n8n production webhook URL first, then click Save.";
+      webhookHint.className = "err";
+      webhookInput.focus();
+      return;
+    }
+    addMessage(text, "user");
+    input.value = "";
+    sendToN8n(text);
+  });
+
+  document.getElementById("suggestions").addEventListener("click", (e) => {
+    if (!e.target.classList.contains("chip")) return;
+    input.value = e.target.textContent;
+    form.requestSubmit();
+  });
+
+  // ---------- Session management & reset ----------
+  const WELCOME = "Welcome to Qualcomm Mission Control. I'm wired into your n8n automation engine. Ask me about telemetry, alerts, or trigger an operations workflow.";
+  function newSession() { return "mc-" + Math.random().toString(36).slice(2) + Date.now().toString(36); }
+  let currentSession = newSession();
+
+  document.getElementById("reset").addEventListener("click", () => {
+    currentSession = newSession();           // fresh session id → clears n8n memory context
+    messages.innerHTML = "";                 // clear the transcript
+    addMessage(WELCOME, "bot");
+    addMessage("🔄 New session started. Previous conversation cleared.", "bot");
+    input.focus();
+  });
+
+  // ---------- Knowledge Base file upload ----------
+  // Dedicated ingestion webhook: drops the file into the n8n Simple Vector Store (memory key "sop").
+  // The URL is editable in the UI and stored locally; this is the default.
+  const KB_STORAGE_KEY = "mc_kb_upload_url";
+  const KB_DEFAULT_URL = "https://n8n.srv923061.hstgr.cloud/webhook/92c5dbda-24a8-4283-83b5-81c1e2b94210";
+  let KB_UPLOAD_URL = localStorage.getItem(KB_STORAGE_KEY) || KB_DEFAULT_URL;
+
+  const kbUrlInput   = document.getElementById("kb-url-input");
+  const kbUrlSave    = document.getElementById("kb-url-save");
+  const dropzone     = document.getElementById("dropzone");
+  const kbFileInput  = document.getElementById("kb-file-input");
+  const kbFileRow    = document.getElementById("kb-file");
+  const kbFname      = document.getElementById("kb-fname");
+  const kbFsize      = document.getElementById("kb-fsize");
+  const kbClear      = document.getElementById("kb-clear");
+  const kbUploadBtn  = document.getElementById("kb-upload-btn");
+  const kbStatus     = document.getElementById("kb-status");
+  const kbBarTrack   = document.getElementById("kb-bar-track");
+  const kbBarFill    = document.getElementById("kb-bar-fill");
+  let selectedFile   = null;
+
+  function humanSize(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  }
+
+  function setKbStatus(text, cls) {
+    kbStatus.textContent = text;
+    kbStatus.className = "kb-status" + (cls ? " " + cls : "");
+  }
+
+  function pickFile(file) {
+    if (!file) return;
+    const MAX = 15 * 1024 * 1024; // 15 MB guard
+    if (file.size > MAX) {
+      setKbStatus("File is too large (max 15 MB).", "err");
+      return;
+    }
+    selectedFile = file;
+    kbFname.textContent = file.name;
+    kbFsize.textContent = humanSize(file.size) + (file.type ? " · " + file.type : "");
+    kbFileRow.classList.add("show");
+    kbUploadBtn.disabled = false;
+    kbBarTrack.classList.remove("show");
+    kbBarFill.style.width = "0%";
+    setKbStatus("Ready to upload. Click “Upload to Knowledge Base”.", "");
+  }
+
+  function clearFile() {
+    selectedFile = null;
+    kbFileInput.value = "";
+    kbFileRow.classList.remove("show");
+    kbUploadBtn.disabled = true;
+    kbBarTrack.classList.remove("show");
+    kbBarFill.style.width = "0%";
+    setKbStatus("Indexes your HR SOP document so the assistant can answer policy questions.", "");
+  }
+
+  // Upload webhook URL config (defaults to KB_DEFAULT_URL, editable + persisted)
+  kbUrlInput.value = KB_UPLOAD_URL;
+  function saveKbUrl() {
+    const url = kbUrlInput.value.trim();
+    if (!/^https?:\/\/.+/i.test(url)) {
+      setKbStatus("Please enter a valid http(s) upload webhook URL.", "err");
+      return;
+    }
+    KB_UPLOAD_URL = url;
+    localStorage.setItem(KB_STORAGE_KEY, url);
+    setKbStatus("✅ Upload webhook URL saved.", "ok");
+  }
+  kbUrlSave.addEventListener("click", saveKbUrl);
+  kbUrlInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); saveKbUrl(); } });
+
+  dropzone.addEventListener("click", () => kbFileInput.click());
+  kbFileInput.addEventListener("change", (e) => pickFile(e.target.files[0]));
+  kbClear.addEventListener("click", clearFile);
+
+  ["dragenter", "dragover"].forEach(ev =>
+    dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.add("drag"); }));
+  ["dragleave", "drop"].forEach(ev =>
+    dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.remove("drag"); }));
+  dropzone.addEventListener("drop", (e) => {
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) pickFile(e.dataTransfer.files[0]);
+  });
+
+  function uploadFile() {
+    if (!selectedFile) return;
+    kbUploadBtn.disabled = true;
+    kbBarTrack.classList.add("show");
+    kbBarFill.style.width = "0%";
+    setKbStatus("Uploading “" + selectedFile.name + "” to the knowledge base…", "");
+
+    // Send as multipart/form-data so the n8n Webhook node exposes it as binary
+    // for the Default Data Loader → Simple Vector Store (insert).
+    const fd = new FormData();
+    fd.append("file", selectedFile, selectedFile.name);
+    fd.append("data", selectedFile, selectedFile.name); // common alternate binary field name
+    fd.append("filename", selectedFile.name);
+    fd.append("source", "qualcomm-mission-control-kb");
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", KB_UPLOAD_URL, true);
+
+    xhr.upload.addEventListener("progress", (e) => {
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100);
+        kbBarFill.style.width = pct + "%";
+      }
+    });
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        kbBarFill.style.width = "100%";
+        setKbStatus("✅ “" + selectedFile.name + "” indexed. You can now ask the assistant about its policies.", "ok");
+        addMessage("📚 Uploaded “" + selectedFile.name + "” to the SOP knowledge base. Ask me about leave, MC, performance, PDPA, marketing, PR, or data privacy policies.", "bot");
+        kbUploadBtn.disabled = true;
+        kbFileInput.value = "";
+        selectedFile = null;
+      } else {
+        setKbStatus("⚠️ Upload failed (HTTP " + xhr.status + "). Make sure the n8n ingestion workflow is active.", "err");
+        kbUploadBtn.disabled = false;
+      }
+    };
+    xhr.onerror = () => {
+      setKbStatus("⚠️ Couldn’t reach the ingestion webhook. Check the workflow is active and CORS is allowed.", "err");
+      kbUploadBtn.disabled = false;
+    };
+
+    xhr.send(fd);
+  }
+
+  kbUploadBtn.addEventListener("click", uploadFile);
+
+  // ---------- Dashboard: pull live stats from the database ----------
+  const syncBtn = document.getElementById("sync-btn");
+
+  const STATS_PROMPT =
+    "Query the employee data table and return ONLY a raw JSON object — no markdown, no code fences, " +
+    "no commentary. Count EVERY employee row. Use this exact shape, with the real column values as keys:\n" +
+    '{"totalStaff": <int>, "gender": {"<value>": <int>}, "departments": {"<value>": <int>}, ' +
+    '"food": {"<value>": <int>}, "locations": {"<value>": <int>}, "attending": {"<value>": <int>}}\n' +
+    "For attending, use the attendance column values (e.g. Yes / No). " +
+    "If a category is unavailable, use an empty object {}. Respond with the JSON object only.";
+
+  // Pull the first balanced JSON object out of any text the agent returns
+  function extractJSON(text) {
+    if (text && typeof text === "object") return text;
+    if (typeof text !== "string") return null;
+    let s = text.replace(/```json/gi, "").replace(/```/g, "").trim();
+    const start = s.indexOf("{");
+    const end = s.lastIndexOf("}");
+    if (start === -1 || end === -1 || end < start) return null;
+    try { return JSON.parse(s.slice(start, end + 1)); } catch { return null; }
+  }
+
+  function sum(obj) { return Object.values(obj || {}).reduce((a, b) => a + (Number(b) || 0), 0); }
+
+  // case-insensitive lookup of a gender bucket
+  function genderCount(g, kind) {
+    let n = 0;
+    for (const [k, v] of Object.entries(g || {})) {
+      const key = k.toLowerCase();
+      if (kind === "female" && key.includes("female")) n += Number(v) || 0;
+      if (kind === "male" && key.includes("male") && !key.includes("female")) n += Number(v) || 0;
+    }
+    return n;
+  }
+
+  function renderBars(containerId, obj, cls) {
+    const el = document.getElementById(containerId);
+    const entries = Object.entries(obj || {}).filter(([, v]) => Number(v) >= 0);
+    if (!entries.length) { el.innerHTML = '<div class="empty">No data.</div>'; return; }
+    const max = Math.max(...entries.map(([, v]) => Number(v) || 0), 1);
+    const palette = ["", "g", "a"];
+    el.innerHTML = entries
+      .sort((a, b) => b[1] - a[1])
+      .map(([k, v], i) => {
+        const pct = Math.round(((Number(v) || 0) / max) * 100);
+        const color = cls || palette[i % palette.length];
+        return `<div class="bar-row"><span title="${k}">${k}</span>` +
+               `<div class="bar-track"><div class="bar-fill ${color}" style="width:${pct}%"></div></div>` +
+               `<span class="bar-val">${Number(v).toLocaleString()}</span></div>`;
+      }).join("");
+  }
+
+  function renderStats(stats) {
+    const gender = stats.gender || {};
+    const total = Number(stats.totalStaff) || sum(gender) || sum(stats.departments);
+    const fem = genderCount(gender, "female");
+    const mal = genderCount(gender, "male");
+    const pct = (n) => total ? Math.round((n / total) * 100) + "%" : "—";
+
+    document.getElementById("kpi-total").textContent = total ? total.toLocaleString() : "—";
+    document.getElementById("kpi-female").textContent = fem ? fem.toLocaleString() : "—";
+    document.getElementById("kpi-female-sub").textContent = fem ? pct(fem) + " of staff" : "—";
+    document.getElementById("kpi-male").textContent = mal ? mal.toLocaleString() : "—";
+    document.getElementById("kpi-male-sub").textContent = mal ? pct(mal) + " of staff" : "—";
+    document.getElementById("kpi-dept").textContent = Object.keys(stats.departments || {}).length || "—";
+
+    renderBars("bars-gender", gender, "");
+    renderBars("bars-dept", stats.departments, "g");
+    renderBars("bars-food", stats.food, "a");
+    renderBars("bars-location", stats.locations, "");
+    renderAttending(stats.attending);
+  }
+
+  // Attending: colour Yes=green, No=red
+  function renderAttending(obj) {
+    const el = document.getElementById("bars-attending");
+    const entries = Object.entries(obj || {});
+    if (!entries.length) { el.innerHTML = '<div class="empty">No data.</div>'; return; }
+    const max = Math.max(...entries.map(([, v]) => Number(v) || 0), 1);
+    el.innerHTML = entries.sort((a, b) => b[1] - a[1]).map(([k, v]) => {
+      const key = k.toLowerCase();
+      const color = key.startsWith("y") ? "g" : (key.startsWith("n") ? "r" : "");
+      const pct = Math.round(((Number(v) || 0) / max) * 100);
+      return `<div class="bar-row"><span>${k}</span>` +
+             `<div class="bar-track"><div class="bar-fill ${color}" style="width:${pct}%"></div></div>` +
+             `<span class="bar-val">${Number(v).toLocaleString()}</span></div>`;
+    }).join("");
+  }
+
+  async function syncDashboard() {
+    if (!WEBHOOK_URL) {
+      webhookBar.classList.remove("hidden");
+      webhookHint.textContent = "Set your webhook URL first, then sync.";
+      webhookHint.className = "err";
+      return;
+    }
+    syncBtn.disabled = true;
+    syncBtn.classList.add("loading");
+    const original = syncBtn.textContent;
+    syncBtn.textContent = "⟳ Syncing…";
+    ["bars-gender", "bars-dept", "bars-food", "bars-location", "bars-attending"].forEach(id => {
+      document.getElementById(id).innerHTML = '<div class="empty">Loading from database…</div>';
+    });
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: STATS_PROMPT,
+          chatInput: STATS_PROMPT,
+          source: "qualcomm-mission-control-dashboard",
+          sessionId: "stats-" + newSession(), // isolated session, won't touch chat memory
+          timestamp: new Date().toISOString()
+        })
+      });
+      const raw = await res.text();
+      let data = raw;
+      if (raw && raw.trim()) { try { data = JSON.parse(raw); } catch { data = raw; } }
+      const replyText = parseReply(data);
+      const stats = extractJSON(typeof data === "object" && data && (data.reply || data.output) ? (data.reply || data.output) : replyText) || extractJSON(data);
+      if (!stats) {
+        ["bars-gender", "bars-dept", "bars-food", "bars-location", "bars-attending"].forEach(id => {
+          document.getElementById(id).innerHTML = '<div class="empty">Couldn\'t parse stats. Try again.</div>';
+        });
+        console.warn("Stats parse failed. Raw reply:", replyText);
+        return;
+      }
+      renderStats(stats);
+    } catch (err) {
+      ["bars-gender", "bars-dept", "bars-food", "bars-location", "bars-attending"].forEach(id => {
+        document.getElementById(id).innerHTML = '<div class="empty">Sync failed — check the webhook.</div>';
+      });
+      console.error(err);
+    } finally {
+      syncBtn.disabled = false;
+      syncBtn.classList.remove("loading");
+      syncBtn.textContent = original;
+    }
+  }
+
+  syncBtn.addEventListener("click", syncDashboard);
+  // Auto-sync once on load if a webhook is configured
+  if (WEBHOOK_URL) syncDashboard();
+</script>
+</body>
+</html>
