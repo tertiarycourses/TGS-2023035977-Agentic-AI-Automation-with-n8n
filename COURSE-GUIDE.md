@@ -63,10 +63,26 @@ flowchart TD
 
 > Whichever you choose, n8n opens at **http://localhost:5678** (self‑hosted) or your cloud URL. On first launch, create the **owner account** (email + password) — this is local to your instance.
 
-#### Option A — n8n Cloud (zero install)
-1. Sign up at https://n8n.io → **Get started** → create a workspace.
-2. Your editor opens in the browser at a `…app.n8n.cloud` URL. Skip to **0.3**.
-   *(Webhook/Production URLs will use your cloud domain instead of `localhost`.)*
+#### Option A — n8n Cloud (zero install — recommended for beginners)
+Nothing to install, nothing to keep running on your laptop — your workflows, credentials, and data tables all live in the cloud.
+
+1. Go to **https://n8n.io** and click **Get started for free** (a free trial — no credit card needed to start).
+2. **Sign up** with your email (or Google / GitHub). If you used email, open the confirmation mail and click the verify link.
+3. Pick a **workspace/instance name** and a **region** — choose the one closest to you (e.g. an Asia/Singapore region) for lower latency.
+4. n8n provisions your instance (≈30–60 s) and opens the **editor** at a URL like `https://<your-workspace>.app.n8n.cloud`. **Bookmark it** — this is where you build every workflow.
+5. Skip or complete the short onboarding survey. You'll land on the **Workflows** screen (empty for now).
+6. Your public **Production / Webhook URLs** will look like `https://<your-workspace>.app.n8n.cloud/webhook/…` (you'll paste these into the web pages in Activities 3–5).
+
+> **Test vs Production URL:** while building, each trigger has a **Test URL** that only works while you click **Listen for test event**. Once you toggle the workflow **Active**, use the **Production URL**. Skip to **0.3** to add your API keys.
+
+```mermaid
+flowchart LR
+    A["n8n.io →<br/>Get started for free"] --> B["Sign up + verify email"]
+    B --> C["Name workspace<br/>+ pick region"]
+    C --> D["Instance provisions<br/>(~1 min)"]
+    D --> E["Editor opens at<br/>your-workspace.app.n8n.cloud"]
+    E --> F["Add credentials (0.3)<br/>+ start building"]
+```
 
 #### Option B — npx / npm (local, needs Node.js 18+)
 First install **Node.js LTS** (≥ 18) from https://nodejs.org. Check it: `node -v`.
@@ -85,7 +101,7 @@ Open **http://localhost:5678** and create your owner account. Stop n8n with **Ct
 #### Option C — Docker (local, reproducible)
 First install **Docker Desktop** from https://www.docker.com/products/docker-desktop. Check it: `docker --version`.
 
-A ready‑made compose file is provided in the **[`n8n-installation/`](../n8n-installation/)** folder:
+A ready‑made compose file is provided in the **[`n8n-installation/`](n8n-installation/)** folder:
 
 ```yaml
 # n8n-installation/docker-compose.yml
@@ -157,6 +173,12 @@ Reference export: `Activity1a_ Design a Flyer with n8n form embedded.json`
 
 **Workflow shape:** `On form submission (Form Trigger)` → `Send a message (Gmail)`
 
+```mermaid
+flowchart LR
+    F["📝 On form submission<br/>(Form Trigger)"] --> G["📧 Send a message<br/>(Gmail)"]
+    G --> M(["📨 Email lands<br/>in your inbox"])
+```
+
 #### Steps
 1. **Create a new workflow** → name it `Activity 1a – Flyer Form`.
 2. **Add the trigger:** click **＋ → On form submission** (the n8n **Form Trigger**).
@@ -209,6 +231,13 @@ Reference export: `Activity1b_ Improved Flyer with Conditonal Route.json`
 
 **Workflow shape:** `On form submission` → `IF` → (true) `Send a message` / (false) `No Operation`
 
+```mermaid
+flowchart LR
+    F["📝 On form submission"] --> IF{"IF<br/>attending = Yes?"}
+    IF -->|"true"| G["📧 Send a message<br/>(Gmail)"]
+    IF -->|"false"| N["⛔ No Operation<br/>(do nothing)"]
+```
+
 #### Steps
 1. Duplicate Activity 1a (or start fresh) → name it `Activity 1b – Conditional`.
 2. **Update the form** (Form Trigger):
@@ -254,6 +283,15 @@ Reference export: `Activity1b_ Improved Flyer with Conditonal Route.json`
 Reference export: `Activity1c_ Improved Flyer with Data Table.json`
 
 **Workflow shape:** `On form submission` → `IF` → true → `Insert row (Attending = true)` → `Send a message`; false → `Insert row1 (Attending = false)`
+
+```mermaid
+flowchart LR
+    F["📝 On form submission"] --> IF{"IF<br/>attending = Yes?"}
+    IF -->|"true"| R1["🗄️ Insert row<br/>Attending = true"] --> G["📧 Send a message"]
+    IF -->|"false"| R0["🗄️ Insert row1<br/>Attending = false"]
+    R1 -.-> DB[("📊 Bowling Party<br/>Data Table")]
+    R0 -.-> DB
+```
 
 #### Steps
 1. **Create the Data Table first:**
@@ -307,6 +345,16 @@ When chat message received (Chat Trigger) ─▶ AI Agent ─▶ (reply)
                                               └─ Get row(s) in Data table (employee data tool)
 ```
 
+```mermaid
+flowchart TD
+    C["💬 When chat message received<br/>(Chat Trigger)"] --> A["🤖 AI Agent"]
+    A --> R(["💬 reply"])
+    LM["🧠 OpenAI Chat Model<br/>(the brain)"] --- A
+    MEM["💭 Simple Memory<br/>(conversation history)"] --- A
+    T1["🔎 Search in Tavily<br/>(web search tool)"] --- A
+    T2["🗄️ Get row(s) in Data table<br/>(employee data tool)"] --- A
+```
+
 #### Prerequisite: an employee data table
 Create a Data Table named **`Mock Employee Data`** with a handful of rows and columns such as `Name`, `Gender`, `Department`, `Role`, `Location`, `Food`, `Attending`. (Activities 2–4 all query this table.)
 
@@ -354,6 +402,17 @@ Webhook (POST) ─▶ AI Agent ─▶ Respond to Webhook
                    ├─ OpenAI Chat Model
                    ├─ Search in Tavily
                    └─ Get row(s) in Data table
+```
+
+```mermaid
+flowchart LR
+    P(["🌐 Web page<br/>index.html"]) -->|"POST { message }"| W["🔗 Webhook (POST)<br/>CORS = *"]
+    W --> A["🤖 AI Agent"]
+    A --> RW["↩️ Respond to Webhook<br/>{ reply }"]
+    RW -->|"JSON reply"| P
+    LM["🧠 OpenAI Chat Model"] --- A
+    T1["🔎 Search in Tavily"] --- A
+    T2["🗄️ Get row(s) in Data table"] --- A
 ```
 
 #### Part A — Build the webhook workflow in n8n
@@ -415,6 +474,28 @@ CHAT (query):
                      ├─ Get row(s) in Data table      (employee data)
                      ├─ Query Data Tool (Vector Store, retrieve "sop")  (SOP knowledge)
                      └─ Search in Tavily              (web fallback)
+```
+
+```mermaid
+flowchart TD
+    subgraph ING["📥 Ingestion (upload)"]
+      direction LR
+      U(["📄 Upload SOP.docx"]) --> W1["🔗 Webhook1 (POST)"]
+      W1 --> VS["🧠 Simple Vector Store<br/>Insert · key sop"]
+      EMB["Embeddings OpenAI"] --- VS
+      DL["Default Data Loader<br/>(reads the file)"] --- VS
+    end
+    subgraph CHAT["💬 Chat (query)"]
+      direction LR
+      P(["🌐 Web page"]) --> W2["🔗 Webhook (POST)"]
+      W2 --> A["🤖 AI Agent"]
+      A --> RW["↩️ Respond to Webhook"]
+      RW --> P
+      LM["🧠 OpenAI Chat Model"] --- A
+      QT["📚 Query Data Tool<br/>retrieve · key sop"] --- A
+      DT["🗄️ Data table (employees)"] --- A
+    end
+    VS -. "fills the SOP store" .-> QT
 ```
 
 #### Part A — Build the ingestion flow (file → vector store)
