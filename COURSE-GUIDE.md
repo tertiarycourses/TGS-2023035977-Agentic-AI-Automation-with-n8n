@@ -479,6 +479,8 @@ Reference export: `Activity5-MultiAgents.json` · Web page: `index.html` (HR | I
 Sample docs to upload: `Qualcomm-HR-SOP.docx`, `Qualcomm-IT-Support-FAQ.docx`
 Sample data to import: `mock-hr-employees.csv`, `mock-it-tickets.csv`
 
+🔗 **Live demo:** https://tertiarycourses.github.io/TGS-2023035977-Agentic-AI-Automation-with-n8n/ — the hosted HR | IT dashboard. Open it, click **⚙️**, paste your own n8n webhook URLs, and it talks to *your* workflow (nothing is hard-coded). Deployed automatically from `activity5-multi-agents/index.html` via GitHub Actions ([`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml)).
+
 In this build each specialist has **its own data table** and **its own document knowledge base**:
 
 | Side | Data Table (structured) | Doc knowledge base (RAG) | Upload webhook |
