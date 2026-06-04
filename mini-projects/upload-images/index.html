@@ -29,7 +29,7 @@
     }
     .card {
       width: 100%;
-      max-width: 440px;
+      max-width: 460px;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 20px;
@@ -40,6 +40,31 @@
     .emoji { font-size: 40px; }
     h1 { margin: 10px 0 6px; font-size: 24px; letter-spacing: -0.02em; }
     p.sub { margin: 0 0 22px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .field { text-align: left; margin: 0 0 16px; }
+    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .row { display: flex; gap: 8px; }
+    input[type="text"] {
+      flex: 1;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 11px 13px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+    input[type="text"]:focus { outline: none; border-color: var(--accent); }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button:hover { filter: brightness(1.08); }
     .qr {
       background: #fff;
       border-radius: 16px;
@@ -47,24 +72,29 @@
       display: inline-block;
       line-height: 0;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+      min-width: 272px;
+      min-height: 272px;
     }
-    .qr img { width: 240px; height: 240px; display: block; }
-    .hint { margin: 18px 0 22px; color: var(--muted); font-size: 13px; }
+    .qr img, .qr canvas { width: 240px !important; height: 240px !important; display: block; }
+    .qr .placeholder { color: #64748b; font-size: 13px; line-height: 240px; }
+    .hint { margin: 16px 0 18px; color: var(--muted); font-size: 13px; }
     .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    a.btn {
+    a.btn, button.linklike {
       text-decoration: none;
       display: inline-block;
-      padding: 12px 20px;
+      padding: 12px 18px;
       border-radius: 12px;
       font-size: 14px;
       font-weight: 600;
     }
     a.primary { background: var(--accent); color: #fff; }
     a.primary:hover { filter: brightness(1.08); }
-    a.secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
-    a.secondary:hover { border-color: var(--accent); }
+    a.secondary, button.linklike {
+      background: var(--panel-2); color: var(--text); border: 1px solid var(--border); cursor: pointer;
+    }
+    a.secondary:hover, button.linklike:hover { border-color: var(--accent); }
     .url {
-      margin-top: 18px;
+      margin-top: 16px;
       font-size: 12px;
       color: var(--muted);
       word-break: break-all;
@@ -91,23 +121,83 @@
     <span class="badge">n8n · Issue Reporting</span>
     <div class="emoji">🛠️</div>
     <h1>Report an Issue</h1>
-    <p class="sub">Scan the QR code with your phone camera to open the submission form.
-      Add your name, a photo, a short summary, and the date.</p>
+    <p class="sub">Paste your n8n <strong>form production URL</strong> to generate a QR code.
+      People scan it with their phone camera to open the submission form.</p>
 
-    <div class="qr">
-      <img src="form-qr.png" alt="QR code linking to the issue reporting form" />
+    <div class="field">
+      <label for="formUrl">Form production URL</label>
+      <div class="row">
+        <input id="formUrl" type="text"
+               placeholder="https://YOUR-N8N/form/&lt;id&gt;" />
+        <button id="genBtn">Generate</button>
+      </div>
     </div>
 
-    <p class="hint">📷 Point your camera here — or tap the button below on this device.</p>
+    <div class="qr" id="qr"><span class="placeholder">QR appears here</span></div>
+
+    <p class="hint">📷 Point your camera at the code — or tap the button below on this device.</p>
 
     <div class="actions">
-      <a class="primary"
-         href="https://n8n.srv923061.hstgr.cloud/form/1fb86042-810c-4361-afe6-560506518116"
-         target="_blank" rel="noopener">Open the Form</a>
-      <a class="secondary" href="gallery.html">View Reports</a>
+      <a class="btn primary" id="openForm" href="#" target="_blank" rel="noopener">Open the Form</a>
+      <button class="linklike" id="downloadBtn">Download QR</button>
+      <a class="btn secondary" href="gallery.html">View Reports</a>
     </div>
 
-    <div class="url">https://n8n.srv923061.hstgr.cloud/form/1fb86042-810c-4361-afe6-560506518116</div>
+    <div class="url" id="urlText">—</div>
   </div>
+
+  <!-- QR generator (client-side, no build step) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const STORAGE_KEY = "issueFormUrl";
+    const DEFAULT_URL = "https://n8n.srv923061.hstgr.cloud/form/1fb86042-810c-4361-afe6-560506518116";
+
+    $("formUrl").value = localStorage.getItem(STORAGE_KEY) || DEFAULT_URL;
+
+    function generate() {
+      const url = $("formUrl").value.trim();
+      const box = $("qr");
+      box.innerHTML = "";
+
+      if (!url) {
+        box.innerHTML = '<span class="placeholder">Enter a URL first</span>';
+        return;
+      }
+      if (typeof QRCode === "undefined") {
+        box.innerHTML = '<span class="placeholder">QR library failed to load.<br>Check your connection.</span>';
+        return;
+      }
+
+      new QRCode(box, {
+        text: url,
+        width: 240,
+        height: 240,
+        colorDark: "#0b1120",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H,
+      });
+
+      localStorage.setItem(STORAGE_KEY, url);
+      $("openForm").href = url;
+      $("urlText").textContent = url;
+    }
+
+    function downloadQR() {
+      const canvas = $("qr").querySelector("canvas");
+      if (!canvas) { alert("Generate a QR code first."); return; }
+      const a = document.createElement("a");
+      a.href = canvas.toDataURL("image/png");
+      a.download = "form-qr.png";
+      a.click();
+    }
+
+    $("genBtn").addEventListener("click", generate);
+    $("downloadBtn").addEventListener("click", downloadQR);
+    $("formUrl").addEventListener("keydown", (e) => { if (e.key === "Enter") generate(); });
+
+    // Generate on load using the saved/default URL.
+    window.addEventListener("load", generate);
+  </script>
 </body>
 </html>

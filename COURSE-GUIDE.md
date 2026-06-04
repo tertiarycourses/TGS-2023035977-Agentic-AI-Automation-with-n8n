@@ -813,9 +813,9 @@ All files live in `mini-projects/upload-images/`:
 | `upload-image-postgressql.json` | **Submission** workflow — Form → Image‑to‑Base64 → INSERT into Postgres. |
 | `issue-reports-api.json` | **Retrieval** workflow — `GET /webhook/issue-reports` returns all reports as JSON (images as base64 data URIs). |
 | `schema.sql` | Postgres table the workflows read/write. |
-| `index.html` | Landing page with the **QR code** + buttons to the form and gallery. |
+| `index.html` | Landing page — type your form URL to **generate a QR code in‑browser**, plus buttons to the form and gallery. |
 | `gallery.html` | Reads the API and renders the reports in a grid with a click‑to‑zoom lightbox. |
-| `form-qr.png` / `form-qr.svg` | QR code pointing to the form. |
+| `form-qr.png` / `form-qr.svg` | Pre‑generated sample QR (optional — `index.html` now makes one from your own URL). |
 
 ```
   Scan QR ▶ n8n Form ─▶ Image→Base64 ─▶ INSERT ─▶ Postgres (issue_reports, image as BYTEA)
@@ -906,14 +906,10 @@ Import `issue-reports-api.json` and re‑select the Postgres credential. The cha
 <a name="mini-issue-frontend"></a>
 ### M.4 QR code, landing page & gallery
 
-1. **Landing page** — open `index.html`. It shows a **QR code** (`form-qr.png`) that points to the form URL, plus **Open the Form** and **View Reports** buttons. Print or project it so people can scan to report an issue. (To point the QR at your own form, regenerate it — see the tip below.)
+1. **Landing page** — open `index.html`. **Paste your form's Production URL** (from M.2) into the **Form production URL** box and click **Generate** — the **QR code is created live in the browser** (no tools to install). The **Open the Form** button and the URL underneath update to match, and your URL is remembered for next time. Use **Download QR** to save a PNG for a printed flyer, or just project the page so people can scan it.
 2. **Gallery** — open `gallery.html`. The API URL box is pre‑filled; set it to your `…/webhook/issue-reports`, click **Save URL** then **Load Reports**. Submitted issues appear as cards (name, date, summary, photo); click an image to enlarge it.
 
-> **Regenerate the QR for your own form URL** (Python, no system tools needed):
-> ```bash
-> pip install segno
-> python -c "import segno; segno.make('https://YOUR-N8N/form/<id>', error='h').save('mini-projects/upload-images/form-qr.png', scale=10, border=4)"
-> ```
+> The QR is generated client‑side with the **qrcodejs** library (loaded from a CDN), so the page needs an internet connection the first time you open it. Whatever URL you type is encoded directly into the QR — point it at *your* n8n form, not the sample.
 
 **Key concepts:** **file uploads** through a Form Trigger, **binary ↔ base64** conversion, storing images in a Postgres **`BYTEA`** column (`decode`/`encode`), a **parameterised SQL insert**, a **CORS‑enabled JSON API** with a Code node guard for empty results, and a decoupled **HTML front end** (QR landing page + gallery) — the same web‑UI pattern from Activities 3–5.
 

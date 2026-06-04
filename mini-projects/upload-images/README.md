@@ -24,6 +24,7 @@ companion API + gallery page lets you **retrieve and view them later**.
 | [upload-image-postgressql.json](upload-image-postgressql.json) | **Submission** workflow — the n8n form that writes a report + image into Postgres. |
 | [issue-reports-api.json](issue-reports-api.json) | **Retrieval** workflow — a `GET /webhook/issue-reports` API returning all reports (images as base64 data URIs). |
 | [schema.sql](schema.sql) | Postgres table (`issue_reports`) the workflows read/write. |
+| [index.html](index.html) | Landing page — paste your form URL to **generate a QR code in the browser**, with buttons to the form and gallery. |
 | [gallery.html](gallery.html) | A standalone page that calls the API and shows the reports in a grid with a lightbox. |
 
 ---
@@ -77,9 +78,15 @@ Both ship with a credential reference named **"Supabase Postgres"**. Open each P
 
 ## Usage
 
+### Share the form with a QR code
+Open [index.html](index.html), paste your form's **Production URL** into the box, and click
+**Generate** — a QR code is created right in the browser. The **Open the Form** button and the
+URL update to match, and **Download QR** saves a PNG for a printed flyer. (Needs an internet
+connection on first open, as it loads the `qrcodejs` library from a CDN.)
+
 ### Submit an issue
-Open the form URL, fill in **Name**, **Issue Summary**, **Date**, attach an **Image**
-(`.jpg/.png/.gif/.webp`), and submit. You'll see a confirmation with the new report number.
+Scan the QR (or open the form URL), fill in **Name**, **Issue Summary**, **Date**, attach an
+**Image** (`.jpg/.png/.gif/.webp`), and submit. You'll see a confirmation with the new report number.
 
 ### View the reports
 Open [gallery.html](gallery.html) in a browser (double-click, or serve it). The Reports API URL
