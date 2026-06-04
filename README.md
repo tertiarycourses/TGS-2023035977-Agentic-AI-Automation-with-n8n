@@ -14,6 +14,12 @@
 
 </div>
 
+> [!NOTE]
+> **These are the official hands-on lab materials for the WSQ course:**
+> ### 🎓 WSQ — Agentic AI Automation with n8n
+> **Course Code:** `TGS-2023035977` · by Tertiary Courses / Tertiary Infotech
+> **Course page:** https://www.tertiarycourses.com.sg/wsq-agentic-ai-automation-with-n8n.html
+
 ---
 
 ## Screenshot
