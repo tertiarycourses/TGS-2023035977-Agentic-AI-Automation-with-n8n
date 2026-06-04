@@ -825,6 +825,18 @@ All files live in `mini-projects/upload-images/`:
 
 > **Why Postgres here (not a Data Table)?** Data Tables are great for plain rows, but storing the **binary image** alongside the text is exactly what a real database column (`BYTEA`) is for. This mini‑project shows the round‑trip: encode on the way in, decode on the way out.
 
+#### Steps at a glance
+
+Do these in order — each step links to its full instructions below.
+
+1. **Create the database** — sign up at [supabase.com](https://supabase.com) → new project (save the DB password). → [M.1](#mini-issue-schema)
+2. **Create the table** — Supabase **SQL Editor** → paste `schema.sql` → **Run**. → [M.1](#mini-issue-schema)
+3. **Add the Postgres credential in n8n** — **Credentials → Add → Postgres**, enter the Supabase Host/DB/User/Password, Port `5432`, **SSL = require**. → [M.1](#mini-issue-schema)
+4. **Import the submission workflow** (`upload-image-postgressql.json`), select your credential on the Postgres node, **Activate**, and copy the **form URL**. → [M.2](#mini-issue-submit)
+5. **Import the Reports API** (`issue-reports-api.json`), select your credential, **Activate** — its URL is `…/webhook/issue-reports`. → [M.3](#mini-issue-api)
+6. **Open the front end** — print/show `index.html` (QR → form) and open `gallery.html` (set its API URL to your `…/webhook/issue-reports`). → [M.4](#mini-issue-frontend)
+7. **Test the round‑trip** — submit a report through the form, then **Load Reports** in the gallery to see the row + image. → [M.4](#mini-issue-frontend)
+
 <a name="mini-issue-schema"></a>
 ### M.1 Create the Supabase database + table
 
