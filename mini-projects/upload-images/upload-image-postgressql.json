@@ -81,7 +81,7 @@
       "credentials": {
         "postgres": {
           "id": "PmGNkdtoY4LrAdYl",
-          "name": "n8n Postgres (Local)"
+          "name": "Supabase Postgres"
         }
       }
     },

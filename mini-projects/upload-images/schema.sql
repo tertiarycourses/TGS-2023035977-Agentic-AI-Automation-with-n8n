@@ -1,8 +1,9 @@
 -- ============================================================
--- Issue Reporting flow — Postgres schema
+-- Issue Reporting flow — Postgres schema (Supabase)
 -- Run this once before activating the n8n workflows.
 --
---   psql -h localhost -U <user> -d <database> -f schema.sql
+-- On Supabase:  Dashboard -> SQL Editor -> paste this -> Run
+-- Or via psql:  psql "<your-supabase-connection-string>" -f schema.sql
 --
 -- The image is stored as a BYTEA column (raw binary). The
 -- submission workflow base64-encodes the uploaded file and

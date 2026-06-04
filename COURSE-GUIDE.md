@@ -826,30 +826,32 @@ All files live in `mini-projects/upload-images/`:
 > **Why Postgres here (not a Data Table)?** Data Tables are great for plain rows, but storing the **binary image** alongside the text is exactly what a real database column (`BYTEA`) is for. This mini‑project shows the round‑trip: encode on the way in, decode on the way out.
 
 <a name="mini-issue-schema"></a>
-### M.1 Create the Postgres table
+### M.1 Create the Supabase database + table
 
-**First, add a Postgres credential in n8n** (do this once). In n8n → top‑left menu → **Credentials → Add credential → Postgres**, then fill in your database connection:
+We use **Supabase** (free, hosted Postgres) so this works on **n8n Cloud** as well as self‑hosted n8n. (Any Postgres works — Supabase just gives you an internet‑reachable database without running your own server.)
+
+**1) Create the project & run the schema**
+
+1. Sign up at **[supabase.com](https://supabase.com)** → **New project** (pick a name and a strong **database password** — save it).
+2. Open **SQL Editor** → **New query** → paste the contents of `mini-projects/upload-images/schema.sql` → **Run**. This creates the `issue_reports` table with the `image_data BYTEA` column.
+3. Get your connection details: **Project Settings → Database → Connection info**. You'll need **Host**, **Port**, **Database**, **User**, and the **password** from step 1.
+
+**2) Add the Postgres credential in n8n** (do this once). In n8n → top‑left menu → **Credentials → Add credential → Postgres**, then fill in the Supabase values:
 
 | Field | What to enter | Example |
 |---|---|---|
-| **Host** | Database server address | `localhost`, or your cloud DB host |
-| **Database** | Database name | `n8n` |
-| **User** | DB username | `postgres` |
-| **Password** | DB password | *your password* |
+| **Host** | Supabase DB host | `db.abcdxyz.supabase.co` |
+| **Database** | Database name | `postgres` |
+| **User** | DB user | `postgres` |
+| **Password** | the password you set | *your password* |
 | **Port** | Postgres port | `5432` |
-| **SSL** | `disable` for local; `require`/`allow` for most cloud DBs | `disable` |
+| **SSL** | **Supabase requires SSL** | `require` |
 
-> 💡 **No database yet?** Quick options: **Docker** — `docker run --name pg -e POSTGRES_PASSWORD=pass -p 5432:5432 -d postgres` (then Host `localhost`, User `postgres`, Password `pass`); or a free cloud Postgres from **Supabase**, **Neon**, or **Railway** (copy the Host/User/Password/Port from their dashboard, set **SSL = require**). If your n8n runs in Docker and Postgres on your host machine, use Host `host.docker.internal` instead of `localhost`.
+> 💡 **Host gotcha:** Supabase shows two hosts — a **direct** one (`db.<ref>.supabase.co`, port `5432`) and a **pooler** (`...pooler.supabase.com`, port `6543`). For n8n's Postgres node use the **direct host on `5432`** with **SSL = require**. (Prefer the **Session pooler** only if your network has no IPv6 — it also works on `5432`.)
 
-Click **Save** — n8n tests the connection and shows a green tick when it can reach the database. You'll pick this credential inside every Postgres node below.
+Click **Save** — n8n tests the connection and shows a green tick when it can reach Supabase. You'll pick this credential inside every Postgres node below.
 
-Now run the schema once against that same database:
-
-```bash
-psql -h <host> -U <user> -d <database> -f mini-projects/upload-images/schema.sql
-```
-
-It creates `issue_reports` with an `image_data BYTEA` column:
+The schema you ran creates `issue_reports` with an `image_data BYTEA` column:
 
 | column | type | from |
 |---|---|---|

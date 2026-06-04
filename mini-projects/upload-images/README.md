@@ -30,31 +30,48 @@ companion API + gallery page lets you **retrieve and view them later**.
 
 ## Setup
 
-### 1. Create the table
+> This project uses **Supabase** (hosted Postgres) so it works with **n8n Cloud** as well as
+> self-hosted n8n. Any Postgres database works — just point the credential at it.
 
-Run the schema once against the same Postgres database your n8n Postgres credential points to:
+### 1. Create a Supabase project + the table
 
-```bash
-psql -h localhost -U <user> -d <database> -f schema.sql
-```
+1. Create a free project at [supabase.com](https://supabase.com).
+2. Open **SQL Editor**, paste the contents of [schema.sql](schema.sql), and click **Run**.
+   This creates the `issue_reports` table (with the `image_data BYTEA` column).
+3. Grab your connection details from **Project Settings ▸ Database ▸ Connection info**:
+   `Host`, `Port` (`5432`), `Database` (`postgres`), `User` (`postgres`), and your password.
 
-### 2. Import the workflows into n8n
+### 2. Add the Postgres (Supabase) credential in n8n
+
+**Credentials ▸ Add credential ▸ Postgres**, then enter the Supabase values:
+
+| Field | Value |
+|-------|-------|
+| **Host** | `db.<your-ref>.supabase.co` |
+| **Database** | `postgres` |
+| **User** | `postgres` |
+| **Password** | your Supabase DB password |
+| **Port** | `5432` |
+| **SSL** | `require` ← **Supabase requires SSL** |
+
+Click **Save** — n8n tests the connection (green tick = good).
+
+### 3. Import the workflows into n8n
 
 In n8n: **Workflows ▸ Import from File** for each of:
 
 - `upload-image-postgressql.json`
 - `issue-reports-api.json`
 
-Both ship with a Postgres credential reference named **"n8n Postgres (Local)"**. Open each
-Postgres node and select (or re-create) your own Postgres credential if it differs.
+Both ship with a credential reference named **"Supabase Postgres"**. Open each Postgres node and
+**select the credential you created in step 2** (the imported credential ID won't match yours).
 
-### 3. Activate
+### 4. Activate
 
 - Open **Issue Reporting - Submit to Postgres** → click the **form trigger** node → copy the
-  **Production URL** (e.g. `http://localhost:5678/form/<id>`). **Activate** the workflow.
+  **Production URL** (e.g. `https://YOUR-N8N/form/<id>`). **Activate** the workflow.
 - Open **Issue Reporting - Reports API** → **Activate** it. Its production URL is
-  `https://n8n.srv923061.hstgr.cloud/webhook/issue-reports` (or
-  `http://localhost:5678/webhook/issue-reports` for a local n8n).
+  `https://YOUR-N8N/webhook/issue-reports`.
 
 ---
 
