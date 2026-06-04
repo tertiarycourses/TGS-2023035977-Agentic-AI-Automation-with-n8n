@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Issue Reports — Gallery</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --panel: #111a2e;
+      --panel-2: #16223c;
+      --border: #233149;
+      --text: #e6ecf7;
+      --muted: #8aa0c2;
+      --accent: #4f8cff;
+      --accent-2: #34d399;
+      --danger: #f87171;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 80% -10%, #16223c 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      padding: 28px 24px 12px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    h1 { margin: 0 0 6px; font-size: 26px; letter-spacing: -0.02em; }
+    .sub { color: var(--muted); font-size: 14px; }
+    .toolbar {
+      max-width: 1100px;
+      margin: 18px auto 0;
+      padding: 0 24px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    input[type="text"] {
+      flex: 1 1 420px;
+      min-width: 240px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 11px 13px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    input[type="text"]:focus { outline: none; border-color: var(--accent); }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(1.08); }
+    button.secondary { background: var(--panel-2); border: 1px solid var(--border); }
+    .status { max-width: 1100px; margin: 14px auto 0; padding: 0 24px; color: var(--muted); font-size: 14px; min-height: 20px; }
+    .grid {
+      max-width: 1100px;
+      margin: 18px auto 60px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .card .imgwrap {
+      aspect-ratio: 4 / 3;
+      background: #0a0f1d;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .card img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
+    .card .noimg { color: var(--muted); font-size: 13px; }
+    .card .body { padding: 14px 15px 16px; }
+    .card .name { font-weight: 700; font-size: 15px; }
+    .card .meta { color: var(--muted); font-size: 12px; margin: 3px 0 10px; }
+    .card .summary { font-size: 14px; line-height: 1.45; color: #cdd9 ; color: #cdd9ee; }
+    .badge {
+      display: inline-block; background: var(--panel-2); border: 1px solid var(--border);
+      color: var(--accent-2); font-size: 11px; padding: 2px 8px; border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    .empty { text-align: center; color: var(--muted); padding: 50px 0; }
+    /* lightbox */
+    .lightbox {
+      position: fixed; inset: 0; background: rgba(3, 7, 18, 0.88);
+      display: none; align-items: center; justify-content: center; padding: 30px; z-index: 50;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 92vw; max-height: 88vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🛠️ Issue Reports</h1>
+    <div class="sub">Reports submitted via the n8n form, with images pulled back from Postgres.</div>
+  </header>
+
+  <div class="toolbar">
+    <input id="apiUrl" type="text"
+           placeholder="Reports API webhook URL, e.g. https://n8n.srv923061.hstgr.cloud/webhook/issue-reports" />
+    <button id="loadBtn">Load Reports</button>
+    <button id="saveBtn" class="secondary" title="Remember this URL in your browser">Save URL</button>
+  </div>
+
+  <div class="status" id="status"></div>
+  <div class="grid" id="grid"></div>
+
+  <div class="lightbox" id="lightbox"><img id="lightboxImg" alt="" /></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const STORAGE_KEY = "issueReportsApiUrl";
+
+    // Restore saved URL, or default to the hosted n8n webhook.
+    $("apiUrl").value =
+      localStorage.getItem(STORAGE_KEY) ||
+      "https://n8n.srv923061.hstgr.cloud/webhook/issue-reports";
+
+    function esc(s) {
+      return String(s ?? "").replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    function render(reports) {
+      const grid = $("grid");
+      grid.innerHTML = "";
+      if (!reports.length) {
+        grid.innerHTML = '<div class="empty">No reports yet. Submit one through the n8n form.</div>';
+        return;
+      }
+      for (const r of reports) {
+        const card = document.createElement("div");
+        card.className = "card";
+        const img = r.image_data_uri
+          ? `<div class="imgwrap"><img src="${r.image_data_uri}" alt="${esc(r.image_filename)}" loading="lazy"></div>`
+          : `<div class="imgwrap"><span class="noimg">No image</span></div>`;
+        card.innerHTML = `
+          ${img}
+          <div class="body">
+            <span class="badge">#${esc(r.id)} · ${esc(r.report_date)}</span>
+            <div class="name">${esc(r.reporter_name)}</div>
+            <div class="meta">${esc(r.image_filename || "")}</div>
+            <div class="summary">${esc(r.issue_summary)}</div>
+          </div>`;
+        const imgEl = card.querySelector("img");
+        if (imgEl) imgEl.addEventListener("click", () => openLightbox(imgEl.src));
+        grid.appendChild(card);
+      }
+    }
+
+    async function load() {
+      const url = $("apiUrl").value.trim();
+      if (!url) { $("status").textContent = "Enter the Reports API webhook URL first."; return; }
+      $("status").textContent = "Loading…";
+      $("grid").innerHTML = "";
+      try {
+        const res = await fetch(url, { method: "GET" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        // Tolerate an empty body (e.g. zero rows) — treat it as no reports.
+        const text = (await res.text()).trim();
+        const data = text ? JSON.parse(text) : { reports: [] };
+        const reports = Array.isArray(data) ? data : (data.reports || []);
+        render(reports);
+        $("status").textContent = `Loaded ${reports.length} report(s).`;
+      } catch (e) {
+        $("status").innerHTML =
+          `<span style="color:var(--danger)">Failed to load: ${esc(e.message)}.</span> ` +
+          `Make sure the "Issue Reporting - Reports API" workflow is active and CORS is allowed.`;
+      }
+    }
+
+    function openLightbox(src) {
+      $("lightboxImg").src = src;
+      $("lightbox").classList.add("open");
+    }
+
+    $("loadBtn").addEventListener("click", load);
+    $("saveBtn").addEventListener("click", () => {
+      localStorage.setItem(STORAGE_KEY, $("apiUrl").value.trim());
+      $("status").textContent = "URL saved in this browser.";
+    });
+    $("lightbox").addEventListener("click", () => $("lightbox").classList.remove("open"));
+    $("apiUrl").addEventListener("keydown", (e) => { if (e.key === "Enter") load(); });
+
+    // Auto-load on open if we have a URL.
+    if ($("apiUrl").value) load();
+  </script>
+</body>
+</html>

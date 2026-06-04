@@ -1,0 +1,154 @@
+{
+  "name": "Issue Reporting - Submit to Postgres",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Report an Issue",
+        "formDescription": "Fill in your details, describe the issue, and attach a photo. Your report and image are stored in Postgres for review later.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "placeholder": "e.g. Alfred Ang",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Issue Summary",
+              "fieldType": "textarea",
+              "placeholder": "Briefly describe the issue you are reporting",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Date",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Image",
+              "fieldType": "file",
+              "acceptFileTypes": ".jpg,.jpeg,.png,.gif,.webp",
+              "multipleFiles": false,
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "buttonLabel": "Submit Report"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "db75e6b9-25ab-47a6-ae64-49018c15f661",
+      "name": "On form submission",
+      "webhookId": "fc5f56cf-44ba-4b8c-b119-902a56ffd863"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToProperty",
+        "binaryPropertyName": "Image",
+        "destinationKey": "image_base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "a1b2c3d4-1111-4a22-9e33-aaaa00001111",
+      "name": "Image to Base64"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO issue_reports\n  (reporter_name, issue_summary, report_date, image_filename, image_mimetype, image_data)\nVALUES\n  ($1, $2, $3, $4, $5, decode($6, 'base64'))\nRETURNING id, reporter_name, report_date, created_at;",
+        "options": {
+          "queryReplacement": "={{ [ $('On form submission').item.json['Name'], $('On form submission').item.json['Issue Summary'], $('On form submission').item.json['Date'], $('On form submission').item.binary['Image'].fileName, $('On form submission').item.binary['Image'].mimeType, $json['image_base64'] ] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        440,
+        0
+      ],
+      "id": "f0070bac-dfa8-4d40-9663-13ed2022ab91",
+      "name": "Insert Issue Report",
+      "credentials": {
+        "postgres": {
+          "id": "PmGNkdtoY4LrAdYl",
+          "name": "n8n Postgres (Local)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "respondWith": "showText",
+        "completionTitle": "Thanks — your issue was reported ✅",
+        "completionMessage": "=Report #{{ $json.id }} saved on {{ $json.report_date }}. We'll review it shortly.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        660,
+        0
+      ],
+      "id": "b2c3d4e5-2222-4b33-9f44-bbbb00002222",
+      "name": "Show Confirmation"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Image to Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image to Base64": {
+      "main": [
+        [
+          {
+            "node": "Insert Issue Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Issue Report": {
+      "main": [
+        [
+          {
+            "node": "Show Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f0139a03-58b3-479e-884c-a3fbb9047b25",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dd9d815cb100cab73a9cd63cc3f30fd090e73e9edbdc09a51a025bdf1bf015af"
+  },
+  "id": "62jgEPYIbGktcmvF",
+  "tags": []
+}

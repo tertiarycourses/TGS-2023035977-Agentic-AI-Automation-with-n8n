@@ -29,8 +29,13 @@ This guide walks you through every hands‑on activity in the course. Each activ
    - [5.5 — Build the IT Support agent](#activity-5-it)
    - [5.6 — Ingestion: upload HR SOP + IT FAQ](#activity-5-ingest)
    - [5.7 — Connect the web page & test routing](#activity-5-test)
-7. [Troubleshooting Cheat‑Sheet](#troubleshooting)
-8. [Glossary](#glossary)
+7. [Mini‑Project — Issue Reporting (Form + Image → Postgres)](#mini-issue-reporting)
+   - [M.1 — Create the Postgres table](#mini-issue-schema)
+   - [M.2 — Build the submission flow (Form → Postgres)](#mini-issue-submit)
+   - [M.3 — Build the Reports API (Webhook → JSON)](#mini-issue-api)
+   - [M.4 — QR code, landing page & gallery](#mini-issue-frontend)
+8. [Troubleshooting Cheat‑Sheet](#troubleshooting)
+9. [Glossary](#glossary)
 
 ---
 
@@ -796,6 +801,110 @@ curl -s -X POST https://YOUR-N8N/webhook/chatbot \
 
 ---
 
+<a name="mini-issue-reporting"></a>
+## Mini‑Project — Issue Reporting (Form + Image → Postgres)
+
+A small, self‑contained app that ties together a **form**, a **database**, and a **custom web UI** — the perfect capstone after the activities. Users scan a **QR code**, submit an **issue report** (name, photo, summary, date) through an n8n form, and the report **plus the uploaded image** are stored in **Postgres**. A second workflow exposes a **JSON API** so a **gallery page** can read the reports back and display the images.
+
+All files live in `mini-projects/upload-images/`:
+
+| File | Role |
+|---|---|
+| `upload-image-postgressql.json` | **Submission** workflow — Form → Image‑to‑Base64 → INSERT into Postgres. |
+| `issue-reports-api.json` | **Retrieval** workflow — `GET /webhook/issue-reports` returns all reports as JSON (images as base64 data URIs). |
+| `schema.sql` | Postgres table the workflows read/write. |
+| `index.html` | Landing page with the **QR code** + buttons to the form and gallery. |
+| `gallery.html` | Reads the API and renders the reports in a grid with a click‑to‑zoom lightbox. |
+| `form-qr.png` / `form-qr.svg` | QR code pointing to the form. |
+
+```
+  Scan QR ▶ n8n Form ─▶ Image→Base64 ─▶ INSERT ─▶ Postgres (issue_reports, image as BYTEA)
+                                                       │
+  gallery.html ◀── JSON (base64 images) ◀── GET /webhook/issue-reports ◀── SELECT ┘
+```
+
+> **Why Postgres here (not a Data Table)?** Data Tables are great for plain rows, but storing the **binary image** alongside the text is exactly what a real database column (`BYTEA`) is for. This mini‑project shows the round‑trip: encode on the way in, decode on the way out.
+
+<a name="mini-issue-schema"></a>
+### M.1 Create the Postgres table
+
+**First, add a Postgres credential in n8n** (do this once). In n8n → top‑left menu → **Credentials → Add credential → Postgres**, then fill in your database connection:
+
+| Field | What to enter | Example |
+|---|---|---|
+| **Host** | Database server address | `localhost`, or your cloud DB host |
+| **Database** | Database name | `n8n` |
+| **User** | DB username | `postgres` |
+| **Password** | DB password | *your password* |
+| **Port** | Postgres port | `5432` |
+| **SSL** | `disable` for local; `require`/`allow` for most cloud DBs | `disable` |
+
+> 💡 **No database yet?** Quick options: **Docker** — `docker run --name pg -e POSTGRES_PASSWORD=pass -p 5432:5432 -d postgres` (then Host `localhost`, User `postgres`, Password `pass`); or a free cloud Postgres from **Supabase**, **Neon**, or **Railway** (copy the Host/User/Password/Port from their dashboard, set **SSL = require**). If your n8n runs in Docker and Postgres on your host machine, use Host `host.docker.internal` instead of `localhost`.
+
+Click **Save** — n8n tests the connection and shows a green tick when it can reach the database. You'll pick this credential inside every Postgres node below.
+
+Now run the schema once against that same database:
+
+```bash
+psql -h <host> -U <user> -d <database> -f mini-projects/upload-images/schema.sql
+```
+
+It creates `issue_reports` with an `image_data BYTEA` column:
+
+| column | type | from |
+|---|---|---|
+| `id` | `SERIAL` | auto |
+| `reporter_name` | `TEXT` | form **Name** |
+| `issue_summary` | `TEXT` | form **Issue Summary** |
+| `report_date` | `DATE` | form **Date** |
+| `image_filename` / `image_mimetype` | `TEXT` | uploaded file metadata |
+| `image_data` | `BYTEA` | the image bytes |
+| `created_at` | `TIMESTAMPTZ` | `now()` |
+
+<a name="mini-issue-submit"></a>
+### M.2 Build the submission flow (Form → Postgres)
+
+Import `upload-image-postgressql.json`, then open each node and **re‑select your own Postgres credential** (the bundled credential ID won't exist on your instance). The three nodes:
+
+1. **On form submission** (Form Trigger) — four fields: **Name** (text), **Issue Summary** (textarea), **Date** (date), **Image** (file, accepts `.jpg/.png/.gif/.webp`). Keep the file field labelled exactly **Image**.
+2. **Image to Base64** (Extract from File → *Binary to Property*) — turns the uploaded binary into a base64 string in `image_base64`.
+3. **Insert Issue Report** (Postgres → *Execute Query*) — a parameterised insert that decodes the base64 back to bytes:
+   ```sql
+   INSERT INTO issue_reports
+     (reporter_name, issue_summary, report_date, image_filename, image_mimetype, image_data)
+   VALUES ($1, $2, $3, $4, $5, decode($6, 'base64'));
+   ```
+   The **Query Parameters** pull from the form node, e.g. `$('On form submission').item.binary['Image'].fileName` and the base64 from `$json.image_base64`.
+
+**Activate** the workflow, open the Form Trigger node, and copy the **Production form URL** (e.g. `https://YOUR-N8N/form/<id>`). Submit a test report — you should get a confirmation page with the new report number.
+
+<a name="mini-issue-api"></a>
+### M.3 Build the Reports API (Webhook → JSON)
+
+Import `issue-reports-api.json` and re‑select the Postgres credential. The chain is **Webhook (GET `/issue-reports`) → Postgres SELECT → Code → Respond to Webhook**:
+
+- The **SELECT** rebuilds each image with `encode(image_data,'base64')` into a ready‑to‑use `data:<mime>;base64,…` URI.
+- A **Code** node (Run Once for All Items) wraps the rows as `{ count, reports }` so the endpoint **always returns valid JSON — even with zero rows** (avoids the "Unexpected end of JSON input" error).
+- The Webhook has **Allowed Origins (CORS) = `*`** and the Respond node sets `Access-Control-Allow-Origin: *`, so a browser page can call it.
+
+**Activate** it. The production URL is `https://YOUR-N8N/webhook/issue-reports`.
+
+<a name="mini-issue-frontend"></a>
+### M.4 QR code, landing page & gallery
+
+1. **Landing page** — open `index.html`. It shows a **QR code** (`form-qr.png`) that points to the form URL, plus **Open the Form** and **View Reports** buttons. Print or project it so people can scan to report an issue. (To point the QR at your own form, regenerate it — see the tip below.)
+2. **Gallery** — open `gallery.html`. The API URL box is pre‑filled; set it to your `…/webhook/issue-reports`, click **Save URL** then **Load Reports**. Submitted issues appear as cards (name, date, summary, photo); click an image to enlarge it.
+
+> **Regenerate the QR for your own form URL** (Python, no system tools needed):
+> ```bash
+> pip install segno
+> python -c "import segno; segno.make('https://YOUR-N8N/form/<id>', error='h').save('mini-projects/upload-images/form-qr.png', scale=10, border=4)"
+> ```
+
+**Key concepts:** **file uploads** through a Form Trigger, **binary ↔ base64** conversion, storing images in a Postgres **`BYTEA`** column (`decode`/`encode`), a **parameterised SQL insert**, a **CORS‑enabled JSON API** with a Code node guard for empty results, and a decoupled **HTML front end** (QR landing page + gallery) — the same web‑UI pattern from Activities 3–5.
+
+---
+
 <a name="troubleshooting"></a>
 ## Troubleshooting Cheat‑Sheet
 
@@ -813,6 +922,10 @@ curl -s -X POST https://YOUR-N8N/webhook/chatbot \
 | (Activity 5) Everything routes to one agent (or nothing) | **Switch** reads the wrong path or values don't match | Use `{{ $json.output.category }}`, compare to `HR`/`IT`, set **case‑sensitive OFF**; verify the extractor outputs `category`. |
 | Form expression shows blank in email | Field label mismatch | The label inside `{{ $json["..."] }}` must match the form field **exactly**. |
 | Production URL 404s | Workflow not **Active/Published** | Toggle the workflow on; the test URL only works while "Listen for test event" is active. |
+| (Mini‑project) Gallery shows **"Unexpected end of JSON input"** | API returned an empty body (often **zero rows**) | Re‑import the latest `issue-reports-api.json` — its **Code** node always returns `{ count, reports }`; confirm the workflow is **Active**. |
+| (Mini‑project) Postgres node: **"connection refused"** / auth error | Wrong host/SSL in the credential | Check Host/Port/SSL (use `host.docker.internal` if n8n is in Docker; **SSL = require** for cloud DBs); re‑test the credential. |
+| (Mini‑project) Insert fails on the image | File field not labelled **Image** | The insert references `binary['Image']`; rename the form field to **Image** or update the **Query Parameters**. |
+| (Mini‑project) `relation "issue_reports" does not exist` | Schema not applied to the DB the credential points to | Run `schema.sql` against the **same** database as the n8n Postgres credential. |
 
 ---
 
