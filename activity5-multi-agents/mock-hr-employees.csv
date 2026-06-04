@@ -1,0 +1,37 @@
+EmployeeID,Name,Gender,Department,Role,Location,Food,Attending
+E1001,Aisha Abdullah,Female,Sales,Account Executive,Penang,No Preference,Yes
+E1002,Wei Jie Tan,Male,Engineering,Senior Engineer,Penang,Seafood,Yes
+E1003,Deepa Reddy,Female,Sales,Sales Manager,Shanghai,Halal,Yes
+E1004,Divya Goh,Female,Marketing,Marketing Specialist,Penang,Halal,Yes
+E1005,Joanne Wong,Female,Marketing,Content Lead,Shanghai,Halal,Yes
+E1006,Sanjay Wong,Male,Finance,Accountant,Shanghai,Halal,Yes
+E1007,Priya Lim,Female,HR,HR Executive,San Diego,No Preference,Yes
+E1008,Joanne Abdullah,Female,Finance,Finance Manager,San Diego,Vegetarian,Yes
+E1009,Marcus Abdullah,Male,HR,HR Manager,Singapore,Seafood,Yes
+E1010,Nadia Teo,Female,Finance,Financial Analyst,Shanghai,Vegetarian,Yes
+E1011,Ananya Lim,Female,IT,System Administrator,Hyderabad,Halal,Yes
+E1012,Ling Lee,Female,HR,Recruiter,Hyderabad,Vegan,Yes
+E1013,Jun Hao Sharma,Male,HR,HR Manager,Shanghai,Halal,No
+E1014,Faisal Sharma,Male,Sales,Sales Rep,Hyderabad,No Preference,Yes
+E1015,Hui Wen Rahman,Female,IT,IT Manager,Hyderabad,Seafood,Yes
+E1016,Bryan Teo,Male,Operations,Ops Coordinator,Shanghai,No Preference,Yes
+E1017,Cheng Wong,Male,Marketing,Content Lead,Penang,Vegan,Yes
+E1018,Haruto Rahman,Male,Operations,Operations Analyst,San Diego,Seafood,Yes
+E1019,Fatimah Rahman,Female,Operations,Operations Manager,Singapore,Seafood,Yes
+E1020,Arjun Wong,Male,Marketing,Content Lead,Penang,No Preference,Yes
+E1021,Priya Garcia,Female,IT,IT Support Engineer,Shanghai,Vegetarian,Yes
+E1022,Sanjay Rahman,Male,Marketing,Marketing Manager,Shanghai,Vegan,Yes
+E1023,Rachel Chua,Female,HR,HR Manager,San Diego,Vegan,No
+E1024,Ananya Sharma,Female,Engineering,QA Engineer,Singapore,Seafood,Yes
+E1025,Aisha Nair,Female,HR,HR Manager,Singapore,Vegetarian,Yes
+E1026,Ling Nair,Female,Operations,Operations Analyst,San Diego,Vegan,Yes
+E1027,Carmen Sharma,Female,IT,System Administrator,Hyderabad,Vegetarian,Yes
+E1028,Divya Iqbal,Female,Finance,Financial Analyst,Hyderabad,No Preference,Yes
+E1029,Joanne Goh,Female,IT,IT Support Engineer,Penang,Vegetarian,Yes
+E1030,Jun Hao Reddy,Male,Sales,Sales Manager,Hyderabad,Vegetarian,Yes
+E1031,Sanjay Wong,Male,Engineering,Software Engineer,Singapore,Vegetarian,Yes
+E1032,Diego Garcia,Male,Sales,Sales Manager,Singapore,Vegetarian,No
+E1033,Joanne Abdullah,Female,IT,System Administrator,San Diego,Vegan,No
+E1034,Grace Ng,Female,Sales,Account Executive,Shanghai,Seafood,Yes
+E1035,Wei Jie Lim,Male,Operations,Ops Coordinator,Shanghai,Seafood,Yes
+E1036,Yuki Nair,Female,IT,IT Support Engineer,Singapore,Seafood,Yes
