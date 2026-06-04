@@ -97,6 +97,9 @@
     background: rgba(255,255,255,0.14);
   }
   .tab-spacer { flex: 1; }
+  .sync-note { font-size: 11.5px; color: var(--muted); margin: -6px 0 16px; line-height: 1.5; }
+  .sync-note code { background: var(--panel); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; font-size: 11px; color: var(--accent-2); }
+  .sync-note b { color: var(--text); font-weight: 600; }
   .sync-btn {
     background: var(--panel); border: 1px solid var(--line); color: var(--text);
     border-radius: 10px; padding: 9px 14px; font-size: 12.5px; font-weight: 600;
@@ -286,8 +289,10 @@
         <button type="button" class="tab-btn hr active" data-tab="hr">🧑‍💼 HR Workforce</button>
         <button type="button" class="tab-btn it" data-tab="it">🛠️ IT Service Desk</button>
         <span class="tab-spacer"></span>
-        <button type="button" id="sync-btn" class="sync-btn"><span class="ico">⟳</span> Sync from Database</button>
+        <button type="button" id="sync-btn" class="sync-btn" title="Pulls live stats through the chatbot webhook (/webhook/chatbot) — the same endpoint the assistant uses"><span class="ico">⟳</span> Sync from Database</button>
       </div>
+
+      <div class="sync-note">ℹ️ <b>Sync</b> pulls data live through the <b>chatbot webhook</b> (<code>/webhook/chatbot</code>) — the same endpoint the assistant uses. The <b>HR</b> tab queries the <code>HR&nbsp;Employee&nbsp;Data</code> table; the <b>IT</b> tab queries the <code>IT&nbsp;Support&nbsp;Tickets</code> table.</div>
 
       <!-- ============ HR TAB ============ -->
       <div class="dash-tab active" id="tab-hr">
