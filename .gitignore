@@ -10,3 +10,14 @@
 
 # Logs / temp
 *.log
+
+# Backups
+*_backup.json
+*-backup.html
+
+# Preview / debug screenshots
+preview-*.png
+qr-check.png
+
+# Editor workspace
+*.code-workspace
