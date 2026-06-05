@@ -36,7 +36,7 @@ def add_section(doc, number, title, intro, clauses):
 doc = Document()
 
 # ---- Cover ----
-title = doc.add_heading("Qualcomm Singapore", level=0)
+title = doc.add_heading("MyCompany Singapore", level=0)
 title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 sub = doc.add_paragraph("Human Resources — Standard Operating Procedures (SOP)")
 sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -46,7 +46,7 @@ sub.runs[0].font.size = Pt(14)
 meta = doc.add_paragraph(
     "Document Owner: Human Resources Department\n"
     "Version: 1.0    |    Effective Date: 1 January 2026    |    Classification: Internal\n"
-    "Applies to: All permanent, contract, and probationary employees of Qualcomm Singapore"
+    "Applies to: All permanent, contract, and probationary employees of MyCompany Singapore"
 )
 meta.alignment = WD_ALIGN_PARAGRAPH.CENTER
 for r in meta.runs:
@@ -60,7 +60,7 @@ purpose.add_run(
     "This handbook consolidates the company's core people policies into a single reference. "
     "It is the authoritative source for the standard operating procedures listed below. "
     "Employees should consult this document first; for anything not covered here, contact "
-    "hr@qualcomm-sg.example.com."
+    "hr@mycompany-sg.example.com."
 )
 
 doc.add_heading("Contents", level=1)
@@ -157,7 +157,7 @@ add_section(
 # ---- 4. PDPA Policy ----
 add_section(
     doc, "4", "PDPA (Personal Data Protection Act) Policy",
-    "This policy sets out how Qualcomm Singapore complies with Singapore's Personal Data Protection "
+    "This policy sets out how MyCompany Singapore complies with Singapore's Personal Data Protection "
     "Act (PDPA) when handling the personal data of employees, customers, and partners.",
     [
         ("4.1 Consent & Purpose", [
@@ -170,7 +170,7 @@ add_section(
          "Accountability."),
         ("4.3 Data Protection Officer (DPO)",
          "The company appoints a Data Protection Officer responsible for PDPA compliance. Questions, "
-         "access requests, and complaints should be directed to dpo@qualcomm-sg.example.com."),
+         "access requests, and complaints should be directed to dpo@mycompany-sg.example.com."),
         ("4.4 Breach Notification", [
             "Any suspected data breach must be reported to the DPO within 2 hours of discovery.",
             "Notifiable breaches will be reported to the PDPC and affected individuals within the timelines set by law (generally within 3 calendar days of assessment).",
@@ -209,7 +209,7 @@ add_section(
         ("6.1 Media Enquiries",
          "Only the designated Corporate Communications spokesperson may speak to the media on behalf "
          "of the company. Employees receiving media enquiries must forward them to "
-         "pr@qualcomm-sg.example.com without comment."),
+         "pr@mycompany-sg.example.com without comment."),
         ("6.2 Social Media", [
             "Official company channels are managed solely by the Communications team.",
             "Employees posting personal opinions online must not present them as the company's position and must not disclose confidential information.",
@@ -252,13 +252,13 @@ add_section(
 doc.add_paragraph()
 end = doc.add_paragraph(
     "End of document. This SOP is reviewed annually by the Human Resources Department. "
-    "For clarification on any policy, contact hr@qualcomm-sg.example.com."
+    "For clarification on any policy, contact hr@mycompany-sg.example.com."
 )
 for r in end.runs:
     r.italic = True
     r.font.size = Pt(9)
     r.font.color.rgb = RGBColor(0x77, 0x77, 0x77)
 
-out = "Qualcomm-HR-SOP.docx"
+out = "MyCompany-HR-SOP.docx"
 doc.save(out)
 print(f"Saved {out}")

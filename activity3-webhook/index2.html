@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Qualcomm · Operations Mission Control</title>
+<title>MyCompany · Operations Mission Control</title>
 <style>
   :root {
     --bg: #05070d;
@@ -309,7 +309,7 @@
     <div class="brand">
       <div class="logo">Q</div>
       <div>
-        <h1>Qualcomm · Operations Mission Control</h1>
+        <h1>MyCompany · Operations Mission Control</h1>
         <p>Machine Registry &amp; Status</p>
       </div>
     </div>
@@ -407,7 +407,7 @@
       <div class="messages" id="messages">
         <div class="msg bot">
           <div class="ic">🤖</div>
-          <div class="bubble">Welcome to Qualcomm Mission Control. I'm wired into your n8n automation engine. Ask me about telemetry, alerts, or trigger an operations workflow.</div>
+          <div class="bubble">Welcome to MyCompany Mission Control. I'm wired into your n8n automation engine. Ask me about telemetry, alerts, or trigger an operations workflow.</div>
         </div>
       </div>
 
@@ -526,7 +526,7 @@
         body: JSON.stringify({
           message,
           chatInput: message, // alias so an AI Agent reading {{ $json.body.chatInput }} also works
-          source: "qualcomm-mission-control",
+          source: "mycompany-mission-control",
           sessionId: currentSession,
           timestamp: new Date().toISOString()
         })
@@ -584,7 +584,7 @@
   });
 
   // ---------- Session management & reset ----------
-  const WELCOME = "Welcome to Qualcomm Mission Control. I'm wired into your n8n automation engine. Ask me about telemetry, alerts, or trigger an operations workflow.";
+  const WELCOME = "Welcome to MyCompany Mission Control. I'm wired into your n8n automation engine. Ask me about telemetry, alerts, or trigger an operations workflow.";
   function newSession() { return "mc-" + Math.random().toString(36).slice(2) + Date.now().toString(36); }
   let currentSession = newSession();
 
@@ -735,7 +735,7 @@
         body: JSON.stringify({
           message: STATS_PROMPT,
           chatInput: STATS_PROMPT,
-          source: "qualcomm-mission-control-dashboard",
+          source: "mycompany-mission-control-dashboard",
           sessionId: "stats-" + newSession(), // isolated session, won't touch chat memory
           timestamp: new Date().toISOString()
         })

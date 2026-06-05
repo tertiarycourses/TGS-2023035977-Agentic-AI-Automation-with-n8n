@@ -10,7 +10,7 @@
 
 **Hands-on lab workflows and web apps for building agentic AI automations with n8n — from form-to-email flows to a RAG chatbot with a vector store.**
 
-[📘 Course Page](https://www.tertiarycourses.com.sg/wsq-agentic-ai-automation-with-n8n.html) · [📖 Step-by-Step Guide](COURSE-GUIDE.md) · [🐛 Report Bug](https://github.com/tertiarycourses/TGS-2023035977-Agentic-AI-Automation-with-n8n/issues) · [💡 Request Feature](https://github.com/tertiarycourses/TGS-2023035977-Agentic-AI-Automation-with-n8n/issues)
+[📘 Course Page](https://www.tertiarycourses.com.sg/wsq-agentic-ai-automation-with-n8n.html) · [📖 Step-by-Step Guide](LEARNER-GUIDE.md) · [🐛 Report Bug](https://github.com/tertiarycourses/TGS-2023035977-Agentic-AI-Automation-with-n8n/issues) · [💡 Request Feature](https://github.com/tertiarycourses/TGS-2023035977-Agentic-AI-Automation-with-n8n/issues)
 
 </div>
 
@@ -42,8 +42,9 @@ This repository contains the complete, working lab materials for the **WSQ Agent
 | **2** | **Build an AI Agent** | Chat Trigger, AI Agent + OpenAI model, memory, tools (Tavily search + Data Table) |
 | **3** | **Webhook + Custom Web UI** | Webhook trigger, CORS, `Respond to Webhook`, decoupling a branded front end from the workflow |
 | **4** | **RAG Chatbot** | Vector store ingestion, embeddings, document loaders, file upload, tool routing via the system prompt |
+| **5** | **Multi-Agent Routing** | A router that dispatches to specialist HR and IT agents, each with its own vector store + Data Table tools, behind one webhook + dashboard |
 
-> 📖 **Full walkthrough:** see **[COURSE-GUIDE.md](COURSE-GUIDE.md)** for detailed, click-by-click instructions for every activity, plus a troubleshooting cheat-sheet and glossary.
+> 📖 **Full walkthrough:** see **[LEARNER-GUIDE.md](LEARNER-GUIDE.md)** for detailed, click-by-click instructions for every activity, plus a troubleshooting cheat-sheet and glossary.
 
 ---
 
@@ -87,6 +88,16 @@ ACTIVITY 3 — Webhook + Web UI          ACTIVITY 4 — RAG
                     └─ Data Table                    ├─ Data Table (employees)
                                                       ├─ Vector Store retrieve ("sop") → SOP answers
                                                       └─ Tavily (fallback)
+
+
+ACTIVITY 5 — Multi-Agent Routing
+┌──────────┐     ┌──────────────┐      ┌── HR Agent ──┐  ├─ HR SOP vector store
+│  Webhook │ ──▶ │ Router Agent │ ──┬─▶│              │  └─ HR Employee Data Table
+└────┬─────┘     └──────────────┘   │  └──────────────┘
+  Dashboard +                       │  ┌── IT Agent ──┐  ├─ IT FAQ vector store
+  chat UI posts JSON                └─▶│              │  └─ IT Tickets Data Table
+                                       └──────┬───────┘
+                                              └──▶ Respond to Webhook
 ```
 
 ---
@@ -95,7 +106,7 @@ ACTIVITY 3 — Webhook + Web UI          ACTIVITY 4 — RAG
 
 ```
 TGS-2023035977-Agentic-AI-Automation-with-n8n/
-├── COURSE-GUIDE.md                  # Full step-by-step lab guide (start here)
+├── LEARNER-GUIDE.md                  # Full step-by-step lab guide (start here)
 ├── README.md
 ├── screenshot.png                   # Activity 4 dashboard
 │
@@ -111,11 +122,26 @@ TGS-2023035977-Agentic-AI-Automation-with-n8n/
 │   ├── Acitivty3-Webhook.json
 │   └── index.html, index1–4.html    # Branded chat UIs (design variants)
 │
-└── activity4-rag/                   # RAG: vector store + file upload + dashboard
-    ├── Activity4-RAG.json
-    ├── index.html                   # Dashboard + chatbot + SOP uploader
-    ├── make_sop.py                  # Generates the sample HR SOP
-    └── Qualcomm-HR-SOP.docx         # Sample document to upload into the vector store
+├── activity4-rag/                   # RAG: vector store + file upload + dashboard
+│   ├── Activity4-RAG.json
+│   ├── index.html                   # Dashboard + chatbot + SOP uploader
+│   ├── make_sop.py                  # Generates the sample HR SOP
+│   └── MyCompany-HR-SOP.docx        # Sample document to upload into the vector store
+│
+├── activity5-multi-agents/          # Multi-agent router: HR + IT specialist agents
+│   ├── Activity5-MultiAgents.json
+│   ├── index.html                   # HR & IT "Mission Control" dashboard + chat
+│   ├── make_it_faq.py               # Generates the sample IT Support FAQ
+│   ├── MyCompany-HR-SOP.docx        # HR SOP for the HR agent's vector store
+│   └── MyCompany-IT-Support-FAQ.docx# IT FAQ for the IT agent's vector store
+│
+└── mini-projects/
+    └── issue-tracking/              # Issue Reporting: n8n form + image → Postgres
+        ├── issue-report-postgresql.json   # Submission workflow
+        ├── issue-reports-api.json         # Retrieval API workflow
+        ├── schema.sql                     # Postgres issue_reports table
+        ├── index.html, gallery.html       # QR/landing + report gallery pages
+        └── README.md
 ```
 
 ---
@@ -127,7 +153,8 @@ TGS-2023035977-Agentic-AI-Automation-with-n8n/
 - An [**OpenAI API key**](https://platform.openai.com/api-keys)
 - A [**Tavily API key**](https://tavily.com) (web-search tool)
 - A **Gmail** account (for Activity 1 email)
-- A modern browser (for the Activity 3 & 4 web pages)
+- A modern browser (for the Activity 3, 4 & 5 web pages)
+- *(Optional, for the Issue Reporting mini-project)* a **Postgres** database (e.g. [Supabase](https://supabase.com))
 
 ### 1. Clone the repo
 ```bash
@@ -141,7 +168,7 @@ cd TGS-2023035977-Agentic-AI-Automation-with-n8n
 3. Re-select **your own credentials** (OpenAI, Tavily, Gmail) on each node — imported credential IDs won't match yours.
 4. **Save**, then toggle **Active / Published**.
 
-### 3. Run the web apps (Activities 3 & 4)
+### 3. Run the web apps (Activities 3, 4 & 5)
 The pages are pure static HTML — just open them, or serve locally:
 ```bash
 cd activity4-rag
@@ -149,11 +176,12 @@ python3 -m http.server 8000
 # then open http://localhost:8000/index.html
 ```
 - Click the **⚙️ gear** and paste your **chat webhook** production URL.
-- In Activity 4, also paste your **upload webhook** URL in the Knowledge Base card, then drag in `Qualcomm-HR-SOP.docx` to populate the vector store.
+- In Activity 4, also paste your **upload webhook** URL in the Knowledge Base card, then drag in `MyCompany-HR-SOP.docx` to populate the vector store.
+- In Activity 5, populate **both** vector stores: upload `MyCompany-HR-SOP.docx` (HR agent) and `MyCompany-IT-Support-FAQ.docx` (IT agent), then ask an HR or IT question and watch the router dispatch to the right specialist.
 
 > ⚠️ **CORS:** each n8n Webhook node must have **Options → Allowed Origins (CORS) = `*`** so the browser page can call it. All workflow exports in this repo already include this.
 
-For complete, click-by-click setup, see **[COURSE-GUIDE.md](COURSE-GUIDE.md)**.
+For complete, click-by-click setup, see **[LEARNER-GUIDE.md](LEARNER-GUIDE.md)**.
 
 ---
 
@@ -195,6 +223,6 @@ Course: [WSQ Agentic AI Automation with n8n (TGS-2023035977)](https://www.tertia
 
 ⭐ **If this helped you learn agentic automation, star the repo!**
 
-[📘 Course Page](https://www.tertiarycourses.com.sg/wsq-agentic-ai-automation-with-n8n.html) · [📖 Step-by-Step Guide](COURSE-GUIDE.md)
+[📘 Course Page](https://www.tertiarycourses.com.sg/wsq-agentic-ai-automation-with-n8n.html) · [📖 Step-by-Step Guide](LEARNER-GUIDE.md)
 
 </div>

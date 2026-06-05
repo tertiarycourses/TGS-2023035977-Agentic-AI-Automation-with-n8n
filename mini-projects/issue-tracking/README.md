@@ -21,7 +21,7 @@ companion API + gallery page lets you **retrieve and view them later**.
 
 | File | What it is |
 |------|-----------|
-| [upload-image-postgressql.json](upload-image-postgressql.json) | **Submission** workflow — the n8n form that writes a report + image into Postgres. |
+| [issue-report-postgresql.json](issue-report-postgresql.json) | **Submission** workflow — the n8n form that writes a report + image into Postgres. |
 | [issue-reports-api.json](issue-reports-api.json) | **Retrieval** workflow — a `GET /webhook/issue-reports` API returning all reports (images as base64 data URIs). |
 | [schema.sql](schema.sql) | Postgres table (`issue_reports`) the workflows read/write. |
 | [index.html](index.html) | Landing page — paste your form URL to **generate a QR code in the browser**, with buttons to the form and gallery. |
@@ -61,7 +61,7 @@ Click **Save** — n8n tests the connection (green tick = good).
 
 In n8n: **Workflows ▸ Import from File** for each of:
 
-- `upload-image-postgressql.json`
+- `issue-report-postgresql.json`
 - `issue-reports-api.json`
 
 Both ship with a credential reference named **"Supabase Postgres"**. Open each Postgres node and

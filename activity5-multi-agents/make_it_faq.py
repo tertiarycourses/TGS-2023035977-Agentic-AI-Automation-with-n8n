@@ -42,7 +42,7 @@ def faq(doc, number, question, intro, steps=None, bullets=None, note=None):
 doc = Document()
 
 # ---- Cover ----
-title = doc.add_heading("Qualcomm Singapore", level=0)
+title = doc.add_heading("MyCompany Singapore", level=0)
 title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 sub = doc.add_paragraph("IT Service Desk — Frequently Asked Questions (FAQ)")
 sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -52,7 +52,7 @@ sub.runs[0].font.size = Pt(14)
 meta = doc.add_paragraph(
     "Document Owner: IT Service Desk\n"
     "Version: 1.0    |    Effective Date: 1 January 2026    |    Classification: Internal\n"
-    "Service Desk: ithelpdesk@qualcomm-sg.example.com    |    IT Portal: https://itportal.qualcomm-sg.example.com"
+    "Service Desk: ithelpdesk@mycompany-sg.example.com    |    IT Portal: https://itportal.mycompany-sg.example.com"
 )
 meta.alignment = WD_ALIGN_PARAGRAPH.CENTER
 for r in meta.runs:
@@ -63,7 +63,7 @@ doc.add_paragraph()
 p = doc.add_paragraph()
 p.add_run("Purpose. ").bold = True
 p.add_run(
-    "This FAQ is the first-line reference for common IT issues at Qualcomm Singapore. "
+    "This FAQ is the first-line reference for common IT issues at MyCompany Singapore. "
     "Try the steps here before raising a ticket. If a problem is not covered or the steps "
     "do not resolve it, contact the IT Service Desk with your name, asset tag, the exact "
     "error message, and what you have already tried."
@@ -90,7 +90,7 @@ doc.add_page_break()
 faq(doc, "1", "How do I reset a forgotten or expired password?",
     "Use the self-service password reset (SSPR) portal — you do not need to call the Service Desk for a routine reset.",
     steps=[
-        "Go to https://passwordreset.qualcomm-sg.example.com from any browser.",
+        "Go to https://passwordreset.mycompany-sg.example.com from any browser.",
         "Enter your work email and complete the identity check (MFA prompt or security questions).",
         "Choose a new password that meets the policy: at least 12 characters, with upper- and lower-case letters, a number, and a symbol.",
         "Sign out and sign back in to all devices using the new password.",
@@ -122,7 +122,7 @@ faq(doc, "4", "How do I connect to the corporate VPN?",
     "Use GlobalConnect VPN to access internal systems when working off-site.",
     steps=[
         "Open the 'GlobalConnect' app (pre-installed on company laptops; otherwise install it from the IT Portal).",
-        "Enter the gateway address: vpn.qualcomm-sg.example.com.",
+        "Enter the gateway address: vpn.mycompany-sg.example.com.",
         "Sign in with your work email and password, then approve the MFA prompt.",
         "Wait for the status to show 'Connected' before opening internal sites.",
     ],
@@ -148,7 +148,7 @@ faq(doc, "6", "My email / Outlook is not working — how do I fix it?",
     ],
     bullets=[
         "Mailbox full? Archive old items or empty Deleted Items — the limit is 50 GB.",
-        "Webmail alternative: https://mail.qualcomm-sg.example.com works from any browser.",
+        "Webmail alternative: https://mail.mycompany-sg.example.com works from any browser.",
     ])
 
 faq(doc, "7", "How do I install approved software?",
@@ -199,7 +199,7 @@ faq(doc, "12", "How do I report a phishing email or a security incident?",
     "Report suspicious messages immediately — do not click links or open attachments.",
     steps=[
         "In Outlook, select the suspicious email and click the 'Report Phishing' button on the toolbar.",
-        "If there is no button, forward the email to phishing@qualcomm-sg.example.com.",
+        "If there is no button, forward the email to phishing@mycompany-sg.example.com.",
         "Delete the email after reporting.",
         "If you already clicked a link or entered your password, change your password now (FAQ 1) and call the Service Desk immediately.",
     ],
@@ -208,8 +208,8 @@ faq(doc, "12", "How do I report a phishing email or a security incident?",
 faq(doc, "13", "How do I raise an IT support ticket?",
     "When the FAQ does not resolve your issue, log a ticket so the Service Desk can help.",
     bullets=[
-        "Portal: https://itportal.qualcomm-sg.example.com → 'New Request'.",
-        "Email: ithelpdesk@qualcomm-sg.example.com (a ticket is created automatically).",
+        "Portal: https://itportal.mycompany-sg.example.com → 'New Request'.",
+        "Email: ithelpdesk@mycompany-sg.example.com (a ticket is created automatically).",
         "Phone (urgent / system down): +65 6000 0000, Mon–Fri 8:30am–6:00pm.",
     ])
 add_para(doc,
@@ -220,13 +220,13 @@ add_para(doc,
 doc.add_paragraph()
 end = doc.add_paragraph(
     "End of document. This FAQ is reviewed quarterly by the IT Service Desk. "
-    "For anything not covered here, contact ithelpdesk@qualcomm-sg.example.com."
+    "For anything not covered here, contact ithelpdesk@mycompany-sg.example.com."
 )
 for r in end.runs:
     r.italic = True
     r.font.size = Pt(9)
     r.font.color.rgb = RGBColor(0x77, 0x77, 0x77)
 
-out = "Qualcomm-IT-Support-FAQ.docx"
+out = "MyCompany-IT-Support-FAQ.docx"
 doc.save(out)
 print(f"Saved {out}")

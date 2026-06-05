@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Qualcomm · HR &amp; IT Mission Control</title>
+<title>MyCompany · HR &amp; IT Mission Control</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
@@ -271,7 +271,7 @@
     <div class="brand">
       <div class="logo">Q</div>
       <div>
-        <h1>Qualcomm · HR &amp; IT Mission Control</h1>
+        <h1>MyCompany · HR &amp; IT Mission Control</h1>
         <p>Multi-Agent Service Desk</p>
       </div>
     </div>
@@ -407,7 +407,7 @@
       <div class="messages" id="messages">
         <div class="msg bot">
           <div class="ic">🤖</div>
-          <div class="bubble">Welcome to Qualcomm Service Desk. Ask me an <b>HR / policy</b> question or an <b>IT support</b> issue — I'll route it to the right specialist (HR or IT). Try the suggestion chips below.</div>
+          <div class="bubble">Welcome to MyCompany Service Desk. Ask me an <b>HR / policy</b> question or an <b>IT support</b> issue — I'll route it to the right specialist (HR or IT). Try the suggestion chips below.</div>
         </div>
       </div>
 
@@ -512,7 +512,7 @@
     try {
       const res = await fetch(WEBHOOK_URL, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, chatInput: message, source: "qualcomm-service-desk", sessionId: currentSession, timestamp: new Date().toISOString() })
+        body: JSON.stringify({ message, chatInput: message, source: "mycompany-service-desk", sessionId: currentSession, timestamp: new Date().toISOString() })
       });
       const raw = await res.text();
       let data = raw; if (raw && raw.trim()) { try { data = JSON.parse(raw); } catch { data = raw; } } else { data = null; }
@@ -541,7 +541,7 @@
   });
 
   // ---------- Session ----------
-  const WELCOME = "Welcome to Qualcomm Service Desk. Ask me an HR / policy question or an IT support issue — I'll route it to the right specialist (HR or IT).";
+  const WELCOME = "Welcome to MyCompany Service Desk. Ask me an HR / policy question or an IT support issue — I'll route it to the right specialist (HR or IT).";
   function newSession() { return "mc-" + Math.random().toString(36).slice(2) + Date.now().toString(36); }
   let currentSession = newSession();
   document.getElementById("reset").addEventListener("click", () => {
@@ -659,7 +659,7 @@
     fd.append("data", selectedFile, selectedFile.name);
     fd.append("filename", selectedFile.name);
     fd.append("target", storeLabel);
-    fd.append("source", "qualcomm-service-desk-kb");
+    fd.append("source", "mycompany-service-desk-kb");
     const xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
     xhr.upload.addEventListener("progress", (e) => { if (e.lengthComputable) kbBarFill.style.width = Math.round((e.loaded/e.total)*100) + "%"; });
@@ -814,7 +814,7 @@
   async function fetchStats(prompt) {
     const res = await fetch(WEBHOOK_URL, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: prompt, chatInput: prompt, source: "qualcomm-service-desk-dashboard", sessionId: "stats-" + newSession(), timestamp: new Date().toISOString() })
+      body: JSON.stringify({ message: prompt, chatInput: prompt, source: "mycompany-service-desk-dashboard", sessionId: "stats-" + newSession(), timestamp: new Date().toISOString() })
     });
     const raw = await res.text();
     let data = raw; if (raw && raw.trim()) { try { data = JSON.parse(raw); } catch { data = raw; } }
