@@ -24,9 +24,9 @@
 
 ## Screenshot
 
-> Activity 4 — RAG "Operations Mission Control" dashboard: a live workforce panel (powered by an n8n Data Table) alongside a chatbot that answers HR-policy questions from an uploaded SOP document via a vector store.
+> MyCompany "HR & IT Mission Control" dashboard: a live workforce panel (powered by an n8n Data Table) alongside a Service Desk Assistant chatbot that answers HR-policy and IT-support questions from uploaded SOP/FAQ documents via a vector store.
 
-![Screenshot](screenshot.png)
+![Screenshot](dashboard.png)
 
 ---
 
@@ -108,7 +108,7 @@ ACTIVITY 5 — Multi-Agent Routing
 TGS-2023035977-Agentic-AI-Automation-with-n8n/
 ├── LEARNER-GUIDE.md                  # Full step-by-step lab guide (start here)
 ├── README.md
-├── screenshot.png                   # Activity 4 dashboard
+├── dashboard.png                    # HR & IT Mission Control dashboard
 │
 ├── activity1-automation/            # Forms → Email → Conditional → Data Table
 │   ├── Activity1a_ Design a Flyer with n8n form embedded.json
