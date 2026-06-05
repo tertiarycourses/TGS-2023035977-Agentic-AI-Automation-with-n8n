@@ -1,4 +1,4 @@
-# Agentic AI Automation with n8n — Step‑by‑Step Lab Guide
+# Agentic AI Automation with n8n — Step‑by‑Step Learner Guide for Labs
 
 **Course Code:** TGS-2023035977
 **Course page:** https://www.tertiarycourses.com.sg/wsq-agentic-ai-automation-with-n8n.html
