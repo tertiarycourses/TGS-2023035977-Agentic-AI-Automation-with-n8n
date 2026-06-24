@@ -38,13 +38,17 @@ This repository contains the complete, working lab materials for the **WSQ Agent
 
 | # | Activity | Concepts |
 |---|----------|----------|
-| **1** | **Workflow Automation with Forms** | Form Trigger → Gmail, expressions, IF-node branching, n8n Data Tables |
-| **2** | **Build an AI Agent** | Chat Trigger, AI Agent + OpenAI model, memory, tools (Tavily search + Data Table) |
-| **3** | **Webhook + Custom Web UI** | Webhook trigger, CORS, `Respond to Webhook`, decoupling a branded front end from the workflow |
-| **4** | **RAG Chatbot** | Vector store ingestion, embeddings, document loaders, file upload, tool routing via the system prompt |
-| **5** | **Multi-Agent Routing** | A router that dispatches to specialist HR and IT agents, each with its own vector store + Data Table tools, behind one webhook + dashboard |
+| **1** | **Flyer with QR Code** | Form Trigger → Gmail, expressions, QR-code generation |
+| **2** | **Capture Data in a Data Table** | n8n Data Tables, storing submissions |
+| **3a / 3b** | **Conditional Response** | IF-node branching → Data Table (3a) / Google Sheets persistence (3b) |
+| **4a / 4b** | **Telegram AI Agent** | Telegram Trigger, AI Agent + `gpt-4.1-mini`, memory, Data Table tool |
+| **5** | **RAG Telegram Agent** | Tokenization, embeddings, vector store, routing between two knowledge sources |
+| **6** | **Website Chatbot (Investment Advisor)** | Webhook trigger, CORS, `Respond to Webhook`, branded front end |
+| **7** | **Finance API → Telegram (Day Trader)** | HTTP Request, Twelve Data + NewsAPI, multi-timeframe analysis |
+| **8a / 8b** | **Security & Guardrails** | Human-in-the-loop approval, pre/post guardrails around the agent |
+| **Capstone** | **Mini Capstone** | End-to-end build (Issue Reporting: form + image → Postgres) |
 
-> 📖 **Full walkthrough:** see **[LEARNER-GUIDE.md](LEARNER-GUIDE.md)** for detailed, click-by-click instructions for every activity, plus a troubleshooting cheat-sheet and glossary.
+> 📖 **Full walkthrough:** see **[LEARNER-GUIDE.md](LEARNER-GUIDE.md)** for detailed, click-by-click instructions (with workflow diagrams) for every activity, plus a troubleshooting cheat-sheet and glossary. Slides, the Learner Guide and the Lesson Plan are in [`courseware/`](courseware/).
 
 ---
 
@@ -52,52 +56,38 @@ This repository contains the complete, working lab materials for the **WSQ Agent
 
 | Category | Technology |
 |----------|------------|
-| **Automation Platform** | [n8n](https://n8n.io) (workflows, triggers, Data Tables) |
-| **LLM** | OpenAI (`gpt-4.1-mini` chat model + `text-embedding` embeddings) |
+| **Automation Platform** | [n8n](https://n8n.io) (cloud trial or local Docker; workflows, triggers, Data Tables) |
+| **LLM** | OpenAI **`gpt-4.1-mini`** (all agents) + `text-embedding` embeddings; Google Gemini optional |
 | **Agent Framework** | n8n LangChain nodes (AI Agent, Memory, Vector Store) |
-| **Tools** | Tavily (web search), n8n Data Table, In-Memory Vector Store |
-| **Email** | Gmail (OAuth2) |
+| **Chat / Messaging** | Telegram (Bot trigger + send) |
+| **Tools & Data** | n8n Data Table, In-Memory Vector Store, Twelve Data + NewsAPI (HTTP) |
+| **Email / Storage** | Gmail (OAuth2), Google Sheets |
 | **Front End** | Vanilla HTML / CSS / JavaScript (no build step) |
-| **Docs** | Markdown guide + generated Word SOP (`python-docx`) |
+| **Courseware** | Slides (`python-pptx`), Learner Guide + Lesson Plan (`python-docx`), workflow diagrams (`matplotlib`) |
 
 ---
 
 ## Architecture
 
 ```
-ACTIVITY 1 — Forms                ACTIVITY 2 — AI Agent
-┌──────────────┐                  ┌────────────────────┐
-│ Form Trigger │                  │   Chat Trigger     │
-└──────┬───────┘                  └─────────┬──────────┘
-       ▼                                    ▼
-   ┌───────┐  true  ┌────────┐        ┌──────────┐   ┌──────────────┐
-   │  IF   ├───────▶│ Gmail  │        │ AI Agent ├──▶│  reply        │
-   └───┬───┘        └────────┘        └────┬─────┘   └──────────────┘
-       │ false                            ├─ OpenAI Chat Model
-       ▼                                  ├─ Simple Memory
-   ┌──────────┐                           ├─ Tavily (web search)
-   │Data Table│                           └─ Data Table (employee data)
-   └──────────┘
+DAY 1 — Workflow Automation + AI Agents
+  Act 1  Form Trigger ─▶ Gmail                         (flyer + QR code)
+  Act 2  Form Trigger ─▶ Gmail + Data Table            (capture data)
+  Act 3a Form ─▶ IF ─▶ Data Table / Gmail              (conditional)
+  Act 3b Form ─▶ IF ─▶ Google Sheets / Gmail           (persistent)
+  Act 4a Telegram ─▶ AI Agent (gpt-4.1-mini + memory) ─▶ reply
+  Act 4b Telegram ─▶ AI Agent + Data Table tool ─▶ reply
 
-ACTIVITY 3 — Webhook + Web UI          ACTIVITY 4 — RAG
-┌──────────┐   ┌──────────┐            INGEST:  Webhook ─▶ Vector Store (Insert "sop")
-│  Webhook │──▶│ AI Agent │──▶ Respond           ├─ Embeddings OpenAI
-└────┬─────┘   └────┬─────┘    to Webhook         └─ Default Data Loader (file upload)
-  HTML page         ├─ OpenAI Chat Model
-  posts JSON        ├─ Tavily               CHAT:   Webhook ─▶ AI Agent ─▶ Respond
-                    └─ Data Table                    ├─ Data Table (employees)
-                                                      ├─ Vector Store retrieve ("sop") → SOP answers
-                                                      └─ Tavily (fallback)
+DAY 2 — RAG · Webhooks · APIs
+  Act 5  Telegram ─▶ AI Agent ─┬─ Vector Store (RAG)    (two sources,
+                               └─ Data Table tool        routed by prompt)
+  Act 6  Website ─▶ Webhook ─▶ AI Agent ─▶ Respond       (Investment Advisor)
+  Act 7  Telegram ─▶ HTTP (Twelve Data + NewsAPI) ─▶ AI Agent ─▶ reply  (Day Trader)
 
-
-ACTIVITY 5 — Multi-Agent Routing
-┌──────────┐     ┌──────────────┐      ┌── HR Agent ──┐  ├─ HR SOP vector store
-│  Webhook │ ──▶ │ Router Agent │ ──┬─▶│              │  └─ HR Employee Data Table
-└────┬─────┘     └──────────────┘   │  └──────────────┘
-  Dashboard +                       │  ┌── IT Agent ──┐  ├─ IT FAQ vector store
-  chat UI posts JSON                └─▶│              │  └─ IT Tickets Data Table
-                                       └──────┬───────┘
-                                              └──▶ Respond to Webhook
+DAY 3 — Security & Guardrails + Capstone
+  Act 8a Form ─▶ Manager Approval (Send & Wait) ─▶ IF ─▶ confirm / decline
+  Act 8b Webhook ─▶ Pre-check ─▶ AI Agent ─▶ Post-check ─▶ Respond / Blocked
+  Capstone  Issue Reporting: Form + image ─▶ Postgres + retrieval API + gallery
 ```
 
 ---
@@ -110,46 +100,23 @@ TGS-2023035977-Agentic-AI-Automation-with-n8n/
 ├── README.md
 ├── dashboard.png                    # HR & IT Mission Control dashboard
 │
-├── labs/                            # All hands-on lab activities + setup
+├── labs/                            # All hands-on lab activities (one folder each)
 │   ├── n8n-installation/            # Docker Compose for self-hosting n8n
-│   │
-│   ├── activity1-automation/        # Forms → Email → Conditional → Data Table
-│   │   ├── Activity1a_ Design a Flyer with n8n form embedded.json
-│   │   ├── Activity1b_ Improved Flyer with Conditonal Route.json
-│   │   └── Activity1c_ Improved Flyer with Data Table.json
-│   │
-│   ├── activity2-ai-agent/          # Chat-based AI Agent with tools + memory
-│   │   └── Activity2-AI Agent.json
-│   │
-│   ├── activity3-webhook/           # Webhook-exposed agent + custom dashboards
-│   │   ├── Acitivty3-Webhook.json
-│   │   └── index.html, index1–4.html  # Branded chat UIs (design variants)
-│   │
-│   ├── activity4-rag/               # RAG: vector store + file upload + dashboard
-│   │   ├── Activity4-RAG.json
-│   │   ├── index.html               # Dashboard + chatbot + SOP uploader
-│   │   ├── make_sop.py              # Generates the sample HR SOP
-│   │   └── MyCompany-HR-SOP.docx    # Sample document to upload into the vector store
-│   │
-│   ├── activity5-multi-agents/      # Multi-agent router: HR + IT specialist agents
-│   │   ├── Activity5-MultiAgents.json
-│   │   ├── index.html               # HR & IT "Mission Control" dashboard + chat
-│   │   ├── make_it_faq.py           # Generates the sample IT Support FAQ
-│   │   ├── MyCompany-HR-SOP.docx    # HR SOP for the HR agent's vector store
-│   │   └── MyCompany-IT-Support-FAQ.docx  # IT FAQ for the IT agent's vector store
-│   │
-│   └── mini-capstone/
-│       └── issue-tracking/          # Issue Reporting: n8n form + image → Postgres
-│           ├── issue-report-postgresql.json   # Submission workflow
-│           ├── issue-reports-api.json         # Retrieval API workflow
-│           ├── schema.sql                     # Postgres issue_reports table
-│           ├── index.html, gallery.html       # QR/landing + report gallery pages
-│           └── README.md
+│   ├── activity1-flyer-form/        # Act 1: Form → Gmail (+ flyer samples)
+│   ├── activity2-data-table/        # Act 2: + Data Table (+ rsvp-sample.csv)
+│   ├── activity3-conditional/       # Act 3a/3b: IF → Data Table / Google Sheets
+│   ├── activity4-telegram-agent/    # Act 4a/4b: Telegram AI agent (+ employees.csv)
+│   ├── activity5-rag/               # Act 5: Telegram + RAG (+ SOP/FAQ docs, CSVs)
+│   ├── activity6-investment-advisor/# Act 6: Webhook website chatbot (HTML app)
+│   ├── activity7-finance-advisor/   # Act 7: Finance API → Telegram (HTML dashboard)
+│   ├── activity8-guardrails/        # Act 8a/8b: human-in-the-loop + guardrails
+│   └── mini-capstone/issue-tracking/# Capstone: Form + image → Postgres + gallery
+│       (each activity folder = workflow .json + a workflow diagram .png + mock data)
 │
 └── courseware/                      # Course slides, Lesson Plan + Learner Guide
-    ├── Lesson Plan - Agentic AI Automation with n8n.docx  # 3-day lesson plan
-    ├── n8n-slides.pptx
-    └── n8n Automation Learner Guide.docx
+    ├── n8n-slides.pptx                                    # 154-slide 3-day deck
+    ├── n8n Automation Learner Guide.docx                  # detailed step-by-step (DOCX)
+    └── Lesson Plan - Agentic AI Automation with n8n.docx  # 3-day lesson plan
 ```
 
 ---

@@ -1,10 +1,11 @@
-name: Deploy Activity 5 to GitHub Pages
+name: Deploy Course Demos to GitHub Pages
 
 on:
   push:
     branches: [main]
     paths:
-      - 'labs/activity5-multi-agents/index*.html'
+      - 'labs/activity6-investment-advisor/**'
+      - 'labs/activity7-finance-advisor/**'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
@@ -27,12 +28,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Assemble site (Activity 5 dashboard at root)
+      - name: Assemble site (Finance Advisor at root, Investment Advisor under /investment-advisor)
         run: |
-          mkdir -p _site
-          cp labs/activity5-multi-agents/index*.html _site/
-          # default landing = the main dashboard
-          cp labs/activity5-multi-agents/index.html _site/index.html
+          mkdir -p _site/investment-advisor
+          # Root = Activity 7 Finance Advisor dashboard (self-contained)
+          cp "labs/activity7-finance-advisor/index.html" _site/index.html
+          # Activity 6 Investment Advisor lead-magnet site
+          cp labs/activity6-investment-advisor/index.html _site/investment-advisor/index.html
+          cp labs/activity6-investment-advisor/script.js  _site/investment-advisor/script.js
+          cp labs/activity6-investment-advisor/style.css  _site/investment-advisor/style.css
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

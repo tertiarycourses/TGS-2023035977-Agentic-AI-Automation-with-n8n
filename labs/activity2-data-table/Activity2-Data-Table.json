@@ -1,0 +1,152 @@
+{
+  "name": "Activity 2 — Capture Submissions in a Data Table",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -608,
+        144
+      ],
+      "id": "bfc3397d-8956-4056-a2ad-4e15bdaadc5d",
+      "name": "On form submission",
+      "webhookId": "da38d7bb-abc8-45b2-b4a5-f9cd98de1584"
+    },
+    {
+      "parameters": {
+        "sendTo": "angch@tertiaryinfotech.com",
+        "subject": "New Enquiry",
+        "message": "=Hi <br> <br>\n\nThere is a new enquiry. Below is the info: <br> <br>\n\nName:{{ $json.Name }} <br>\nEmail:{{ $json.Email }} <br>\nTel:{{ $json.Tel }} <br>\nMessage:{{ $json.Message }} <br>\n\n <br>\nAdmin  <br>\nABC Pte Ltd",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c6e05ae6-21ff-4233-bdb1-5dbf55a7e7f1",
+      "name": "Send a message",
+      "webhookId": "03a340b8-7cae-4d9e-9bac-f89dd2a8b570"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "CvZ4zZMT30wgDNO0",
+          "mode": "list",
+          "cachedResultName": "Event",
+          "cachedResultUrl": "/projects/koXyebnPoyxlBtCG/datatables/CvZ4zZMT30wgDNO0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Joining": true,
+            "Name": "={{ $json.Name }}",
+            "Email": "={{ $json.Email }}",
+            "Tel": "={{ $json.Tel }}",
+            "Message": "={{ $json.Message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tel",
+              "displayName": "Tel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Joining",
+              "displayName": "Joining",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -192,
+        112
+      ],
+      "id": "681cf92c-a96d-482f-954b-0354aef6714c",
+      "name": "Insert row"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d6f4b577-53d1-4a15-a015-3dab7586a47f",
+  "meta": {
+    "instanceId": "dd9d815cb100cab73a9cd63cc3f30fd090e73e9edbdc09a51a025bdf1bf015af"
+  },
+  "nodeGroups": [],
+  "id": "10fd449977644ab2",
+  "tags": []
+}

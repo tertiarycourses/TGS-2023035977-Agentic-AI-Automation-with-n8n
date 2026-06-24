@@ -1,0 +1,240 @@
+{
+  "name": "Activity 3b — Conditional Response (Google Sheets / Excel)",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -784,
+        144
+      ],
+      "id": "f23cab08-b067-4894-9925-cb4141e1cb62",
+      "name": "On form submission",
+      "webhookId": "8aa52f9b-3223-4796-9d25-e19f0bb2d913"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "19GRfbErtrEoKZx2T5SQYtf3aNRntDcOzB3vXTpGcNcE",
+          "mode": "list",
+          "cachedResultName": "BELL Event",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19GRfbErtrEoKZx2T5SQYtf3aNRntDcOzB3vXTpGcNcE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19GRfbErtrEoKZx2T5SQYtf3aNRntDcOzB3vXTpGcNcE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Email": "={{ $json.Email }}",
+            "Tel": "={{ $json.Tel }}",
+            "Joining": "={{ $('On form submission').item.json['Are you interested to join the event?'] }}",
+            "Message": "={{ $('On form submission').item.json.Message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tel",
+              "displayName": "Tel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Joining",
+              "displayName": "Joining",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -256,
+        32
+      ],
+      "id": "81313140-33b5-4b3d-a30c-732d92365d38",
+      "name": "Append row in sheet"
+    },
+    {
+      "parameters": {
+        "sendTo": "angch@tertiaryinfotech.com",
+        "subject": "New Enquiry",
+        "message": "=Hi <br> <br>\n\nThere is a new enquiry. Below is the info: <br> <br>\n\nName:{{ $json.Name }} <br>\nEmail:{{ $json.Email }} <br>\nTel:{{ $json.Tel }} <br>\nMessage:{{ $json.Message }} <br>\n\n <br>\nAdmin  <br>\nABC Pte Ltd",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2355f8be-0013-4f66-a173-cf9f5bff37a1",
+      "name": "Send to Admin",
+      "webhookId": "03a340b8-7cae-4d9e-9bac-f89dd2a8b570"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "New Enquiry",
+        "message": "=Hi <{{ $('On form submission').item.json.Name }}br> <br>\n\nThanks for letting us that you will not joining. Hope to you in the next even.\n\n <br>\nAdmin  <br>\nABC Pte Ltd",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        272
+      ],
+      "id": "c74d1ab3-b3ee-45b1-a3e5-8e59b8c26783",
+      "name": "Decline Reply",
+      "webhookId": "03a340b8-7cae-4d9e-9bac-f89dd2a8b570"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "Thank you for joning the event",
+        "message": "=Hi {{ $('On form submission').item.json.Name }}\n<br> <br>\n\nThank your for your interest in the event. We will send you a reminder nearer to the event date.  <br>\n\n<br>\nAdmin  <br>\nABC Pte Ltd",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        192
+      ],
+      "id": "ccd839e0-6b22-44fb-88cc-2dd0440060cc",
+      "name": "Accept Reply",
+      "webhookId": "03a340b8-7cae-4d9e-9bac-f89dd2a8b570"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "96180c90-cf34-4201-a9ca-526042e2ce15",
+              "leftValue": "={{ $json['Are you interested to join the event?'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -544,
+        144
+      ],
+      "id": "9a4b735b-cc3c-408a-9f24-29abe17a2530",
+      "name": "Joining"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send to Admin",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Accept Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Joining": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Decline Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "2c9c16f6-72a7-4dd9-9611-9775997df567",
+  "meta": {
+    "instanceId": "dd9d815cb100cab73a9cd63cc3f30fd090e73e9edbdc09a51a025bdf1bf015af"
+  },
+  "nodeGroups": [],
+  "id": "c37278238ca947be",
+  "tags": []
+}

@@ -1,0 +1,237 @@
+{
+  "name": "Activity 3a — Conditional Response (Data Table)",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -608,
+        144
+      ],
+      "id": "bfc3397d-8956-4056-a2ad-4e15bdaadc5d",
+      "name": "On form submission",
+      "webhookId": "da38d7bb-abc8-45b2-b4a5-f9cd98de1584"
+    },
+    {
+      "parameters": {
+        "sendTo": "angch@tertiaryinfotech.com",
+        "subject": "New Enquiry",
+        "message": "=Hi <br> <br>\n\nThere is a new enquiry. Below is the info: <br> <br>\n\nName:{{ $json.Name }} <br>\nEmail:{{ $json.Email }} <br>\nTel:{{ $json.Tel }} <br>\nMessage:{{ $json.Message }} <br>\n\n <br>\nAdmin  <br>\nABC Pte Ltd",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c6e05ae6-21ff-4233-bdb1-5dbf55a7e7f1",
+      "name": "Send a message",
+      "webhookId": "03a340b8-7cae-4d9e-9bac-f89dd2a8b570"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "96180c90-cf34-4201-a9ca-526042e2ce15",
+              "leftValue": "={{ $json['Are you interested to join the event?'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -400,
+        144
+      ],
+      "id": "dca18224-ecc2-473e-9fbb-e49920c7150d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "New Enquiry",
+        "message": "=Hi <{{ $('On form submission').item.json.Name }}br> <br>\n\nThanks for letting us that you will not joining. Hope to you in the next even.\n\n <br>\nAdmin  <br>\nABC Pte Ltd",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -176,
+        304
+      ],
+      "id": "6d787c60-4a9f-4ef8-b4c8-36d7850ec328",
+      "name": "Send a message1",
+      "webhookId": "03a340b8-7cae-4d9e-9bac-f89dd2a8b570"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "CvZ4zZMT30wgDNO0",
+          "mode": "list",
+          "cachedResultName": "Event",
+          "cachedResultUrl": "/projects/koXyebnPoyxlBtCG/datatables/CvZ4zZMT30wgDNO0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Joining": true,
+            "Name": "={{ $json.Name }}",
+            "Email": "={{ $json.Email }}",
+            "Tel": "={{ $json.Tel }}",
+            "Message": "={{ $json.Message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tel",
+              "displayName": "Tel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Joining",
+              "displayName": "Joining",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -192,
+        112
+      ],
+      "id": "681cf92c-a96d-482f-954b-0354aef6714c",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "Thank you for joning the event",
+        "message": "=Hi {{ $('On form submission').item.json.Name }}\n<br> <br>\n\nThank your for your interest in the event. We will send you a reminder nearer to the event date.  <br>\n\n<br>\nAdmin  <br>\nABC Pte Ltd",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        192
+      ],
+      "id": "07f90dde-b927-422c-8131-41e04b7de83e",
+      "name": "Send a message2",
+      "webhookId": "03a340b8-7cae-4d9e-9bac-f89dd2a8b570"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d6f4b577-53d1-4a15-a015-3dab7586a47f",
+  "meta": {
+    "instanceId": "dd9d815cb100cab73a9cd63cc3f30fd090e73e9edbdc09a51a025bdf1bf015af"
+  },
+  "nodeGroups": [],
+  "id": "d63cc6d892584754",
+  "tags": []
+}

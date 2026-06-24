@@ -1,0 +1,101 @@
+EmployeeID,Name,Gender,Department,Role,Location,Email,Phone
+E1001,Priya Tan,Female,HR,Recruiter,Penang,priya.tan@mycompany.com,+65 84744854
+E1002,Jun Hao Wong,Male,HR,HR Executive,Shanghai,jun.hao@mycompany.com,+65 88078673
+E1003,Wei Jie Tan,Female,Engineering,Software Engineer,Penang,wei.jie@mycompany.com,+65 89478454
+E1004,Imran Tan,Male,Operations,Ops Analyst,Shanghai,imran.tan@mycompany.com,+65 88038374
+E1005,Ananya Teo,Female,Operations,Ops Coordinator,Singapore,ananya.teo@mycompany.com,+65 83678638
+E1006,Karthik Goh,Male,Marketing,Marketing Specialist,Penang,karthik.goh@mycompany.com,+65 86647119
+E1007,Priya Nair,Female,Finance,Accountant,San Diego,priya.nair@mycompany.com,+65 86770619
+E1008,Imran Abdullah,Male,IT,IT Support Engineer,Hyderabad,imran.abdullah@mycompany.com,+65 89996414
+E1009,Priya Chua,Female,Engineering,QA Engineer,San Diego,priya.chua@mycompany.com,+65 87067228
+E1010,Grace Lee,Male,HR,HR Executive,Singapore,grace.lee@mycompany.com,+65 84823498
+E1011,Rachel Nair,Female,IT,IT Support Engineer,Singapore,rachel.nair@mycompany.com,+65 87377459
+E1012,Hafiz Teo,Male,HR,Recruiter,Penang,hafiz.teo@mycompany.com,+65 87210606
+E1013,Faisal Lee,Female,HR,Recruiter,Singapore,faisal.lee@mycompany.com,+65 83871230
+E1014,Sanjay Sharma,Male,Sales,Sales Manager,Hyderabad,sanjay.sharma@mycompany.com,+65 85528972
+E1015,Sanjay Sharma,Female,HR,Recruiter,Singapore,sanjay.sharma@mycompany.com,+65 84842788
+E1016,Wei Jie Goh,Male,Finance,Financial Analyst,Singapore,wei.jie@mycompany.com,+65 84539704
+E1017,Grace Goh,Female,Sales,Sales Manager,Hyderabad,grace.goh@mycompany.com,+65 88698256
+E1018,Jun Hao Abdullah,Male,Sales,Account Executive,Shanghai,jun.hao@mycompany.com,+65 85408072
+E1019,Grace Reddy,Female,Operations,Ops Coordinator,San Diego,grace.reddy@mycompany.com,+65 84679591
+E1020,Jun Hao Sato,Male,Finance,Accountant,Singapore,jun.hao@mycompany.com,+65 82839607
+E1021,Jun Hao Rahman,Female,IT,SysAdmin,Shanghai,jun.hao@mycompany.com,+65 82065818
+E1022,Joanne Chua,Male,Operations,Ops Coordinator,Shanghai,joanne.chua@mycompany.com,+65 85218028
+E1023,Sanjay Tan,Female,HR,HR Executive,Shanghai,sanjay.tan@mycompany.com,+65 85476583
+E1024,Ling Wong,Male,Marketing,Content Lead,Penang,ling.wong@mycompany.com,+65 88612220
+E1025,Aisha Abdullah,Female,Operations,Ops Analyst,Shanghai,aisha.abdullah@mycompany.com,+65 82785277
+E1026,Rachel Sato,Male,Operations,Ops Analyst,Penang,rachel.sato@mycompany.com,+65 87273233
+E1027,Nadia Menon,Female,IT,IT Support Engineer,Shanghai,nadia.menon@mycompany.com,+65 86438436
+E1028,Diego Tan,Male,Engineering,Senior Engineer,San Diego,diego.tan@mycompany.com,+65 85017343
+E1029,Wei Jie Sharma,Female,Operations,Ops Analyst,Singapore,wei.jie@mycompany.com,+65 89153566
+E1030,Daniel Menon,Male,IT,IT Support Engineer,Penang,daniel.menon@mycompany.com,+65 88973915
+E1031,Sanjay Rahman,Female,Marketing,Content Lead,Penang,sanjay.rahman@mycompany.com,+65 84374754
+E1032,Rachel Chua,Male,HR,Recruiter,Hyderabad,rachel.chua@mycompany.com,+65 89683481
+E1033,Wei Ting Wong,Female,Sales,Account Executive,Singapore,wei.ting@mycompany.com,+65 86672134
+E1034,Aisha Menon,Male,Sales,Account Executive,Singapore,aisha.menon@mycompany.com,+65 82191066
+E1035,Wei Jie Sharma,Female,Engineering,Software Engineer,San Diego,wei.jie@mycompany.com,+65 82188789
+E1036,Yuki Sharma,Male,Marketing,Content Lead,Penang,yuki.sharma@mycompany.com,+65 83219824
+E1037,Grace Garcia,Female,Sales,Sales Manager,Hyderabad,grace.garcia@mycompany.com,+65 84194548
+E1038,Priya Wong,Male,HR,Recruiter,San Diego,priya.wong@mycompany.com,+65 88106470
+E1039,Karthik Teo,Female,IT,IT Support Engineer,Singapore,karthik.teo@mycompany.com,+65 82016911
+E1040,Joanne Goh,Male,IT,IT Support Engineer,Penang,joanne.goh@mycompany.com,+65 84214348
+E1041,Marcus Menon,Female,Finance,Accountant,Hyderabad,marcus.menon@mycompany.com,+65 84078418
+E1042,Hafiz Teo,Male,Sales,Account Executive,Hyderabad,hafiz.teo@mycompany.com,+65 82642635
+E1043,Wei Jie Menon,Female,IT,IT Support Engineer,Singapore,wei.jie@mycompany.com,+65 84965789
+E1044,Nadia Reddy,Male,Finance,Financial Analyst,Penang,nadia.reddy@mycompany.com,+65 87728339
+E1045,Wei Jie Rahman,Female,Finance,Accountant,Hyderabad,wei.jie@mycompany.com,+65 85449368
+E1046,Wei Ting Ng,Male,Finance,Financial Analyst,Penang,wei.ting@mycompany.com,+65 84185957
+E1047,Rachel Lee,Female,Engineering,QA Engineer,Shanghai,rachel.lee@mycompany.com,+65 82022698
+E1048,Ling Lim,Male,Engineering,QA Engineer,Hyderabad,ling.lim@mycompany.com,+65 89436429
+E1049,Yuki Rahman,Female,Engineering,QA Engineer,Singapore,yuki.rahman@mycompany.com,+65 84117625
+E1050,Daniel Nair,Male,HR,HR Executive,Hyderabad,daniel.nair@mycompany.com,+65 83011363
+E1051,Grace Sharma,Female,Operations,Ops Analyst,Shanghai,grace.sharma@mycompany.com,+65 82375453
+E1052,Karthik Sato,Male,Marketing,Content Lead,Penang,karthik.sato@mycompany.com,+65 86271130
+E1053,Ananya Abdullah,Female,Finance,Accountant,San Diego,ananya.abdullah@mycompany.com,+65 88670955
+E1054,Ling Nair,Male,Engineering,Senior Engineer,Shanghai,ling.nair@mycompany.com,+65 82677407
+E1055,Daniel Menon,Female,Sales,Sales Manager,Penang,daniel.menon@mycompany.com,+65 86855396
+E1056,Daniel Sharma,Male,Marketing,Content Lead,Penang,daniel.sharma@mycompany.com,+65 88351517
+E1057,Sanjay Ng,Female,Operations,Ops Analyst,Shanghai,sanjay.ng@mycompany.com,+65 86022741
+E1058,Priya Kumar,Male,Marketing,Marketing Specialist,Singapore,priya.kumar@mycompany.com,+65 83607983
+E1059,Hafiz Ng,Female,Operations,Ops Analyst,San Diego,hafiz.ng@mycompany.com,+65 84415796
+E1060,Hafiz Sato,Male,Finance,Financial Analyst,Singapore,hafiz.sato@mycompany.com,+65 82548511
+E1061,Karthik Abdullah,Female,Engineering,Software Engineer,San Diego,karthik.abdullah@mycompany.com,+65 83194789
+E1062,Hafiz Rahman,Male,HR,Recruiter,Shanghai,hafiz.rahman@mycompany.com,+65 88175395
+E1063,Sanjay Tan,Female,Engineering,Software Engineer,Penang,sanjay.tan@mycompany.com,+65 81604451
+E1064,Faisal Menon,Male,Sales,Sales Manager,Penang,faisal.menon@mycompany.com,+65 81701771
+E1065,Rachel Iqbal,Female,IT,IT Support Engineer,San Diego,rachel.iqbal@mycompany.com,+65 84524499
+E1066,Ananya Wong,Male,Marketing,Content Lead,Shanghai,ananya.wong@mycompany.com,+65 83592974
+E1067,Ananya Rahman,Female,IT,IT Support Engineer,Hyderabad,ananya.rahman@mycompany.com,+65 81415846
+E1068,Nadia Goh,Male,IT,SysAdmin,Penang,nadia.goh@mycompany.com,+65 85476257
+E1069,Nadia Wong,Female,Finance,Accountant,Hyderabad,nadia.wong@mycompany.com,+65 84731818
+E1070,Marcus Teo,Male,Marketing,Content Lead,Penang,marcus.teo@mycompany.com,+65 84740036
+E1071,Aisha Lee,Female,Finance,Financial Analyst,San Diego,aisha.lee@mycompany.com,+65 82164686
+E1072,Hafiz Iqbal,Male,HR,Recruiter,Shanghai,hafiz.iqbal@mycompany.com,+65 86555772
+E1073,Aisha Wong,Female,Marketing,Marketing Specialist,Shanghai,aisha.wong@mycompany.com,+65 85453786
+E1074,Wei Jie Wong,Male,Operations,Ops Coordinator,San Diego,wei.jie@mycompany.com,+65 86262632
+E1075,Karthik Sato,Female,Engineering,Senior Engineer,Shanghai,karthik.sato@mycompany.com,+65 84188992
+E1076,Hafiz Lim,Male,HR,Recruiter,Singapore,hafiz.lim@mycompany.com,+65 89722815
+E1077,Sanjay Lee,Female,Marketing,Content Lead,Singapore,sanjay.lee@mycompany.com,+65 86539837
+E1078,Imran Goh,Male,HR,HR Executive,San Diego,imran.goh@mycompany.com,+65 89508103
+E1079,Rachel Reddy,Female,Marketing,Content Lead,San Diego,rachel.reddy@mycompany.com,+65 83135534
+E1080,Marcus Reddy,Male,HR,Recruiter,Penang,marcus.reddy@mycompany.com,+65 86049101
+E1081,Joanne Menon,Female,IT,IT Support Engineer,San Diego,joanne.menon@mycompany.com,+65 85813613
+E1082,Marcus Reddy,Male,IT,SysAdmin,Hyderabad,marcus.reddy@mycompany.com,+65 88411939
+E1083,Wei Ting Lee,Female,Operations,Ops Coordinator,Penang,wei.ting@mycompany.com,+65 82422633
+E1084,Rachel Sato,Male,HR,Recruiter,Singapore,rachel.sato@mycompany.com,+65 84940441
+E1085,Rachel Sharma,Female,IT,IT Support Engineer,Penang,rachel.sharma@mycompany.com,+65 81409790
+E1086,Wei Jie Sharma,Male,Finance,Accountant,Hyderabad,wei.jie@mycompany.com,+65 87953166
+E1087,Grace Lee,Female,HR,Recruiter,Hyderabad,grace.lee@mycompany.com,+65 87705062
+E1088,Ananya Kumar,Male,HR,HR Executive,Singapore,ananya.kumar@mycompany.com,+65 88132769
+E1089,Ananya Rahman,Female,IT,SysAdmin,Singapore,ananya.rahman@mycompany.com,+65 85180853
+E1090,Priya Teo,Male,Sales,Sales Manager,Shanghai,priya.teo@mycompany.com,+65 86323376
+E1091,Wei Ting Sato,Female,Finance,Financial Analyst,Penang,wei.ting@mycompany.com,+65 88963715
+E1092,Wei Ting Abdullah,Male,IT,IT Support Engineer,San Diego,wei.ting@mycompany.com,+65 89745959
+E1093,Diego Sharma,Female,Marketing,Content Lead,Singapore,diego.sharma@mycompany.com,+65 85793722
+E1094,Ananya Abdullah,Male,Marketing,Content Lead,Shanghai,ananya.abdullah@mycompany.com,+65 82351868
+E1095,Jun Hao Kumar,Female,Sales,Sales Manager,Penang,jun.hao@mycompany.com,+65 84589533
+E1096,Daniel Reddy,Male,Finance,Financial Analyst,Shanghai,daniel.reddy@mycompany.com,+65 88816912
+E1097,Karthik Lim,Female,Sales,Sales Manager,Hyderabad,karthik.lim@mycompany.com,+65 81327691
+E1098,Grace Chua,Male,Finance,Accountant,San Diego,grace.chua@mycompany.com,+65 86009888
+E1099,Joanne Reddy,Female,Operations,Ops Analyst,Hyderabad,joanne.reddy@mycompany.com,+65 84681284
+E1100,Hafiz Reddy,Male,Finance,Accountant,Hyderabad,hafiz.reddy@mycompany.com,+65 86639317

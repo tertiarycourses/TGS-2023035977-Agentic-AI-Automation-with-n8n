@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Stock Analysis Dashboard</title>
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#141925; --panel-2:#1b2230; --border:#283143;
+    --text:#e6edf3; --muted:#8b97a8; --accent:#ff6d3f; --accent-2:#4f8cff;
+    --green:#26a17b; --red:#ef4444; --radius:14px;
+    --font:'Segoe UI',Roboto,-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(1200px 600px at 80% -10%,#161c2b 0%,var(--bg) 60%);
+    color:var(--text);font-family:var(--font);min-height:100vh;padding:24px}
+  a{color:inherit}
+  .wrap{max-width:1180px;margin:0 auto}
+
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+  .brand{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:700}
+  .brand .logo{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--accent),#ff9a3f);font-size:20px}
+  .brand small{display:block;font-size:12px;color:var(--muted);font-weight:500}
+
+  .searchbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .field{display:flex;align-items:center;background:var(--panel);border:1px solid var(--border);
+    border-radius:12px;padding:0 12px;height:46px}
+  .field input{background:transparent;border:none;outline:none;color:var(--text);font-size:15px;width:170px;text-transform:uppercase}
+  .field input::placeholder{color:var(--muted);text-transform:none}
+  select{background:var(--panel);border:1px solid var(--border);color:var(--text);height:46px;
+    border-radius:12px;padding:0 12px;font-size:14px;outline:none;cursor:pointer}
+  .btn{height:46px;padding:0 20px;border:none;border-radius:12px;cursor:pointer;font-size:15px;font-weight:600;color:#fff;
+    background:linear-gradient(135deg,var(--accent),#ff8a3f);transition:.15s}
+  .btn:hover{filter:brightness(1.08)} .btn:active{transform:translateY(1px)}
+  .btn-ghost{height:46px;width:46px;border:1px solid var(--border);background:var(--panel);border-radius:12px;
+    cursor:pointer;font-size:18px;transition:.15s}
+  .btn-ghost:hover{border-color:var(--accent)}
+
+  /* API key modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(5,7,11,.7);display:grid;place-items:center;z-index:60;padding:20px}
+  .modal{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:24px;width:440px;max-width:100%}
+  .modal h3{font-size:18px;margin-bottom:8px}
+  .modal p{color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:16px}
+  .modal input{width:100%;height:46px;background:var(--panel-2);border:1px solid var(--border);border-radius:12px;
+    color:var(--text);padding:0 14px;font-size:14px;outline:none}
+  .modal input:focus{border-color:var(--accent)}
+  .modal-actions{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px}
+  .modal-actions .link{color:var(--accent-2);font-size:13px;text-decoration:none}
+  .modal-actions .link:hover{text-decoration:underline}
+  .btn-secondary{height:42px;padding:0 16px;border:1px solid var(--border);background:transparent;color:var(--text);
+    border-radius:10px;cursor:pointer;font-size:14px;margin-right:8px}
+  .btn-secondary:hover{border-color:var(--muted)}
+  .modal-label{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+  .modal .link{display:inline-block;margin-top:8px}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 18px}
+  .chip{background:var(--panel);border:1px solid var(--border);color:var(--muted);padding:6px 12px;
+    border-radius:999px;font-size:13px;cursor:pointer;transition:.15s}
+  .chip:hover{color:var(--text);border-color:var(--accent)}
+
+  .title-row{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px;min-height:34px}
+  .title-row h1{font-size:24px}
+  .title-row .exch{color:var(--muted);font-size:13px}
+  .badge{padding:4px 10px;border-radius:8px;font-weight:700;font-size:14px}
+  .badge.up{background:rgba(38,161,123,.15);color:var(--green)}
+  .badge.down{background:rgba(239,68,68,.15);color:var(--red)}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:18px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+  .card .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  .card .value{font-size:22px;font-weight:700;margin-top:6px}
+  .card .sub{font-size:13px;color:var(--muted);margin-top:4px}
+  .value.up{color:var(--green)} .value.down{color:var(--red)}
+
+  /* Chart toolbar + source switcher */
+  .chart-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+  .seg{display:inline-flex;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:4px;gap:4px}
+  .seg button{background:transparent;border:none;color:var(--muted);padding:8px 16px;border-radius:9px;
+    font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+  .seg button.active{background:linear-gradient(135deg,var(--accent),#ff8a3f);color:#fff}
+  .seg button:not(.active):hover{color:var(--text)}
+  .yahoo-link{display:inline-flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--border);
+    color:var(--text);text-decoration:none;padding:9px 14px;border-radius:11px;font-size:13px;font-weight:600;transition:.15s}
+  .yahoo-link:hover{border-color:#7e57ff;color:#fff}
+  .yahoo-link b{color:#7e57ff}
+
+  .chart-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:8px;position:relative;overflow:hidden}
+  #tvchart,#tdchart{width:100%;height:520px;border-radius:10px;overflow:hidden}
+  .status{position:absolute;inset:0;display:grid;place-items:center;background:rgba(11,14,20,.65);
+    border-radius:var(--radius);font-size:15px;color:var(--muted);text-align:center;padding:20px;z-index:5}
+  .status.err{color:#ffb4b4}
+  .hidden{display:none!important}
+  .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);
+    border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .td-legend{display:flex;gap:16px;font-size:12px;color:var(--muted);flex-wrap:wrap;padding:6px 4px 2px}
+  .td-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
+
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
+  .powered-by{margin-top:8px;font-size:12px}
+  .powered-by a{color:var(--accent);text-decoration:none}
+  .powered-by a:hover{text-decoration:underline}
+
+  /* Telegram floating widget */
+  .tg-launcher{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;
+    background:linear-gradient(135deg,#2aabee,#229ed9);display:grid;place-items:center;cursor:pointer;
+    box-shadow:0 8px 26px rgba(34,158,217,.5);z-index:50;transition:.2s}
+  .tg-launcher:hover{transform:scale(1.06)}
+  .tg-launcher svg{width:30px;height:30px}
+  .tg-launcher .dot{position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+  .tg-panel{position:fixed;bottom:96px;right:24px;width:340px;max-width:calc(100vw - 48px);
+    background:var(--panel);border:1px solid var(--border);border-radius:18px;overflow:hidden;
+    box-shadow:0 18px 50px rgba(0,0,0,.5);z-index:50;transform:translateY(16px) scale(.96);opacity:0;pointer-events:none;transition:.2s}
+  .tg-panel.open{transform:none;opacity:1;pointer-events:auto}
+  .tg-head{background:linear-gradient(135deg,#2aabee,#229ed9);padding:16px;display:flex;gap:12px;align-items:center}
+  .tg-head .av{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:20px}
+  .tg-head h3{font-size:16px;color:#fff} .tg-head p{font-size:12px;color:rgba(255,255,255,.85)}
+  .tg-head .x{margin-left:auto;color:#fff;cursor:pointer;font-size:20px;opacity:.85;line-height:1}
+  .tg-body{padding:16px;background:var(--panel-2)}
+  .tg-msg{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--text);line-height:1.5}
+  .tg-msg b{color:var(--accent-2)}
+  .tg-suggest{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+  .tg-suggest button{text-align:left;background:var(--panel);border:1px solid var(--border);color:var(--text);
+    padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13px;transition:.15s}
+  .tg-suggest button:hover{border-color:#2aabee;color:#fff}
+  .tg-cta{display:block;text-align:center;margin-top:14px;background:linear-gradient(135deg,#2aabee,#229ed9);
+    color:#fff;text-decoration:none;padding:12px;border-radius:12px;font-weight:600;font-size:14px}
+  .tg-foot{padding:10px 16px;text-align:center;font-size:11px;color:var(--muted);background:var(--panel-2)}
+
+  @media(max-width:560px){ body{padding:14px} .field input{width:130px} #tvchart,#tdchart{height:420px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">📈</div>
+      <div>Stock Analysis<small>Real-time technical dashboard</small></div>
+    </div>
+    <form class="searchbar" id="searchForm">
+      <div class="field"><input id="symbolInput" placeholder="Enter symbol e.g. AAPL" value="AAPL" autocomplete="off" /></div>
+      <select id="intervalSelect">
+        <option value="1min">1 min</option>
+        <option value="5min">5 min</option>
+        <option value="15min">15 min</option>
+        <option value="1h">1 hour</option>
+        <option value="1day" selected>1 day</option>
+        <option value="1week">1 week</option>
+      </select>
+      <button class="btn-ghost" type="button" id="keyBtn" title="Settings — TwelveData API key & Telegram bot">⚙️</button>
+      <button class="btn" type="submit">Analyze</button>
+    </form>
+  </header>
+
+  <div class="chips" id="quickChips">
+    <span class="chip" data-sym="AAPL">AAPL</span>
+    <span class="chip" data-sym="TSLA">TSLA</span>
+    <span class="chip" data-sym="MSFT">MSFT</span>
+    <span class="chip" data-sym="NVDA">NVDA</span>
+    <span class="chip" data-sym="AMZN">AMZN</span>
+    <span class="chip" data-sym="GOOGL">GOOGL</span>
+    <span class="chip" data-sym="BTC/USD">BTC/USD</span>
+    <span class="chip" data-sym="ETH/USD">ETH/USD</span>
+  </div>
+
+  <div class="title-row">
+    <h1 id="symTitle">—</h1>
+    <span class="exch" id="symExch"></span>
+    <span class="badge" id="symBadge"></span>
+  </div>
+
+  <div class="stats" id="stats">
+    <div class="card"><div class="label">Price (Close)</div><div class="value" id="stPrice">—</div><div class="sub" id="stPrevClose"></div></div>
+    <div class="card"><div class="label">Change (today)</div><div class="value" id="stChange">—</div><div class="sub" id="stChangePct"></div></div>
+    <div class="card"><div class="label">Open</div><div class="value" id="stOpen">—</div><div class="sub">Session open</div></div>
+    <div class="card"><div class="label">High</div><div class="value" id="stHigh">—</div><div class="sub">Day max</div></div>
+    <div class="card"><div class="label">Low</div><div class="value" id="stLow">—</div><div class="sub">Day min</div></div>
+    <div class="card"><div class="label">Volume</div><div class="value" id="stVol">—</div><div class="sub">Shares traded</div></div>
+    <div class="card"><div class="label">52-Week Range</div><div class="value" id="st52">—</div><div class="sub">Low – High</div></div>
+  </div>
+
+  <div class="chart-toolbar">
+    <div class="seg" id="srcSwitch">
+      <button data-src="tradingview" class="active">TradingView</button>
+      <button data-src="twelvedata">TwelveData</button>
+    </div>
+    <a class="yahoo-link" id="yahooLink" href="#" target="_blank" rel="noopener">View on <b>Yahoo&nbsp;Finance</b> ↗</a>
+  </div>
+
+  <div class="chart-card">
+    <div id="tvchart"></div>
+    <div id="tdwrap" class="hidden">
+      <div class="td-legend">
+        <span><i style="background:#26a17b"></i>Up</span>
+        <span><i style="background:#ef4444"></i>Down</span>
+        <span><i style="background:#4f8cff"></i>SMA 20</span>
+        <span><i style="background:#5a6478"></i>Volume</span>
+      </div>
+      <div id="tdchart"></div>
+      <div class="status hidden" id="tdStatus"></div>
+    </div>
+  </div>
+
+  <footer>Charts by <a href="https://www.tradingview.com" target="_blank" rel="noopener">TradingView</a> /
+    <a href="https://twelvedata.com" target="_blank" rel="noopener">TwelveData</a>
+    · Quote data by TwelveData · For research/education only — not financial advice.
+    <p class="powered-by">Powered by <a href="https://www.tertiaryinfotech.com/" target="_blank" rel="noopener">Tertiary Infotech Academy Pte Ltd</a></p></footer>
+</div>
+
+<!-- ===== Settings modal ===== -->
+<div class="modal-overlay hidden" id="settingsModal">
+  <div class="modal">
+    <h3>⚙️ Settings</h3>
+    <p>These are saved only in your browser (localStorage) — never uploaded, shared, or committed to git.</p>
+    <label class="modal-label" for="keyInput">TwelveData API key</label>
+    <input id="keyInput" type="text" placeholder="Paste your TwelveData API key" autocomplete="off" spellcheck="false" />
+    <a class="link" href="https://twelvedata.com/account/api" target="_blank" rel="noopener">Get a free TwelveData key ↗</a>
+    <label class="modal-label" for="tgInput" style="margin-top:16px">Telegram bot username</label>
+    <input id="tgInput" type="text" placeholder="e.g. @bellcohort3bot" autocomplete="off" spellcheck="false" />
+    <div class="modal-actions">
+      <span></span>
+      <div>
+        <button class="btn-secondary" type="button" id="settingsCancel">Cancel</button>
+        <button class="btn" type="button" id="settingsSave">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Telegram floating widget ===== -->
+<div class="tg-panel" id="tgPanel">
+  <div class="tg-head">
+    <div class="av">🤖</div>
+    <div><h3>Stock Assistant</h3><p>AI day-trading agent · via Telegram</p></div>
+    <span class="x" id="tgClose">×</span>
+  </div>
+  <div class="tg-body">
+    <div class="tg-msg">Hi 👋 I'm your AI trading assistant. Send me a stock and I'll reply with a
+      <b>Buy / Sell / Hold</b> recommendation plus the reasoning — right inside Telegram.</div>
+    <div class="tg-suggest" id="tgSuggest">
+      <button data-q="Should I buy {SYM}?">💬 "Should I buy <span class="qsym">AAPL</span>?"</button>
+      <button data-q="{SYM} analysis and recommendation">💬 "<span class="qsym">AAPL</span> analysis and recommendation"</button>
+      <button data-q="How is {SYM} looking today?">💬 "How is <span class="qsym">AAPL</span> looking today?"</button>
+    </div>
+    <a class="tg-cta" id="tgOpen" href="#" target="_blank" rel="noopener">Open chat in Telegram →</a>
+  </div>
+  <div class="tg-foot">Powered by your n8n AI Agent</div>
+</div>
+<div class="tg-launcher" id="tgLauncher" title="Ask the AI trading assistant">
+  <span class="dot"></span>
+  <svg viewBox="0 0 24 24" fill="#fff"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+</div>
+
+<script>
+/* ===================== CONFIG ===================== */
+// Your TwelveData API key is stored only in YOUR browser (localStorage) — never hardcoded or committed to git.
+// Get a free key at https://twelvedata.com/account/api
+const TD_KEY_STORAGE = "TWELVEDATA_KEY";
+let TWELVEDATA_KEY = localStorage.getItem(TD_KEY_STORAGE) || "";
+// Telegram bot username is also browser-stored and editable in Settings. Default is just a starting value.
+const TG_STORAGE = "TELEGRAM_BOT";
+let TELEGRAM_BOT_USERNAME = localStorage.getItem(TG_STORAGE) || "bellcohort3bot";
+
+let currentSymbol = "AAPL";
+let chartSource = "tradingview";        // 'tradingview' | 'twelvedata'
+
+/* ===================== SYMBOL MAPPING ===================== */
+const tvSymbol     = s => s.replace("/", "");                 // BTC/USD -> BTCUSD
+const yahooSymbol  = s => s.replace("/", "-");                // BTC/USD -> BTC-USD
+
+/* ===================== TRADINGVIEW CHART ===================== */
+const TV_INTERVAL = { "1min":"1","5min":"5","15min":"15","1h":"60","1day":"D","1week":"W" };
+function renderTradingView(symbol, interval){
+  document.getElementById('tvchart').innerHTML = "";
+  new TradingView.widget({
+    container_id:"tvchart", autosize:true, symbol:tvSymbol(symbol),
+    interval:TV_INTERVAL[interval]||"D", timezone:"Etc/UTC", theme:"dark", style:"1", locale:"en",
+    toolbar_bg:"#141925", enable_publishing:false, allow_symbol_change:true,
+    hide_side_toolbar:false, withdateranges:true, details:true, studies:["STD;SMA"],
+  });
+}
+
+/* ===================== TWELVEDATA CHART (lightweight-charts) ===================== */
+let tdChart, tdCandle, tdSMA, tdVol, tdReady = false;
+function ensureTdChart(){
+  if(tdReady) return;
+  const el = document.getElementById('tdchart');
+  tdChart = LightweightCharts.createChart(el, {
+    width: el.clientWidth || 800, height: 520,
+    layout:{ background:{ color:'transparent' }, textColor:'#8b97a8', fontFamily:'Segoe UI' },
+    grid:{ vertLines:{ color:'rgba(40,49,67,.5)' }, horzLines:{ color:'rgba(40,49,67,.5)' } },
+    rightPriceScale:{ borderColor:'#283143' },
+    timeScale:{ borderColor:'#283143', timeVisible:true, secondsVisible:false },
+  });
+  tdCandle = tdChart.addCandlestickSeries({ upColor:'#26a17b', downColor:'#ef4444', borderVisible:false, wickUpColor:'#26a17b', wickDownColor:'#ef4444' });
+  tdSMA = tdChart.addLineSeries({ color:'#4f8cff', lineWidth:2, priceLineVisible:false, lastValueVisible:false });
+  tdVol = tdChart.addHistogramSeries({ priceFormat:{ type:'volume' }, priceScaleId:'' });
+  tdVol.priceScale().applyOptions({ scaleMargins:{ top:0.82, bottom:0 } });
+  new ResizeObserver(es=>{ for(const e of es) tdChart.applyOptions({ width:e.contentRect.width, height:520 }); }).observe(el);
+  tdReady = true;
+}
+function tdStatus(msg, isErr){ const s=document.getElementById('tdStatus'); if(!msg){ s.className='status hidden'; return; }
+  s.className='status'+(isErr?' err':''); s.innerHTML = isErr ? '⚠️ '+msg : '<div><div class="spinner"></div>'+msg+'</div>'; }
+
+async function fetchSeries(symbol, interval){
+  if(!TWELVEDATA_KEY) throw new Error('Add your TwelveData API key (🔑 button) to load this chart.');
+  const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(symbol)}&interval=${interval}&outputsize=300&apikey=${TWELVEDATA_KEY}`;
+  const j = await (await fetch(url)).json();
+  if(j.status==='error' || !j.values) throw new Error(j.message || 'No data for this symbol.');
+  return j;
+}
+function toChartData(values){
+  const rows = values.slice().reverse().map(v=>({
+    time: v.datetime.length>10 ? Math.floor(new Date(v.datetime.replace(' ','T')).getTime()/1000) : v.datetime,
+    open:+v.open, high:+v.high, low:+v.low, close:+v.close, volume:+v.volume||0 }));
+  const seen=new Set(),out=[]; for(const r of rows){ const k=String(r.time); if(seen.has(k))continue; seen.add(k); out.push(r);} return out;
+}
+function sma(data,p){ const out=[]; let s=0; for(let i=0;i<data.length;i++){ s+=data[i].close; if(i>=p)s-=data[i-p].close; if(i>=p-1)out.push({time:data[i].time,value:+(s/p).toFixed(4)});} return out; }
+async function renderTwelveData(symbol, interval){
+  ensureTdChart(); tdStatus('Loading market data…', false);
+  try{
+    const data = toChartData((await fetchSeries(symbol, interval)).values);
+    if(!data.length) throw new Error('No candles for this symbol/interval.');
+    tdCandle.setData(data);
+    tdVol.setData(data.map(d=>({ time:d.time, value:d.volume, color: d.close>=d.open ? 'rgba(38,161,123,.5)' : 'rgba(239,68,68,.5)' })));
+    tdSMA.setData(data.length>=20 ? sma(data,20) : []);
+    tdChart.timeScale().fitContent(); tdStatus(null);
+  }catch(e){ tdStatus(e.message || 'Failed to load chart.', true); }
+}
+
+/* ===================== CHART DISPATCH ===================== */
+function renderChart(symbol, interval){
+  const tv=document.getElementById('tvchart'), td=document.getElementById('tdwrap');
+  if(chartSource==='tradingview'){ tv.classList.remove('hidden'); td.classList.add('hidden'); renderTradingView(symbol, interval); }
+  else { td.classList.remove('hidden'); tv.classList.add('hidden'); renderTwelveData(symbol, interval); }
+}
+
+/* ===================== QUOTE / STAT CARDS (TwelveData) ===================== */
+async function fetchQuote(symbol){
+  if(!TWELVEDATA_KEY) return null;
+  const j = await (await fetch(`https://api.twelvedata.com/quote?symbol=${encodeURIComponent(symbol)}&apikey=${TWELVEDATA_KEY}`)).json();
+  return (j.status==='error') ? null : j;
+}
+const fmt = (n,d=2)=> (n==null||n===''||isNaN(n)) ? '—' : Number(n).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtVol = n => { n=+n; if(!n)return '—'; if(n>=1e9)return (n/1e9).toFixed(2)+'B'; if(n>=1e6)return (n/1e6).toFixed(2)+'M'; if(n>=1e3)return (n/1e3).toFixed(1)+'K'; return n.toString(); };
+function renderQuote(symbol, q){
+  document.getElementById('symTitle').textContent = q&&q.name ? q.name : symbol;
+  document.getElementById('symExch').textContent = q ? [q.exchange,q.currency].filter(Boolean).join(' · ') : '';
+  const badge=document.getElementById('symBadge');
+  if(q && q.percent_change!=null && q.percent_change!==''){ const up=+q.percent_change>=0; badge.className='badge '+(up?'up':'down'); badge.textContent=(up?'▲ ':'▼ ')+fmt(Math.abs(q.percent_change))+'%'; }
+  else badge.textContent='';
+  const ids=['stPrice','stChange','stOpen','stHigh','stLow','stVol','st52'];
+  if(!q){ ids.forEach(id=>document.getElementById(id).textContent='—'); return; }
+  const up=+q.percent_change>=0;
+  const price=document.getElementById('stPrice'); price.textContent=fmt(q.close); price.className='value';
+  document.getElementById('stPrevClose').textContent = q.previous_close ? 'Prev close '+fmt(q.previous_close) : '';
+  const ch=document.getElementById('stChange'); ch.textContent=(up?'+':'')+fmt(q.change); ch.className='value '+(up?'up':'down');
+  document.getElementById('stChangePct').textContent=(up?'+':'')+fmt(q.percent_change)+'% today';
+  document.getElementById('stOpen').textContent=fmt(q.open);
+  document.getElementById('stHigh').textContent=fmt(q.high);
+  document.getElementById('stLow').textContent=fmt(q.low);
+  document.getElementById('stVol').textContent=fmtVol(q.volume);
+  const w=q.fifty_two_week||{}; document.getElementById('st52').textContent=(w.low&&w.high)?fmt(w.low)+' – '+fmt(w.high):'—';
+}
+
+/* ===================== MAIN LOAD ===================== */
+async function loadSymbol(symbol, interval){
+  symbol = symbol.trim().toUpperCase(); if(!symbol) return;
+  currentSymbol = symbol;
+  document.getElementById('symbolInput').value = symbol;
+  document.getElementById('yahooLink').href = `https://finance.yahoo.com/quote/${yahooSymbol(symbol)}`;
+  updateTelegramSuggestions(symbol);
+  renderChart(symbol, interval);
+  try{ renderQuote(symbol, await fetchQuote(symbol)); }catch(e){ renderQuote(symbol, null); }
+}
+const curInterval = ()=> document.getElementById('intervalSelect').value;
+
+/* ===================== EVENTS ===================== */
+document.getElementById('searchForm').addEventListener('submit', e=>{ e.preventDefault(); loadSymbol(document.getElementById('symbolInput').value, curInterval()); });
+document.getElementById('intervalSelect').addEventListener('change', ()=> loadSymbol(currentSymbol, curInterval()));
+document.getElementById('quickChips').addEventListener('click', e=>{ if(e.target.classList.contains('chip')) loadSymbol(e.target.dataset.sym, curInterval()); });
+document.getElementById('srcSwitch').addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  chartSource = b.dataset.src;
+  document.querySelectorAll('#srcSwitch button').forEach(x=>x.classList.toggle('active', x===b));
+  renderChart(currentSymbol, curInterval());
+});
+
+/* ===================== TELEGRAM WIDGET ===================== */
+const tgPanel=document.getElementById('tgPanel');
+function tgLink(text){ const base=`https://t.me/${TELEGRAM_BOT_USERNAME}`; return text?`${base}?text=${encodeURIComponent(text)}`:base; }
+function updateTelegramSuggestions(symbol){
+  document.querySelectorAll('#tgSuggest .qsym').forEach(s=>s.textContent=symbol);
+  document.getElementById('tgOpen').href = tgLink('Recommendation for '+symbol);
+}
+document.getElementById('tgLauncher').addEventListener('click', ()=> tgPanel.classList.toggle('open'));
+document.getElementById('tgClose').addEventListener('click', ()=> tgPanel.classList.remove('open'));
+document.querySelectorAll('#tgSuggest button').forEach(b=> b.addEventListener('click', ()=> window.open(tgLink(b.dataset.q.replace('{SYM}',currentSymbol)),'_blank')));
+
+/* ===================== SETTINGS MODAL ===================== */
+const settingsModal = document.getElementById('settingsModal');
+function openSettings(){
+  document.getElementById('keyInput').value = TWELVEDATA_KEY;
+  document.getElementById('tgInput').value = TELEGRAM_BOT_USERNAME ? '@'+TELEGRAM_BOT_USERNAME : '';
+  settingsModal.classList.remove('hidden');
+  document.getElementById('keyInput').focus();
+}
+function closeSettings(){ settingsModal.classList.add('hidden'); }
+document.getElementById('keyBtn').addEventListener('click', openSettings);
+document.getElementById('settingsCancel').addEventListener('click', closeSettings);
+document.getElementById('settingsSave').addEventListener('click', ()=>{
+  const k = document.getElementById('keyInput').value.trim();
+  const t = document.getElementById('tgInput').value.trim().replace(/^@/,'').replace(/^https?:\/\/t\.me\//i,'');
+  if(k){ TWELVEDATA_KEY = k; localStorage.setItem(TD_KEY_STORAGE, k); }
+  if(t){ TELEGRAM_BOT_USERNAME = t; localStorage.setItem(TG_STORAGE, t); }
+  closeSettings();
+  updateTelegramSuggestions(currentSymbol);
+  loadSymbol(currentSymbol, curInterval());
+});
+settingsModal.addEventListener('click', e=>{ if(e.target===settingsModal) closeSettings(); });
+
+/* Initial load */
+loadSymbol('AAPL', '1day');
+if(!TWELVEDATA_KEY) openSettings();   // prompt for key on first visit
+</script>
+</body>
+</html>

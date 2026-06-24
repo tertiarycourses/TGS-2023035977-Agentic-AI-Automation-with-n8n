@@ -21,3 +21,6 @@ qr-check.png
 
 # Editor workspace
 *.code-workspace
+
+# Local reference material (large; not part of deliverable)
+reference flows/
