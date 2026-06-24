@@ -143,7 +143,7 @@ IMG=lambda p: f"{REPO}/{p}"
 cover()
 
 # ---------- ADMIN ----------
-section("COURSE ADMINISTRATION","Welcome & Housekeeping","01")
+section("COURSE ADMINISTRATION","Welcome & Housekeeping","")
 content("Digital Attendance (Mandatory)",[
  "It is mandatory to take the AM, PM and Assessment digital attendance for WSQ-funded courses.",
  "The trainer/administrator will display the digital attendance QR code generated from the SSG portal.",
@@ -192,7 +192,7 @@ content("Briefing for Assessment",[
  "Scripts are collected when time is up."])
 
 # ---------- TOPIC 1: WORKFLOW AUTOMATION ----------
-section("TOPIC 1","Workflow Automation with n8n","02","Triggers · Actions · Nodes · Flows")
+section("TOPIC 1","Workflow Automation with n8n","01","Triggers · Actions · Nodes · Flows")
 content("What is n8n?",[
  "A workflow automation platform — connect apps and services with little or no code.",
  "Visual editor: drag nodes onto a canvas and wire them together.",
@@ -267,7 +267,7 @@ def activity_block(a):
     if a.get("test"): test_slide(a["title"],a["test"],a["kicker"])
 
 K1="TOPIC 1 · WORKFLOW AUTOMATION"
-activity_block(dict(tag="ACT 1",title="Activity 1 — Flyer with QR Code",kicker=K1,
+activity_block(dict(tag="ACT 1",title="Activity 1 — Flyer with QR Code (Form → Email)",kicker=K1,
  desc="Collect a visitor's details with an n8n Form and email them to an admin, then turn the form URL into a QR code on an event flyer (group activity).",
  build="Form Trigger  →  Gmail (Send)",nodes="formTrigger, gmail",
  img="labs/activity1-flyer-form/Activity1-Flyer-Form.png",cap="Form Trigger → Gmail",
@@ -279,7 +279,7 @@ activity_block(dict(tag="ACT 1",title="Activity 1 — Flyer with QR Code",kicker
    "Copy the Form's Production URL; paste it into the QR generator (alfredang.github.io/qrcodegenerator) and put the QR on a flyer.",
    "Group activity: design an event flyer (e.g. bowling night) with the QR code, then present it."],
  test="Scan the QR code, submit the form, and confirm the admin inbox receives the email."))
-activity_block(dict(tag="ACT 2",title="Activity 2 — Capture Data in a Data Table",kicker=K1,
+activity_block(dict(tag="ACT 2",title="Activity 2 — Capture Submissions in a Data Table",kicker=K1,
  desc="Extend Activity 1 so every submission is also saved into an n8n Data Table — your first taste of storing data, not just forwarding it.",
  build="Form Trigger  →  Gmail  +  Data Table (Insert row)",nodes="formTrigger, gmail, dataTable",
  img="labs/activity2-data-table/Activity2-Data-Table.png",cap="Form → Gmail + Data Table",
@@ -299,7 +299,7 @@ activity_block(dict(tag="ACT 3a",title="Activity 3a — Conditional Response (Da
    "On the false output, add a Gmail node sending a friendly thank-you.",
    "Save and keep the workflow Active."],
  test="Submit once with Attending = Yes (new Data Table row) and once with No (thank-you email)."))
-activity_block(dict(tag="ACT 3b",title="Activity 3b — Conditional Response (Google Sheets)",kicker=K1,
+activity_block(dict(tag="ACT 3b",title="Activity 3b — Conditional Response (Google Sheets / Excel)",kicker=K1,
  desc="Make data persistent by replacing the Data Table with Google Sheets (or Excel). Same logic — the Yes branch appends a row to a real spreadsheet you keep.",
  build="Form Trigger  →  IF  →  Google Sheets / Gmail",nodes="formTrigger, if, googleSheets, gmail",
  img="labs/activity3-conditional/Activity3b-Conditional-Google-Sheets.png",cap="IF routes to Google Sheets or a thank-you email",
@@ -312,7 +312,7 @@ activity_block(dict(tag="ACT 3b",title="Activity 3b — Conditional Response (Go
 brk("Lunch Break","1 hour  ·  see you at 2:00 pm",AMBER)
 
 # ---------- TOPIC 2: AI AGENTS ----------
-section("TOPIC 2","AI Agents","03","LLM · Memory · Tools · System Instruction")
+section("TOPIC 2","AI Agents and RAG","02","LLM · Memory · Tools · System Instruction")
 content("What is Agentic AI?",[
  "Traditional automation follows fixed rules you wire by hand.",
  "An AI agent uses an LLM to understand language and decide what to do.",
@@ -345,7 +345,7 @@ content("Memory & Tools",[
  "The agent decides when to call a tool based on your description.",
  "All agents in this course use OpenAI gpt-4.1-mini."],kicker="EXTENDING THE AGENT")
 K2="TOPIC 2 · AI AGENTS"
-activity_block(dict(tag="ACT 4a",title="Activity 4a — Telegram AI Agent (Customer Service)",kicker=K2,
+activity_block(dict(tag="ACT 4a",title="Activity 4a — Telegram-Triggered AI Agent (Customer Service)",kicker=K2,
  desc="Build your first AI agent: a customer-service chatbot you talk to from Telegram, using an LLM, memory and a system instruction.",
  build="Telegram Trigger  →  AI Agent (+ model + memory)  →  Telegram reply",nodes="telegramTrigger, agent, lmChatOpenAi, memory, telegram",
  img="labs/activity4-telegram-agent/Activity4a-Telegram-Agent.png",cap="Telegram-triggered AI agent with model + memory",
@@ -357,7 +357,7 @@ activity_block(dict(tag="ACT 4a",title="Activity 4a — Telegram AI Agent (Custo
    "Write the system instruction (friendly customer-service assistant).",
    "Add a Telegram → Send Message: Chat ID = {{ $json.message.chat.id }}, Text = the agent output. Save & Activate."],
  test="Message your bot in Telegram and confirm it replies."))
-activity_block(dict(tag="ACT 4b",title="Activity 4b — Agent + Data Table Tool (HR Admin)",kicker=K2,
+activity_block(dict(tag="ACT 4b",title="Activity 4b — Telegram Agent + Data Table Tool (HR Admin)",kicker=K2,
  desc="Give the agent a tool: an employee Data Table it can query. The same bot now answers HR-admin questions from real data.",
  build="Telegram  →  AI Agent  +  Data Table Tool  →  reply",nodes="agent, dataTableTool, telegram",
  img="labs/activity4-telegram-agent/Activity4b-Telegram-Data-Table.png",cap="Agent with a Data Table tool",
@@ -373,7 +373,7 @@ content("End of Day 1 — Recap",[
  "Tomorrow: RAG, Webhooks and external APIs."],kicker="WRAP-UP")
 
 # ---------- TOPIC 3: RAG ----------
-section("TOPIC 3","Retrieval-Augmented Generation (RAG)","04","Tokenization · Embeddings · Vector Stores")
+section("TOPIC 2 (cont.)","Retrieval-Augmented Generation (RAG)","02","Tokenization · Embeddings · Vector Stores")
 content("What is RAG?",[
  "RAG lets an agent answer from YOUR documents, not just its training data.",
  "Documents are split, embedded and stored; relevant chunks are retrieved per question.",
@@ -386,8 +386,8 @@ content("Vector Database",[
  "Vectors are stored in a vector store (in-memory, Pinecone, etc.).",
  "At query time, the question is embedded and the closest chunks are retrieved.",
  "Those chunks are given to the LLM as context to answer."],kicker="VECTOR STORE")
-K3="TOPIC 3 · RAG"
-activity_block(dict(tag="ACT 5",title="Activity 5 — Add RAG to the Telegram Agent",kicker=K3,
+K3="TOPIC 2 · RAG"
+activity_block(dict(tag="ACT 5",title="Activity 5 — Add RAG to the Telegram Agent (Two Knowledge Sources)",kicker=K3,
  desc="Upgrade the agent to answer from documents (policies/FAQs) AND the Data Table. It must route to the right source for each question — two knowledge sources, one agent.",
  build="Telegram  →  AI Agent  +  Vector Store (RAG) + Data Table  →  reply",nodes="agent, vectorStoreInMemory, embeddingsOpenAi, dataTableTool",
  img="labs/activity5-rag/Activity5-RAG-Telegram.png",cap="Agent routes between a RAG vector store and a Data Table",
@@ -400,7 +400,7 @@ activity_block(dict(tag="ACT 5",title="Activity 5 — Add RAG to the Telegram Ag
 brk("Lunch Break","1 hour",AMBER)
 
 # ---------- TOPIC 4: WEBHOOKS ----------
-section("TOPIC 4","Webhooks","05","External triggers for your workflows")
+section("TOPIC 3","Webhooks","03","External triggers for your workflows")
 content("What is a Webhook?",[
  "A Webhook is a URL that external systems call to trigger your workflow.",
  "Use cases: website chat, form submissions, payments, app notifications.",
@@ -418,8 +418,8 @@ content("Webhook Authentication",[
  "Basic Auth — username & password.",
  "Header Auth — a secret key in a request header.",
  "JWT — signed tokens for stronger security."],kicker="SECURING WEBHOOKS")
-K4="TOPIC 4 · WEBHOOKS"
-activity_block(dict(tag="ACT 6",title="Activity 6 — Website Chatbot (Investment Advisor)",kicker=K4,
+K4="TOPIC 3 · WEBHOOKS"
+activity_block(dict(tag="ACT 6",title="Activity 6 — Website Chatbot via Webhook (Investment Advisor)",kicker=K4,
  desc="Expose an AI agent to a public website via a Webhook. The Investment Advisor page has an enquiry form and a floating chatbot; both post to one n8n webhook.",
  build="Webhook  →  AI Agent  →  Respond to Webhook  (+ email the advisor)",nodes="webhook, agent, respondToWebhook, gmail",
  img="labs/activity6-investment-advisor/Activity6-Investment-Advisor.png",cap="One webhook, two paths: enquiry email + AI chat",
@@ -433,7 +433,7 @@ activity_block(dict(tag="ACT 6",title="Activity 6 — Website Chatbot (Investmen
 brk("Tea Break","15 minutes",TEAL)
 
 # ---------- TOPIC 5: API ----------
-section("TOPIC 5","API & HTTP Request","06","Pull live data from external services")
+section("TOPIC 4","API and HTTP Request","04","Pull live data from external services")
 content("What is an API?",[
  "An API lets your workflow request data from another service over HTTP.",
  "You send a request; the service sends back a response (usually JSON).",
@@ -452,8 +452,8 @@ content("HTTP Request Node",[
  "Configure method, URL, headers and query parameters.",
  "Store API keys in credentials, never hard-coded.",
  "Parse the JSON response and pass fields to the next node."],kicker="IN n8n")
-K5="TOPIC 5 · API & HTTP"
-activity_block(dict(tag="ACT 7",title="Activity 7 — Finance API → Telegram (Day Trader)",kicker=K5,
+K5="TOPIC 4 · API & HTTP"
+activity_block(dict(tag="ACT 7",title="Activity 7 — Finance API → Telegram (AI Day-Trading Agent)",kicker=K5,
  desc="Ask the Telegram bot about a stock; it resolves the ticker, pulls candles from Twelve Data and headlines from NewsAPI, and replies with a Buy/Sell/Hold call and reasoning.",
  build="Telegram → Extract ticker → HTTP (Twelve Data + NewsAPI) → AI Agent → reply",nodes="telegram, httpRequest, agent, lmChatOpenAi",
  img="labs/activity7-finance-advisor/Activity7-Finance-Advisor.png",cap="Multi-timeframe candles + news → AI day-trading agent",
@@ -470,13 +470,13 @@ content("End of Day 2 — Recap",[
  "You pulled live market + news data through APIs into a Telegram agent."],kicker="WRAP-UP")
 
 # ---------- TOPIC 6: SECURITY ----------
-section("TOPIC 6","Security & Guardrails","07","Human-in-the-loop · Pre/Post guardrails")
+section("TOPIC 5","Security and Guardrails","05","Human-in-the-loop · Pre/Post guardrails")
 content("Human in the Loop",[
  "Some actions are too sensitive to fully automate — money, hiring, sending on behalf.",
  "A human-in-the-loop step pauses the workflow for a person to Approve or Reject.",
  "n8n's Send and Wait for Response captures that decision (email / Telegram)."],kicker="CONCEPT")
-K6="TOPIC 6 · SECURITY"
-activity_block(dict(tag="ACT 8a",title="Activity 8a — Human-in-the-Loop Approval",kicker=K6,
+K6="TOPIC 5 · SECURITY"
+activity_block(dict(tag="ACT 8a",title="Activity 8a — Human-in-the-Loop Approval (Leave Application)",kicker=K6,
  desc="Model a leave-application approval: a request comes in, a manager is asked to approve, and the flow only continues — recording the leave and confirming — on approval.",
  build="Form → Manager Approval (Send & Wait) → IF → confirm / decline",nodes="formTrigger, gmail (sendAndWait), if",
  img="labs/activity8-guardrails/Activity8a-Human-in-the-Loop.png",cap="Approval pauses the flow until a manager decides",
@@ -490,7 +490,7 @@ content("Guardrails",[
  "Pre-guardrail — validate/sanitise the input (block prompt-injection, PII) before the LLM.",
  "Post-guardrail — check the output (no secrets, no disallowed content) before sending.",
  "On a violation, route to a safe fallback or human review."],kicker="CONCEPT")
-activity_block(dict(tag="ACT 8b",title="Activity 8b — Pre & Post Guardrails",kicker=K6,
+activity_block(dict(tag="ACT 8b",title="Activity 8b — Pre & Post Guardrails for the AI Agent",kicker=K6,
  desc="Wrap an AI agent so unsafe input never reaches the model and unsafe output never reaches the user. Add a pre-check before the agent and a post-check after it.",
  build="Webhook → Pre-check → AI Agent → Post-check → Respond / Blocked",nodes="webhook, if, agent, respondToWebhook",
  img="labs/activity8-guardrails/Activity8b-Guardrails.png",cap="Pre/post checks gate the agent",
@@ -503,7 +503,7 @@ activity_block(dict(tag="ACT 8b",title="Activity 8b — Pre & Post Guardrails",k
 brk("Lunch Break","1 hour",AMBER)
 
 # ---------- TOPIC 7: CAPSTONE ----------
-section("TOPIC 7","Mini Capstone Project","08","Design · Build · Present · Assess")
+section("TOPIC 6","Mini Capstone Project","06","Design · Build · Present · Assess")
 content("Mini Capstone Project",[
  "In small groups, design and build an end-to-end automation using what you learned.",
  "Include: a trigger, an AI agent with a tool or RAG source, an external API or storage, and a guardrail / human-in-the-loop step.",
