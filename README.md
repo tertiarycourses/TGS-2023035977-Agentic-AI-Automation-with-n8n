@@ -24,9 +24,9 @@
 
 ## Screenshot
 
-> MyCompany "HR & IT Mission Control" dashboard: a live workforce panel (powered by an n8n Data Table) alongside a Service Desk Assistant chatbot that answers HR-policy and IT-support questions from uploaded SOP/FAQ documents via a vector store.
+> **Activity 7 — Finance Advisor**: a live stock-analysis dashboard (TradingView + Twelve Data) with a floating Telegram launcher to an AI day-trading agent. **Live demo:** <https://tertiarycourses.github.io/TGS-2023035977-Agentic-AI-Automation-with-n8n/>
 
-![Screenshot](dashboard.png)
+![Agentic AI Automation with n8n — Finance Advisor dashboard](screenshot.png)
 
 ---
 
@@ -98,7 +98,7 @@ DAY 3 — Security & Guardrails + Capstone
 TGS-2023035977-Agentic-AI-Automation-with-n8n/
 ├── LEARNER-GUIDE.md                  # Full step-by-step lab guide (start here)
 ├── README.md
-├── dashboard.png                    # HR & IT Mission Control dashboard
+├── screenshot.png                   # Live Finance Advisor dashboard (Activity 7)
 │
 ├── labs/                            # All hands-on lab activities (one folder each)
 │   ├── n8n-installation/            # Docker Compose for self-hosting n8n

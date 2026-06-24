@@ -386,6 +386,9 @@ content("Vector Database",[
  "Vectors are stored in a vector store (in-memory, Pinecone, etc.).",
  "At query time, the question is embedded and the closest chunks are retrieved.",
  "Those chunks are given to the LLM as context to answer."],kicker="VECTOR STORE")
+img_slide("How RAG Works",IMG("courseware/assets/rag-flow.png"),
+          "User → Prompt → Data Retrieval (search/retrieve over your data sources) → Generator → Response",
+          kicker="TOPIC 2 · RAG")
 K3="TOPIC 2 · RAG"
 activity_block(dict(tag="ACT 5",title="Activity 5 — Add RAG to the Telegram Agent (Two Knowledge Sources)",kicker=K3,
  desc="Upgrade the agent to answer from documents (policies/FAQs) AND the Data Table. It must route to the right source for each question — two knowledge sources, one agent.",

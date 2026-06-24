@@ -316,6 +316,10 @@ Upgrade the agent with **Retrieval-Augmented Generation (RAG)** so it can answer
 - **Embeddings** — each chunk of a document becomes a vector (a list of numbers capturing meaning).
 - **Vector store** — those vectors are saved so the most relevant chunks can be retrieved for a question.
 
+![How RAG works — User → Prompt → Data Retrieval (search/retrieve over your data sources) → Generator → Response](courseware/assets/rag-flow.png)
+
+*How RAG works — User → Prompt → Data Retrieval (search/retrieve over your data sources) → Generator → Response*
+
 ### Step-by-step
 
 1. Prepare knowledge documents. Use the provided `MyCompany-HR-SOP.docx` and `MyCompany-IT-Support-FAQ.docx`, or generate fresh ones with Claude Code (e.g. an employee-benefits FAQ or product info).

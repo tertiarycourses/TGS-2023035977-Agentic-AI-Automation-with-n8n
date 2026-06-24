@@ -287,6 +287,8 @@ bullets([
     "**Embeddings** — each chunk of a document becomes a vector (a list of numbers capturing meaning).",
     "**Vector store** — those vectors are saved so the most relevant chunks can be retrieved for a question.",
 ])
+B.append(("img", "courseware/assets/rag-flow.png",
+          "How RAG works — User → Prompt → Data Retrieval (search/retrieve over your data sources) → Generator → Response"))
 h3("Step-by-step")
 steps([
     "Prepare knowledge documents. Use the provided `MyCompany-HR-SOP.docx` and `MyCompany-IT-Support-FAQ.docx`, "
