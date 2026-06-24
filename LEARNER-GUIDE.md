@@ -6,7 +6,7 @@
 This guide walks you through every hands‑on activity in the course. Each activity builds on the previous one, taking you from a simple form‑to‑email automation all the way to a Retrieval‑Augmented Generation (RAG) chatbot and a multi‑agent router with a custom web front end.
 
 > The completed workflow exports (`.json`) and web pages (`.html`) for every activity are in the matching folders:
-> `activity1-automation/`, `activity2-ai-agent/`, `activity3-webhook/`, `activity4-rag/`, `activity5-multi-agents/`.
+> `labs/activity1-automation/`, `labs/activity2-ai-agent/`, `labs/activity3-webhook/`, `labs/activity4-rag/`, `labs/activity5-multi-agents/`.
 > You can import any `.json` into n8n to compare against your own build.
 
 ---
@@ -106,10 +106,10 @@ Open **http://localhost:5678** and create your owner account. Stop n8n with **Ct
 #### Option C — Docker (local, reproducible)
 First install **Docker Desktop** from https://www.docker.com/products/docker-desktop. Check it: `docker --version`.
 
-A ready‑made compose file is provided in the **[`n8n-installation/`](n8n-installation/)** folder:
+A ready‑made compose file is provided in the **[`labs/n8n-installation/`](labs/n8n-installation/)** folder:
 
 ```yaml
-# n8n-installation/docker-compose.yml
+# labs/n8n-installation/docker-compose.yml
 version: "3.8"
 services:
   n8n:
@@ -125,9 +125,9 @@ volumes:
   n8n_data:
 ```
 
-Start it (run from inside the `n8n-installation` folder):
+Start it (run from inside the `labs/n8n-installation` folder):
 ```bash
-cd n8n-installation
+cd labs/n8n-installation
 docker compose up -d        # -d = run in the background
 ```
 Then open **http://localhost:5678** and create your owner account.
@@ -166,7 +166,7 @@ In n8n, credentials are stored centrally and reused by nodes.
 
 **Goal:** Learn the core n8n building blocks — a **trigger**, **data**, **logic**, and an **action** — by capturing form submissions and emailing them. You'll build three increasingly capable versions.
 
-Folder: [`activity1-automation/`](activity1-automation/)
+Folder: [`labs/activity1-automation/`](labs/activity1-automation/)
 
 ---
 
@@ -321,13 +321,13 @@ flowchart LR
 
 #### Flyer samples (for reference)
 
-Print or embed one of these flyers and drop your form's **QR code** (from step 8 of Activity 1a) into the marked spot, so people can scan to open your RSVP form. Samples live in [`activity1-automation/`](activity1-automation/):
+Print or embed one of these flyers and drop your form's **QR code** (from step 8 of Activity 1a) into the marked spot, so people can scan to open your RSVP form. Samples live in [`labs/activity1-automation/`](labs/activity1-automation/):
 
 | | Sample | File |
 |---|---|---|
-| ![Flyer sample 1](activity1-automation/flyer-sample1-preview.png) | **Sample 1 — Network event** (QR bottom‑left) | [flyer-sample1.pdf](activity1-automation/flyer-sample1.pdf) |
-| ![Flyer sample 2](activity1-automation/flyer-sample2-preview.png) | **Sample 2 — Event poster** | [flyer-sample2.pdf](activity1-automation/flyer-sample2.pdf) |
-| ![Flyer sample 3](activity1-automation/flyer-sample3.jpeg) | **Sample 3 — Bowling party** | [flyer-sample3.jpeg](activity1-automation/flyer-sample3.jpeg) |
+| ![Flyer sample 1](labs/activity1-automation/flyer-sample1-preview.png) | **Sample 1 — Network event** (QR bottom‑left) | [flyer-sample1.pdf](labs/activity1-automation/flyer-sample1.pdf) |
+| ![Flyer sample 2](labs/activity1-automation/flyer-sample2-preview.png) | **Sample 2 — Event poster** | [flyer-sample2.pdf](labs/activity1-automation/flyer-sample2.pdf) |
+| ![Flyer sample 3](labs/activity1-automation/flyer-sample3.jpeg) | **Sample 3 — Bowling party** | [flyer-sample3.jpeg](labs/activity1-automation/flyer-sample3.jpeg) |
 
 > Tip: generate the QR from your Form Trigger **Production URL** at **https://alfredang.github.io/qrcodegenerator/**, download it, and place it where the sample shows the “scan the QR code” box.
 
@@ -338,7 +338,7 @@ Print or embed one of these flyers and drop your form's **QR code** (from step 8
 
 **Goal:** Create a conversational **AI Agent** that can reason, remember context, search the web, and look up your **employee data table** — all from n8n's built‑in chat.
 
-Folder: [`activity2-ai-agent/`](activity2-ai-agent/)
+Folder: [`labs/activity2-ai-agent/`](labs/activity2-ai-agent/)
 Reference export: `Activity2-AI Agent.json`
 
 **Workflow shape:**
@@ -398,7 +398,7 @@ Create a Data Table named **`Mock Employee Data`** with a handful of rows and co
 
 **Goal:** Replace n8n's built‑in chat with a **webhook** so your own web page (a branded dashboard) can talk to the agent over HTTP.
 
-Folder: [`activity3-webhook/`](activity3-webhook/)
+Folder: [`labs/activity3-webhook/`](labs/activity3-webhook/)
 Reference export: `Acitivty3-Webhook.json` · Web pages: `index.html` (+ `index1.html`…`index4.html` design variants)
 
 **Workflow shape:**
@@ -446,7 +446,7 @@ flowchart LR
    `https://<your-n8n-host>/webhook/dd040a01-…`.
 
 #### Part B — Connect the web page
-1. Open `activity3-webhook/index.html` in your browser (double‑click, or serve it locally).
+1. Open `labs/activity3-webhook/index.html` in your browser (double‑click, or serve it locally).
 2. Click the **⚙️ gear** in the chat header to reveal the **Webhook URL** field.
 3. Paste your **Production URL** → **Save** (it's stored in the browser's localStorage).
 4. Type a message and **Send**. The page POSTs to your webhook; the agent's reply appears in the chat.
@@ -463,7 +463,7 @@ flowchart LR
 
 **Goal:** Give the agent a **knowledge base**. Users upload HR policy documents (SOPs) which are embedded into a **vector store**; the agent then answers policy questions from those documents (RAG) while still answering people/headcount questions from the **employee data table**.
 
-Folder: [`activity4-rag/`](activity4-rag/)
+Folder: [`labs/activity4-rag/`](labs/activity4-rag/)
 Reference export: `Activity4-RAG.json` · Web page: `index.html` · Sample doc: `MyCompany-HR-SOP.docx`
 
 **Workflow shape — two flows in one workflow:**
@@ -538,7 +538,7 @@ or the number of rows counted.
 ```
 
 #### Part D — Connect the web page & upload a document
-1. Open `activity4-rag/index.html`.
+1. Open `labs/activity4-rag/index.html`.
 2. **Chat webhook (⚙️ gear):** paste the **chat** Production URL (the `dd040a01`‑style one) → Save.
 3. **Knowledge Base card → upload webhook field:** paste the **`Webhook1`** Production URL (`…/webhook/92c5dbda-…`) → Save.
 4. **Upload the SOP:** drag `MyCompany-HR-SOP.docx` into the dropzone → **Upload to Knowledge Base**. This POSTs the file to `Webhook1`, which embeds it into the `sop` vector store.
@@ -547,7 +547,7 @@ or the number of rows counted.
    - "When do I need to submit an MC?" → from the SOP.
    - "How many employees are in Engineering?" → from the **Data Table**.
 
-> The sample document `MyCompany-HR-SOP.docx` contains 7 policies (Leave, MC, Performance, PDPA, Marketing, Public Relations, Data Privacy). It's generated by `activity4-rag/make_sop.py` if you want to regenerate or edit it.
+> The sample document `MyCompany-HR-SOP.docx` contains 7 policies (Leave, MC, Performance, PDPA, Marketing, Public Relations, Data Privacy). It's generated by `labs/activity4-rag/make_sop.py` if you want to regenerate or edit it.
 
 **Key concepts:** **RAG** (embed → store → retrieve), **vector store** + **embeddings**, **document loaders**, **binary file uploads** through a webhook, **tool routing** via the system prompt, separating ingestion from querying.
 
@@ -560,12 +560,12 @@ or the number of rows counted.
 
 This is the "agentic" capstone: instead of one agent doing everything, a **classifier + router** sends each message down the correct path — the pattern behind real help‑desk and triage bots.
 
-Folder: [`activity5-multi-agents/`](activity5-multi-agents/)
+Folder: [`labs/activity5-multi-agents/`](labs/activity5-multi-agents/)
 Reference export: `Activity5-MultiAgents.json` · Web page: `index.html` (HR | IT dashboard + chatbot)
 Sample docs to upload: `MyCompany-HR-SOP.docx`, `MyCompany-IT-Support-FAQ.docx`
 Sample data to import: `mock-hr-employees.csv`, `mock-it-tickets.csv`
 
-🔗 **Live demo:** https://tertiarycourses.github.io/TGS-2023035977-Agentic-AI-Automation-with-n8n/ — the hosted HR | IT dashboard. Open it, click **⚙️**, paste your own n8n webhook URLs, and it talks to *your* workflow (nothing is hard-coded). Deployed automatically from `activity5-multi-agents/index.html` via GitHub Actions ([`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml)).
+🔗 **Live demo:** https://tertiarycourses.github.io/TGS-2023035977-Agentic-AI-Automation-with-n8n/ — the hosted HR | IT dashboard. Open it, click **⚙️**, paste your own n8n webhook URLs, and it talks to *your* workflow (nothing is hard-coded). Deployed automatically from `labs/activity5-multi-agents/index.html` via GitHub Actions ([`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml)).
 
 In this build each specialist has **its own data table** and **its own document knowledge base**:
 
@@ -637,13 +637,13 @@ Step by step at runtime:
 
    | Data Table name | Columns | Import |
    |---|---|---|
-   | **`HR Employee Data`** | EmployeeID, Name, Gender, Department, Role, Location, Food, Attending | `activity5-multi-agents/mock-hr-employees.csv` (36 rows) |
-   | **`IT Support Tickets`** | TicketID, Requester, Department, Category, Priority, Status, Assignee, Channel, CreatedDate, ResolvedDate | `activity5-multi-agents/mock-it-tickets.csv` (45 rows) |
+   | **`HR Employee Data`** | EmployeeID, Name, Gender, Department, Role, Location, Food, Attending | `labs/activity5-multi-agents/mock-hr-employees.csv` (36 rows) |
+   | **`IT Support Tickets`** | TicketID, Requester, Department, Category, Priority, Status, Assignee, Channel, CreatedDate, ResolvedDate | `labs/activity5-multi-agents/mock-it-tickets.csv` (45 rows) |
 
 2. The quickest way to populate each table is **Add Data Table → Import from CSV** (or create the columns above, then paste rows). The CSV headers already match the column names.
 3. After importing the workflow, open **Get HR employee row(s)** and select `HR Employee Data`, then open **Get IT ticket row(s)** and select `IT Support Tickets` (its ID ships as a placeholder, so you **must** re‑select it from the dropdown).
 
-> Want to regenerate the mock data? Run `python3 activity5-multi-agents/make_mock_data.py` — it rewrites both CSVs deterministically.
+> Want to regenerate the mock data? Run `python3 labs/activity5-multi-agents/make_mock_data.py` — it rewrites both CSVs deterministically.
 
 <a name="activity-5-extractor"></a>
 ### 5.2 Build the Information Extractor (the classifier)
@@ -751,8 +751,8 @@ flowchart LR
 ```
 
 **Get the sample docs** (upload them from the page in 5.7):
-- `activity5-multi-agents/MyCompany-HR-SOP.docx` (7 HR policies) → upload on the **HR** target. *(Regenerate with `python3 activity4-rag/make_sop.py` if needed.)*
-- `activity5-multi-agents/MyCompany-IT-Support-FAQ.docx` (13 IT FAQs) → upload on the **IT** target. *(Regenerate with `python3 activity5-multi-agents/make_it_faq.py`.)*
+- `labs/activity5-multi-agents/MyCompany-HR-SOP.docx` (7 HR policies) → upload on the **HR** target. *(Regenerate with `python3 labs/activity4-rag/make_sop.py` if needed.)*
+- `labs/activity5-multi-agents/MyCompany-IT-Support-FAQ.docx` (13 IT FAQs) → upload on the **IT** target. *(Regenerate with `python3 labs/activity5-multi-agents/make_it_faq.py`.)*
 
 > **Memory key & persistence notes (important):**
 > - The **Simple Vector Store is in‑memory** — contents are **wiped on every n8n restart or re‑deploy**. After any restart, **re‑upload** both documents.
@@ -762,7 +762,7 @@ flowchart LR
 ### 5.7 Connect the web page, upload docs & test the routing
 
 1. **Save** and toggle the workflow **Active / Published**. Copy the three Production URLs (from the Webhook nodes): `…/webhook/chatbot`, `…/webhook/upload-hr`, `…/webhook/upload-it`.
-2. Open `activity5-multi-agents/index.html` in your browser. You'll see the **HR | IT dashboard** on the left and the **chatbot** on the right.
+2. Open `labs/activity5-multi-agents/index.html` in your browser. You'll see the **HR | IT dashboard** on the left and the **chatbot** on the right.
 3. Click the **⚙️ gear** to reveal the **Setup** panel and fill **three** fields, then **Save** each:
    - **① HR Doc Upload Webhook** → `…/webhook/upload-hr`
    - **② IT Doc Upload Webhook** → `…/webhook/upload-it`
@@ -806,7 +806,7 @@ curl -s -X POST https://YOUR-N8N/webhook/chatbot \
 
 A small, self‑contained app that ties together a **form**, a **database**, and a **custom web UI** — the perfect capstone after the activities. Users scan a **QR code**, submit an **issue report** (name, photo, summary, date) through an n8n form, and the report **plus the uploaded image** are stored in **Postgres**. A second workflow exposes a **JSON API** so a **gallery page** can read the reports back and display the images.
 
-All files live in `mini-projects/issue-tracking/`:
+All files live in `labs/mini-capstone/issue-tracking/`:
 
 | File | Role |
 |---|---|
@@ -845,7 +845,7 @@ We use **Supabase** (free, hosted Postgres) so this works on **n8n Cloud** as we
 **1) Create the project & run the schema**
 
 1. Sign up at **[supabase.com](https://supabase.com)** → **New project** (pick a name and a strong **database password** — save it).
-2. Open **SQL Editor** → **New query** → paste the contents of `mini-projects/issue-tracking/schema.sql` → **Run**. This creates the `issue_reports` table with the `image_data BYTEA` column.
+2. Open **SQL Editor** → **New query** → paste the contents of `labs/mini-capstone/issue-tracking/schema.sql` → **Run**. This creates the `issue_reports` table with the `image_data BYTEA` column.
 3. Get your connection details: **Project Settings → Database → Connection info**. You'll need **Host**, **Port**, **Database**, **User**, and the **password** from step 1.
 
 **2) Add the Postgres credential in n8n** (do this once). In n8n → top‑left menu → **Credentials → Add credential → Postgres**, then fill in the Supabase values:

@@ -110,42 +110,45 @@ TGS-2023035977-Agentic-AI-Automation-with-n8n/
 ├── README.md
 ├── dashboard.png                    # HR & IT Mission Control dashboard
 │
-├── activity1-automation/            # Forms → Email → Conditional → Data Table
-│   ├── Activity1a_ Design a Flyer with n8n form embedded.json
-│   ├── Activity1b_ Improved Flyer with Conditonal Route.json
-│   └── Activity1c_ Improved Flyer with Data Table.json
+├── labs/                            # All hands-on lab activities + setup
+│   ├── n8n-installation/            # Docker Compose for self-hosting n8n
+│   │
+│   ├── activity1-automation/        # Forms → Email → Conditional → Data Table
+│   │   ├── Activity1a_ Design a Flyer with n8n form embedded.json
+│   │   ├── Activity1b_ Improved Flyer with Conditonal Route.json
+│   │   └── Activity1c_ Improved Flyer with Data Table.json
+│   │
+│   ├── activity2-ai-agent/          # Chat-based AI Agent with tools + memory
+│   │   └── Activity2-AI Agent.json
+│   │
+│   ├── activity3-webhook/           # Webhook-exposed agent + custom dashboards
+│   │   ├── Acitivty3-Webhook.json
+│   │   └── index.html, index1–4.html  # Branded chat UIs (design variants)
+│   │
+│   ├── activity4-rag/               # RAG: vector store + file upload + dashboard
+│   │   ├── Activity4-RAG.json
+│   │   ├── index.html               # Dashboard + chatbot + SOP uploader
+│   │   ├── make_sop.py              # Generates the sample HR SOP
+│   │   └── MyCompany-HR-SOP.docx    # Sample document to upload into the vector store
+│   │
+│   ├── activity5-multi-agents/      # Multi-agent router: HR + IT specialist agents
+│   │   ├── Activity5-MultiAgents.json
+│   │   ├── index.html               # HR & IT "Mission Control" dashboard + chat
+│   │   ├── make_it_faq.py           # Generates the sample IT Support FAQ
+│   │   ├── MyCompany-HR-SOP.docx    # HR SOP for the HR agent's vector store
+│   │   └── MyCompany-IT-Support-FAQ.docx  # IT FAQ for the IT agent's vector store
+│   │
+│   └── mini-capstone/
+│       └── issue-tracking/          # Issue Reporting: n8n form + image → Postgres
+│           ├── issue-report-postgresql.json   # Submission workflow
+│           ├── issue-reports-api.json         # Retrieval API workflow
+│           ├── schema.sql                     # Postgres issue_reports table
+│           ├── index.html, gallery.html       # QR/landing + report gallery pages
+│           └── README.md
 │
-├── activity2-ai-agent/              # Chat-based AI Agent with tools + memory
-│   └── Activity2-AI Agent.json
-│
-├── activity3-webhook/               # Webhook-exposed agent + custom dashboards
-│   ├── Acitivty3-Webhook.json
-│   └── index.html, index1–4.html    # Branded chat UIs (design variants)
-│
-├── activity4-rag/                   # RAG: vector store + file upload + dashboard
-│   ├── Activity4-RAG.json
-│   ├── index.html                   # Dashboard + chatbot + SOP uploader
-│   ├── make_sop.py                  # Generates the sample HR SOP
-│   └── MyCompany-HR-SOP.docx        # Sample document to upload into the vector store
-│
-├── activity5-multi-agents/          # Multi-agent router: HR + IT specialist agents
-│   ├── Activity5-MultiAgents.json
-│   ├── index.html                   # HR & IT "Mission Control" dashboard + chat
-│   ├── make_it_faq.py               # Generates the sample IT Support FAQ
-│   ├── MyCompany-HR-SOP.docx        # HR SOP for the HR agent's vector store
-│   └── MyCompany-IT-Support-FAQ.docx# IT FAQ for the IT agent's vector store
-│
-├── courseware/                      # Course slides + Learner Guide (PPTX / DOCX)
-│   ├── n8n-slides.pptx
-│   └── n8n Automation Learner Guide.docx
-│
-└── mini-projects/
-    └── issue-tracking/              # Issue Reporting: n8n form + image → Postgres
-        ├── issue-report-postgresql.json   # Submission workflow
-        ├── issue-reports-api.json         # Retrieval API workflow
-        ├── schema.sql                     # Postgres issue_reports table
-        ├── index.html, gallery.html       # QR/landing + report gallery pages
-        └── README.md
+└── courseware/                      # Course slides + Learner Guide (PPTX / DOCX)
+    ├── n8n-slides.pptx
+    └── n8n Automation Learner Guide.docx
 ```
 
 ---
@@ -158,7 +161,7 @@ TGS-2023035977-Agentic-AI-Automation-with-n8n/
 - A [**Tavily API key**](https://tavily.com) (web-search tool)
 - A **Gmail** account (for Activity 1 email)
 - A modern browser (for the Activity 3, 4 & 5 web pages)
-- *(Optional, for the Issue Reporting mini-project)* a **Postgres** database (e.g. [Supabase](https://supabase.com))
+- *(Optional, for the Issue Reporting mini-capstone)* a **Postgres** database (e.g. [Supabase](https://supabase.com))
 
 ### 1. Clone the repo
 ```bash
@@ -168,14 +171,14 @@ cd TGS-2023035977-Agentic-AI-Automation-with-n8n
 
 ### 2. Import a workflow into n8n
 1. In n8n: **Workflows → Add workflow → ⋯ → Import from File**.
-2. Pick a `.json` from the matching `activity*/` folder.
+2. Pick a `.json` from the matching `labs/activity*/` folder.
 3. Re-select **your own credentials** (OpenAI, Tavily, Gmail) on each node — imported credential IDs won't match yours.
 4. **Save**, then toggle **Active / Published**.
 
 ### 3. Run the web apps (Activities 3, 4 & 5)
 The pages are pure static HTML — just open them, or serve locally:
 ```bash
-cd activity4-rag
+cd labs/activity4-rag
 python3 -m http.server 8000
 # then open http://localhost:8000/index.html
 ```

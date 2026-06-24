@@ -1,4 +1,4 @@
-# 🛠️ Mini-Project — Issue Reporting Flow (n8n + Postgres)
+# 🛠️ Mini-Capstone — Issue Reporting Flow (n8n + Postgres)
 
 A small end-to-end app: users submit an **issue report** (name, photo, issue summary, date)
 through an n8n form. The report **and the uploaded image** are stored in **Postgres**, and a

@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'activity5-multi-agents/index*.html'
+      - 'labs/activity5-multi-agents/index*.html'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
@@ -30,9 +30,9 @@ jobs:
       - name: Assemble site (Activity 5 dashboard at root)
         run: |
           mkdir -p _site
-          cp activity5-multi-agents/index*.html _site/
+          cp labs/activity5-multi-agents/index*.html _site/
           # default landing = the main dashboard
-          cp activity5-multi-agents/index.html _site/index.html
+          cp labs/activity5-multi-agents/index.html _site/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
