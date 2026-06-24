@@ -24,3 +24,7 @@ qr-check.png
 
 # Local reference material (large; not part of deliverable)
 reference flows/
+
+# Office lock/owner temp files
+~$*
+.~lock.*
