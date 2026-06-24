@@ -55,11 +55,11 @@ def footer(s,dark=False):
     txt(s,Inches(6.0),Inches(7.08),Inches(6),Inches(0.3),[[("© 2026 Tertiary Infotech Academy Pte Ltd",8.5,c,False)]],align=PP_ALIGN.CENTER)
     txt(s,Inches(11.9),Inches(7.08),Inches(0.9),Inches(0.3),[[(str(PAGE["n"]),9,c,True)]],align=PP_ALIGN.RIGHT)
 def head(s,title,kicker=None,kcolor=BLUE):
-    rect(s,0,0,SW,SH,WHITE); rect(s,Inches(0.55),Inches(0.62),Inches(0.12),Inches(0.62),kcolor)
+    rect(s,0,0,SW,SH,WHITE); rect(s,Inches(0.55),Inches(0.60),Inches(0.14),Inches(0.66),kcolor)
     y=Inches(0.55)
     if kicker:
-        txt(s,Inches(0.8),Inches(0.5),Inches(11.8),Inches(0.34),[[(kicker,13,kcolor,True)]]); y=Inches(0.82)
-    txt(s,Inches(0.8),y,Inches(12.0),Inches(0.8),[[(title,27,INK,True)]])
+        txt(s,Inches(0.8),Inches(0.5),Inches(11.8),Inches(0.34),[[(kicker,14,kcolor,True)]]); y=Inches(0.82)
+    txt(s,Inches(0.8),y,Inches(12.0),Inches(0.85),[[(title,29,INK,True)]])
     rect(s,Inches(0.8),Inches(1.55),Inches(12.0),Pt(2),LINE)
 
 ASSETS=f"{REPO}/courseware/assets"
@@ -89,15 +89,15 @@ def section(kicker,title,n,sub=""):
     if sub: txt(s,Inches(1.27),Inches(4.5),Inches(11),Inches(0.8),[[(sub,16,GREY,False)]])
     txt(s,Inches(10.3),Inches(0.7),Inches(2.5),Inches(1.6),[[(n,72,RGBColor(0xE2,0xE8,0xF0),True)]],align=PP_ALIGN.RIGHT)
     footer(s)
-def content(title,items,kicker=None,size=18):
+def content(title,items,kicker=None,size=20):
     s=slide(); head(s,title,kicker); bullets(s,Inches(0.85),Inches(1.9),Inches(11.6),Inches(4.9),items,size=size); footer(s); return s
 def two_col(title,left,right,kicker=None,lhead="",rhead=""):
     s=slide(); head(s,title,kicker)
     rect(s,Inches(0.85),Inches(1.95),Inches(5.7),Inches(4.7),LIGHT); rect(s,Inches(6.95),Inches(1.95),Inches(5.55),Inches(4.7),LIGHT)
-    if lhead: txt(s,Inches(1.1),Inches(2.15),Inches(5.2),Inches(0.4),[[(lhead,15,BLUE,True)]])
-    if rhead: txt(s,Inches(7.2),Inches(2.15),Inches(5.0),Inches(0.4),[[(rhead,15,TEAL,True)]])
-    bullets(s,Inches(1.1),Inches(2.7),Inches(5.2),Inches(3.8),left,size=15)
-    bullets(s,Inches(7.2),Inches(2.7),Inches(5.05),Inches(3.8),right,size=15,mcolor=TEAL); footer(s); return s
+    if lhead: txt(s,Inches(1.1),Inches(2.15),Inches(5.2),Inches(0.4),[[(lhead,16,BLUE,True)]])
+    if rhead: txt(s,Inches(7.2),Inches(2.15),Inches(5.0),Inches(0.4),[[(rhead,16,TEAL,True)]])
+    bullets(s,Inches(1.1),Inches(2.7),Inches(5.2),Inches(3.8),left,size=17)
+    bullets(s,Inches(7.2),Inches(2.7),Inches(5.05),Inches(3.8),right,size=17,mcolor=TEAL); footer(s); return s
 def img_slide(title,img,caption,kicker="WORKFLOW"):
     s=slide(); head(s,title,kicker,TEAL)
     pic=s.shapes.add_picture(img,Inches(1.0),Inches(1.85),width=Inches(11.3))
@@ -110,21 +110,61 @@ def img_slide(title,img,caption,kicker="WORKFLOW"):
         pic.left=int((SW-pic.width)/2)
     txt(s,Inches(0.8),Inches(6.55),Inches(11.7),Inches(0.4),[[(caption,13,GREY,False)]],align=PP_ALIGN.CENTER)
     footer(s); return s
+def website_slide(title,img,items,kicker,note=""):
+    import os
+    s=slide(); head(s,title,kicker,BLUE)
+    bullets(s,Inches(0.85),Inches(1.95),Inches(5.4),Inches(4.6),items,size=18)
+    if os.path.exists(img):
+        rect(s,Inches(6.42),Inches(1.92),Inches(6.18),Inches(3.92),LINE)
+        pic=s.shapes.add_picture(img,Inches(6.5),Inches(2.0),width=Inches(6.0))
+        if pic.height>Inches(3.78):
+            s.shapes._spTree.remove(pic._element); pic=s.shapes.add_picture(img,Inches(6.5),Inches(2.0),height=Inches(3.78)); pic.left=int(Inches(6.5)+(Inches(6.0)-pic.width)/2)
+    footer(s); return s
+def gallery_slide(title,imgs,captions,kicker):
+    import os
+    s=slide(); head(s,title,kicker,TEAL)
+    imgs2=[(i,c) for i,c in zip(imgs,captions) if os.path.exists(i)]; n=len(imgs2)
+    if not n: footer(s); return s
+    slot=11.6/n; cell=Inches(slot)
+    for k,(im,cap) in enumerate(imgs2):
+        x0=Inches(0.85)+Inches(slot*k)
+        pic=s.shapes.add_picture(im,x0+Inches(0.1),Inches(2.0),width=cell-Inches(0.3))
+        if pic.height>Inches(3.7):
+            s.shapes._spTree.remove(pic._element); pic=s.shapes.add_picture(im,x0,Inches(2.0),height=Inches(3.7))
+        pic.left=int(x0+(cell-pic.width)/2)
+        txt(s,x0,Inches(5.95),cell,Inches(0.5),[[(cap,13,GREY,False)]],align=PP_ALIGN.CENTER)
+    footer(s); return s
+def big_statement(line1,line2,kicker,color=BLUE):
+    s=slide(); rect(s,0,0,SW,SH,WHITE); rect(s,0,0,Inches(0.28),SH,color)
+    txt(s,Inches(1.1),Inches(2.2),Inches(11),Inches(0.5),[[(kicker,16,color,True)]])
+    txt(s,Inches(1.1),Inches(2.8),Inches(11.3),Inches(2.4),[[(line1,40,INK,True)]])
+    if line2: txt(s,Inches(1.12),Inches(4.7),Inches(11),Inches(1.2),[[(line2,20,GREY,False)]])
+    footer(s); return s
+def cards3(title,cards,kicker):
+    s=slide(); head(s,title,kicker)
+    xs=[Inches(0.85),Inches(5.0),Inches(9.15)]
+    for i,c in enumerate(cards[:3]):
+        x=xs[i]; col=c[0]
+        rect(s,x,Inches(1.95),Inches(3.65),Inches(4.7),LIGHT)
+        rect(s,x,Inches(1.95),Inches(3.65),Inches(0.12),col)
+        txt(s,x+Inches(0.25),Inches(2.2),Inches(3.2),Inches(0.6),[[(c[1],19,col,True)]])
+        bullets(s,x+Inches(0.25),Inches(2.95),Inches(3.2),Inches(3.4),c[2],size=14,mcolor=col,gap=9)
+    footer(s); return s
 def activity_overview(tag,title,desc,build,nodes,kicker):
     s=slide(); head(s,title,kicker,kcolor=TEAL)
     rect(s,Inches(0.85),Inches(1.82),Inches(1.7),Inches(0.5),TEAL)
     txt(s,Inches(0.85),Inches(1.87),Inches(1.7),Inches(0.4),[[(tag,16,WHITE,True)]],align=PP_ALIGN.CENTER)
-    txt(s,Inches(0.85),Inches(2.6),Inches(11.7),Inches(1.5),[[(desc,18,INK,False)]])
+    txt(s,Inches(0.85),Inches(2.55),Inches(11.7),Inches(1.6),[[(desc,21,INK,False)]])
     rect(s,Inches(0.85),Inches(4.3),Inches(11.7),Inches(2.0),LIGHT)
     txt(s,Inches(1.1),Inches(4.5),Inches(11),Inches(0.4),[[("You'll build",14,BLUE,True)]])
-    txt(s,Inches(1.1),Inches(4.9),Inches(11),Inches(0.6),[[(build,16,INK,True)]])
+    txt(s,Inches(1.1),Inches(4.9),Inches(11),Inches(0.6),[[(build,18,INK,True)]])
     txt(s,Inches(1.1),Inches(5.6),Inches(11),Inches(0.5),[[("Key nodes:  ",13,GREY,True),(nodes,13,GREY,False)]]); footer(s); return s
 def step_slide(kicker,act_title,n,total,text):
     s=slide(); head(s,act_title,kicker,TEAL)
     oval(s,Inches(0.85),Inches(2.6),Inches(1.5),Inches(1.5),TEAL)
     txt(s,Inches(0.85),Inches(2.86),Inches(1.5),Inches(1.0),[[(str(n),40,WHITE,True)]],align=PP_ALIGN.CENTER)
     txt(s,Inches(0.95),Inches(1.95),Inches(11),Inches(0.4),[[(f"STEP {n} OF {total}",13,GREY,True)]])
-    txt(s,Inches(2.7),Inches(2.7),Inches(10.0),Inches(3.2),[[(text,21,INK,False)]],anchor=MSO_ANCHOR.MIDDLE); footer(s); return s
+    txt(s,Inches(2.7),Inches(2.7),Inches(10.0),Inches(3.2),[[(text,24,INK,False)]],anchor=MSO_ANCHOR.MIDDLE); footer(s); return s
 def test_slide(act_title,text,kicker):
     s=slide(); head(s,act_title,kicker,TEAL)
     rect(s,Inches(0.85),Inches(2.3),Inches(11.7),Inches(2.6),RGBColor(0xE8,0xF7,0xEE))
@@ -198,6 +238,14 @@ content("What is n8n?",[
  "Visual editor: drag nodes onto a canvas and wire them together.",
  "Runs in the cloud (trial) or self-hosted locally with Docker.",
  "400+ integrations, HTTP/code nodes, and AI/LangChain nodes for agents."],kicker="OVERVIEW")
+cards3("Features of n8n",[
+ (BLUE,"Build visually",["400+ app integrations","Drag-and-drop node canvas","No-code to full-code (JS/Python)"]),
+ (TEAL,"Run anywhere",["Cloud or self-host (Docker)","Webhooks, schedules, queues","Version & export workflows"]),
+ (VIOLET,"AI-native",["AI Agent + LangChain nodes","Memory, tools, RAG, MCP","Use any LLM (OpenAI, Gemini...)"])],kicker="FEATURES")
+big_statement("One canvas to connect apps, data and AI.","n8n lets you automate work and build AI agents without gluing code together by hand.","WHY USE n8n",color=BLUE)
+website_slide("n8n.io",IMG("courseware/assets/site-n8n.png"),
+ ["n8n is an open, fair-code workflow automation platform.","Free cloud trial at n8n.io, or self-host with Docker.","Same visual editor in both."],
+ kicker="THE PLATFORM")
 content("Why Automate?",[
  "Remove repetitive manual work and human error.",
  "Connect systems that don't normally talk to each other.",
@@ -224,6 +272,28 @@ two_col("n8n Nodes",[
  [("Logic nodes — control the flow",0),("IF, Switch, Merge, Split Out, Code, Edit Fields",1),
  ("AI nodes — reason and act",0),("AI Agent, Chat Model, Memory, Vector Store, Tools",1)],
  kicker="THE BUILDING BLOCKS",lhead="Triggers & Actions",rhead="Logic & AI")
+two_col("Triggers Available in n8n",[
+ ("Manual Trigger - run on demand (testing)",0),
+ ("Schedule Trigger - run on a timer / cron",0),
+ ("Form Trigger - a hosted web form",0),
+ ("Webhook - external apps call a URL",0)],
+ [("Chat Trigger - built-in chat UI",0),
+ ("Telegram Trigger - messages to your bot",0),
+ ("Email (IMAP) - on new email",0),
+ ("App triggers - Gmail, Sheets, Notion, ...",0)],
+ kicker="WHEN A WORKFLOW RUNS",lhead="Core triggers",rhead="Chat & app triggers")
+two_col("Key Nodes in n8n",[
+ ("HTTP Request - call any API",0),
+ ("Gmail / Outlook - send email",0),
+ ("Google Sheets / Data Table - store rows",0),
+ ("Code - run JavaScript / Python",0),
+ ("Edit Fields (Set) - reshape data",0)],
+ [("IF / Switch - branch on conditions",0),
+ ("Merge / Split Out - combine / expand",0),
+ ("AI Agent - reason with tools + memory",0),
+ ("Vector Store - RAG retrieval",0),
+ ("Respond to Webhook - reply to caller",0)],
+ kicker="THE WORKHORSE NODES",lhead="Actions",rhead="Logic & AI")
 content("Triggers and Actions",[
  "A Trigger is the first node — it decides WHEN a workflow runs.",
  "Manual & Schedule triggers for testing and time-based jobs.",
@@ -237,6 +307,12 @@ content("Data Structure & JSON",[
  "Data flows between nodes as a list of items, each a JSON object.",
  "Each item has a json field with key/value pairs.",
  "Nodes read the previous node's output and add to it."],kicker="DATA")
+content("What is JSON?",[
+ "JSON (JavaScript Object Notation) is a simple text format for data.",
+ 'It stores key/value pairs:  { "name": "Alice", "age": 30 }.',
+ "Values can be text, numbers, true/false, lists [...] or nested objects {...}.",
+ "n8n passes data between nodes as JSON - and most APIs send/receive JSON.",
+ "Read a value with an expression, e.g.  {{ $json.name }}."],kicker="THE DATA FORMAT")
 content("Expressions & Data Mapping",[
  "Expressions pull data from earlier nodes: {{ $json.Name }}.",
  "Drag fields from the input panel to map them automatically.",
@@ -279,6 +355,11 @@ activity_block(dict(tag="ACT 1",title="Activity 1 — Flyer with QR Code (Form �
    "Copy the Form's Production URL; paste it into the QR generator (alfredang.github.io/qrcodegenerator) and put the QR on a flyer.",
    "Group activity: design an event flyer (e.g. bowling night) with the QR code, then present it."],
  test="Scan the QR code, submit the form, and confirm the admin inbox receives the email."))
+gallery_slide("Sample Flyers from Past Students",
+ [IMG("labs/activity1-flyer-form/flyer-sample1-preview.png"),
+  IMG("labs/activity1-flyer-form/flyer-sample2-preview.png"),
+  IMG("labs/activity1-flyer-form/flyer-sample3.jpeg")],
+ ["Network event","Event poster","Bowling party"],kicker="GROUP ACTIVITY")
 activity_block(dict(tag="ACT 2",title="Activity 2 — Capture Submissions in a Data Table",kicker=K1,
  desc="Extend Activity 1 so every submission is also saved into an n8n Data Table — your first taste of storing data, not just forwarding it.",
  build="Form Trigger  →  Gmail  +  Data Table (Insert row)",nodes="formTrigger, gmail, dataTable",
@@ -318,6 +399,18 @@ content("What is Agentic AI?",[
  "An AI agent uses an LLM to understand language and decide what to do.",
  "It can call tools, remember context, and handle open-ended requests.",
  "Agentic = the AI takes actions toward a goal, not just answers once."],kicker="CONCEPT")
+cards3("Why Use an AI Agent?",[
+ (BLUE,"Understands language",["Handles free-text requests","No rigid forms or keywords","Summarises & reasons"]),
+ (TEAL,"Takes action",["Calls tools & APIs","Looks up your data (RAG)","Chains multiple steps"]),
+ (VIOLET,"Flexible",["One agent, many questions","Adapts to new cases","Easy to extend with tools"])],kicker="WHY AGENTS")
+two_col("Popular LLM Models",[
+ ("OpenAI - gpt-4.1, gpt-4.1-mini, gpt-4o",0),
+ ("Google - Gemini 2.x Flash / Pro",0),
+ ("Anthropic - Claude (Sonnet, Opus, Haiku)",0)],
+ [("Meta - Llama 3.x (open weights)",0),
+ ("Mistral - Mistral / Mixtral",0),
+ ("This course uses OpenAI gpt-4.1-mini",0)],
+ kicker="THE BRAINS",lhead="Hosted models",rhead="Open & course default")
 content("AI Agent Using an LLM",[
  "The LLM is the 'brain' that interprets the user and plans a response.",
  "Tools give the agent abilities (look up data, search, call an API).",
@@ -400,6 +493,34 @@ activity_block(dict(tag="ACT 5",title="Activity 5 — Add RAG to the Telegram Ag
    "Rewrite the system instruction to route: knowledge base for policy/FAQ, Data Table for staff records.",
    "Save and keep Active; have a few learners present their chatbot."],
  test="Ask a policy question and a staff-record question; confirm each is answered from the correct source."))
+content("From In-Memory to a Real Vector Database",[
+ "The in-memory store resets when the workflow restarts - fine for a demo.",
+ "For production, use a hosted vector database that persists your embeddings.",
+ "Pinecone is a popular managed vector database that scales to millions of vectors.",
+ "Same idea: embed your documents once, then retrieve the closest chunks per question."],kicker="WHY PINECONE")
+website_slide("Pinecone",IMG("courseware/assets/site-pinecone.png"),
+ ["Pinecone is a managed (cloud) vector database for RAG.","Free 'Starter' tier is enough for this lab.","Create an index, then point n8n's Pinecone node at it."],
+ kicker="VECTOR DATABASE")
+content("Create a Pinecone Index",[
+ "1. Sign up at pinecone.io and open the console.",
+ "2. Create an API key (Database -> API Keys) - you'll paste it into n8n.",
+ "3. Create an Index: give it a name (e.g. n8n-course).",
+ "4. Set Dimensions to match your embeddings - OpenAI text-embedding-3-small = 1536.",
+ "5. Use metric 'cosine'. The index name + key go into the n8n Pinecone node."],kicker="SETUP")
+activity_overview("ACT 5b","Activity 5b — RAG with Pinecone (Persistent Vector Database)",
+ "Swap the in-memory vector store for Pinecone so your knowledge base persists. Upload documents into a Pinecone index, then let the Telegram agent answer from it via a Vector Store tool.",
+ "Upload -> Embeddings (OpenAI) -> Pinecone (insert)   |   Telegram -> AI Agent + Pinecone tool -> reply",
+ "vectorStorePinecone, embeddingsOpenAi, toolVectorStore, agent",kicker="TOPIC 2 (cont.) - RAG")
+img_slide("Activity 5b - Pinecone RAG Workflow",IMG("labs/activity5-rag/Activity5b-Pinecone-RAG.png"),
+ "Telegram agent answering from a Pinecone vector store (gpt-4.1-mini)",kicker="TOPIC 2 (cont.) - RAG")
+for i,t in enumerate([
+ "Create a Pinecone account, API key and an index (1536 dims, cosine).",
+ "Import Activity5b-Pinecone-Upload.json - upload your documents into the index (Embeddings OpenAI -> Pinecone insert).",
+ "Import Activity5b-Pinecone-RAG.json - the Telegram agent with a Pinecone Vector Store tool.",
+ "Add your Pinecone + OpenAI credentials and select your index on each Pinecone node.",
+ "Save, Activate, and ask the bot a question answered from your uploaded documents."],1):
+    step_slide("TOPIC 2 (cont.) - RAG","Activity 5b — RAG with Pinecone (Persistent Vector Database)",i,5,t)
+test_slide("Activity 5b — RAG with Pinecone (Persistent Vector Database)","Upload a document, then ask the Telegram bot a question only answerable from it - the answer is retrieved from Pinecone.","TOPIC 2 (cont.) - RAG")
 brk("Lunch Break","1 hour",AMBER)
 
 # ---------- TOPIC 4: WEBHOOKS ----------
@@ -408,6 +529,18 @@ content("What is a Webhook?",[
  "A Webhook is a URL that external systems call to trigger your workflow.",
  "Use cases: website chat, form submissions, payments, app notifications.",
  "Pair the Webhook trigger with a Respond to Webhook node to reply."],kicker="CONCEPT")
+content("How a Webhook Works",[
+ "1. You activate an n8n Webhook node - it gives you a unique URL.",
+ "2. An external system (website, app, Telegram) sends an HTTP request to that URL.",
+ "3. n8n runs your workflow with the request data as the trigger input.",
+ "4. A Respond to Webhook node sends a reply back to the caller.",
+ "It is 'reverse' of an API call: the outside world calls YOU when an event happens."],kicker="EVENT -> WORKFLOW")
+two_col("Webhook: GET vs POST",[
+ ("GET",0),("Data comes in the URL query string",1),
+ ("?name=Alice&topic=AI",1),("Good for simple links / browser visits",1)],
+ [("POST",0),("Data comes in the request body (JSON)",1),
+ ('{ "message": "hello" }',1),("Used by website chat & app callbacks",1)],
+ kicker="TWO WAYS TO SEND DATA",lhead="GET",rhead="POST")
 two_col("HTTP Request vs Webhook",[
  ("HTTP Request node",0),("YOUR workflow CALLS an external service",1),("You pull data when you choose",1)],
  [("Webhook node",0),("An external service CALLS your workflow",1),("You react when an event happens",1)],
@@ -441,6 +574,18 @@ content("What is an API?",[
  "An API lets your workflow request data from another service over HTTP.",
  "You send a request; the service sends back a response (usually JSON).",
  "APIs power live data: prices, weather, news, CRM records."],kicker="CONCEPT")
+content("How an API Works",[
+ "1. Your workflow (the client) sends an HTTP request to an API endpoint (URL).",
+ "2. You include a method, headers (often an API key) and parameters.",
+ "3. The server processes it and returns a response - usually JSON.",
+ "4. n8n parses the JSON and passes the fields to the next node.",
+ "Here, YOU call the outside service (the opposite of a webhook)."],kicker="WORKFLOW -> SERVICE")
+two_col("API: GET vs POST",[
+ ("GET - read data",0),("Fetch prices, news, records",1),
+ ("Parameters in the URL query",1),("Safe & repeatable",1)],
+ [("POST - send / create data",0),("Submit a form, create a record",1),
+ ("Parameters in the JSON body",1),("Changes data on the server",1)],
+ kicker="THE TWO MAIN METHODS",lhead="GET",rhead="POST")
 content("Components of an HTTP Request",[
  "Method — GET (read), POST (send), PUT, DELETE.",
  "URL / endpoint — the address of the resource.",
@@ -456,6 +601,10 @@ content("HTTP Request Node",[
  "Store API keys in credentials, never hard-coded.",
  "Parse the JSON response and pass fields to the next node."],kicker="IN n8n")
 K5="TOPIC 4 · API & HTTP"
+website_slide("Twelve Data",IMG("courseware/assets/site-twelvedata.png"),
+ ["Twelve Data provides live stock / forex / crypto market data.","Sign up (free Basic plan), then Account -> API Keys.","Paste the apikey into the 3 'candles' HTTP nodes."],kicker="MARKET DATA API")
+website_slide("NewsAPI",IMG("courseware/assets/site-newsapi.png"),
+ ["NewsAPI returns recent news articles for a search query.","Register (free Developer plan) and copy your API key.","Store it as a Query Auth credential (name = apiKey) on the news node."],kicker="NEWS API")
 activity_block(dict(tag="ACT 7",title="Activity 7 — Finance API → Telegram (AI Day-Trading Agent)",kicker=K5,
  desc="Ask the Telegram bot about a stock; it resolves the ticker, pulls candles from Twelve Data and headlines from NewsAPI, and replies with a Buy/Sell/Hold call and reasoning.",
  build="Telegram → Extract ticker → HTTP (Twelve Data + NewsAPI) → AI Agent → reply",nodes="telegram, httpRequest, agent, lmChatOpenAi",

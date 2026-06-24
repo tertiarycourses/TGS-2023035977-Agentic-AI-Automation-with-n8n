@@ -20,6 +20,7 @@
 - [Activity 4a — Telegram-Triggered AI Agent (Customer Service)](#activity-4a-telegram-triggered-ai-agent-customer-service)
 - [Activity 4b — Telegram Agent + Data Table Tool (HR Admin)](#activity-4b-telegram-agent-+-data-table-tool-hr-admin)
 - [Activity 5 — Add RAG to the Telegram Agent (Two Knowledge Sources)](#activity-5-add-rag-to-the-telegram-agent-two-knowledge-sources)
+- [Activity 5b — RAG with Pinecone (Persistent Vector Database)](#activity-5b-rag-with-pinecone-persistent-vector-database)
 - [Activity 6 — Website Chatbot via Webhook (Investment Advisor)](#activity-6-website-chatbot-via-webhook-investment-advisor)
 - [Activity 7 — Finance API → Telegram (AI Day-Trading Agent)](#activity-7-finance-api-→-telegram-ai-day-trading-agent)
 - [Activity 8a — Human-in-the-Loop Approval (Leave Application)](#activity-8a-human-in-the-loop-approval-leave-application)
@@ -334,6 +335,60 @@ Upgrade the agent with **Retrieval-Augmented Generation (RAG)** so it can answer
 
 ---
 
+## Activity 5b — RAG with Pinecone (Persistent Vector Database)
+
+**Folder:** `labs/activity5-rag/`  ·  workflows `Activity5b-Pinecone-Upload.json` (ingest) + `Activity5b-Pinecone-RAG.json` (chat)
+
+### Goal
+
+Activity 5 used an **in-memory** vector store that resets when the workflow restarts. Here you swap it for **Pinecone**, a managed cloud **vector database**, so your knowledge base **persists** and scales. You upload documents into a Pinecone index once, then the Telegram agent answers from it.
+
+![Activity 5b workflow — Telegram agent answering from a Pinecone vector store (gpt-4.1-mini)](labs/activity5-rag/Activity5b-Pinecone-RAG.png)
+
+*Activity 5b workflow — Telegram agent answering from a Pinecone vector store (gpt-4.1-mini)*
+
+### Why a vector database (Pinecone)?
+
+- An **in-memory** store is fine for a demo but is lost on restart.
+- **Pinecone** stores your embeddings in the cloud — persistent, fast, scales to millions of vectors.
+- Same RAG idea: embed documents once, then retrieve the closest chunks for each question.
+
+### Step 1 — Create a Pinecone account
+
+1. Open https://www.pinecone.io/ and click **Sign Up** (the free **Starter** tier is enough for this lab).
+2. Register with your email (or Google/GitHub) and verify the account.
+3. You land in the **Pinecone console** at https://app.pinecone.io.
+
+![Pinecone — the managed vector database; sign up for the free Starter tier](courseware/assets/site-pinecone.png)
+
+*Pinecone — the managed vector database; sign up for the free Starter tier*
+
+### Step 2 — Create an API key and an index
+
+1. In the console, open **API Keys** and **create / copy** an API key (you'll paste it into n8n).
+2. Open **Indexes → Create index** and give it a name, e.g. `n8n-course`.
+3. Set **Dimensions = 1536** to match OpenAI `text-embedding-3-small` (the embeddings used in this lab).
+4. Set **Metric = cosine**, then create the index.
+
+> **Note:** The embedding model on **both** the upload and the chat workflows must be the **same** (here, OpenAI `text-embedding-3-small` = 1536 dims) — otherwise the vector dimensions won't match the index.
+
+### Step 3 — Upload your documents into Pinecone
+
+1. Import `Activity5b-Pinecone-Upload.json`.
+2. Add a **Pinecone** credential (paste your API key) and select your `n8n-course` index on the Pinecone node.
+3. Add your **OpenAI** credential on the Embeddings node.
+4. Provide your documents (e.g. the HR SOP / IT FAQ) and run the workflow to embed and insert them into Pinecone.
+
+### Step 4 — Chat with your Pinecone knowledge base
+
+1. Import `Activity5b-Pinecone-RAG.json` (Telegram → AI Agent + Pinecone Vector Store tool → reply).
+2. Select the **same** Pinecone index and credential, your **OpenAI** key (gpt-4.1-mini), and your **Telegram** credential.
+3. **Save** and toggle **Active**.
+
+> ✅ **Test it:** Upload a document, then ask the Telegram bot a question only answerable from it — the answer is retrieved from your Pinecone index, and it survives a workflow restart.
+
+---
+
 ## Activity 6 — Website Chatbot via Webhook (Investment Advisor)
 
 **Folder:** `labs/activity6-investment-advisor/`  ·  Reference: https://alfredang.github.io/n8n-investmentadvisor/
@@ -385,20 +440,57 @@ Combine **APIs/HTTP Requests** with an AI agent. Ask the Telegram bot about a st
 - The **HTTP Request** node calls an endpoint with a method (GET/POST), headers, and query parameters.
 - **API keys** authenticate you — keep them in credentials, never hard-coded.
 
-### Get your API keys
+### Step A — Get your Twelve Data API key (free)
 
-1. Twelve Data — sign in at https://twelvedata.com/login and copy your free API key.
-2. NewsAPI — register at https://newsapi.org/ and copy your API key.
+1. Open https://twelvedata.com/ and click **Sign Up** (the free **Basic** plan is enough for this lab).
+2. Register with your email and verify the account.
+3. Once logged in, go to **https://twelvedata.com/account/api-keys** (Account → API Keys).
+4. Copy the **API key** shown there — you'll paste it into the workflow in Step C.
 
-### Step-by-step
+> **Note:** The free Twelve Data plan allows ~8 requests/minute and ~800 calls/day — plenty for testing. All three candle requests in this activity use the **same** Twelve Data key.
 
-1. Import `Activity7-Finance-Advisor.json` into n8n.
-2. Set your **Twelve Data** and **NewsAPI** keys (in credentials or the HTTP Request query params).
-3. Re-select your **OpenAI** and **Telegram** credentials.
-4. Review the flow: **Telegram Trigger → Extract Ticker (LLM) → HTTP candles (1m/15m/1h) + HTTP news → Aggregate/Merge → AI Agent → Telegram reply**.
-5. **Save**, toggle **Active**. Optionally open `index.html`, set your Twelve Data key and bot username in the dashboard settings.
+![Twelve Data home page — click Sign Up, then Account → API Keys to copy your key](courseware/assets/site-twelvedata.png)
 
-> ✅ **Test it:** Message the bot "Should I buy AAPL?" and confirm it returns a recommendation with reasoning.
+*Twelve Data home page — click Sign Up, then Account → API Keys to copy your key*
+
+### Step B — Get your NewsAPI key (free)
+
+1. Open https://newsapi.org/ and click **Get API Key**.
+2. Register with your email (choose the free **Developer** plan).
+3. Your key appears on your account page at **https://newsapi.org/account** — copy it.
+
+![NewsAPI home page — click Get API Key and register for the free Developer plan](courseware/assets/site-newsapi.png)
+
+*NewsAPI home page — click Get API Key and register for the free Developer plan*
+
+### Step C — Put the keys into the workflow
+
+Import `Activity7-Finance-Advisor.json` into n8n, then set the keys. **Twelve Data** and **NewsAPI** are configured in two different ways:
+
+**C1 — Twelve Data (3 HTTP Request nodes).** The key is a query parameter you paste directly:
+
+1. Open the **candles1min** node (an HTTP Request node).
+2. Scroll to **Query Parameters** and find the parameter named **`apikey`**.
+3. Replace its value `YOUR_TWELVEDATA_API_KEY` with the key you copied from Twelve Data.
+4. Repeat for **candles15min** and **candles1hr** — all three call Twelve Data and need the same key.
+
+> **Note:** Tip — set it once: create a **Query Auth** credential (Name = `apikey`, Value = your Twelve Data key), then on each candle node set **Authentication → Generic Credential Type → Query Auth** and delete the inline `apikey` parameter. That way the key lives in one place.
+
+**C2 — NewsAPI (the `news` node).** The key is stored as a credential:
+
+1. Open the **news** HTTP Request node. **Authentication** is already set to **Generic Credential Type → Query Auth**.
+2. Click the **Credential** dropdown → **Create New Credential**.
+3. Set **Name** = `apiKey` and **Value** = your NewsAPI key, then **Save**. (NewsAPI expects the key in a query parameter called `apiKey`.)
+4. Back on the `news` node, make sure your new credential is selected.
+
+### Step D — Finish & run
+
+1. Re-select your own **OpenAI** and **Telegram** credentials on the model and Telegram nodes.
+2. Review the flow: **Telegram Trigger → Extract Ticker (LLM) → HTTP candles (1m/15m/1h) + HTTP news → Aggregate/Merge → AI Agent → Telegram reply**.
+3. **Save** the workflow and toggle it **Active**.
+4. *(Optional)* open `index.html`, click the gear, and paste your Twelve Data key + Telegram bot username for the dashboard.
+
+> ✅ **Test it:** Message the bot "Should I buy AAPL?" and confirm it returns a recommendation with reasoning. If you get a 401/429 from an HTTP node, re-check the corresponding API key (401 = wrong key, 429 = rate limit).
 
 ---
 

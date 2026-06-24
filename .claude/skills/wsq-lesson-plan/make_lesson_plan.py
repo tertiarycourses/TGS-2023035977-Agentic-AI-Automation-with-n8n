@@ -180,7 +180,7 @@ schedule_table([
     ("9:45 – 10:30", "Overview of RAG — Tokenization, Embeddings, Vector Stores", 45, "normal"),
     ("10:30 – 11:00","Generate mock documents with Claude Code (e.g. employee-benefits FAQ, product info)", 30, "normal"),
     ("11:00 – 11:15","Tea Break", 15, "break"),
-    ("11:15 – 12:30","Activity 5: Add RAG to the Telegram chatbot — route between two data sources (RAG vector store + the earlier Data Table) via the system instruction", 75, "normal"),
+    ("11:15 – 12:30","Activity 5: Add RAG to the Telegram chatbot — route between two data sources (RAG vector store + the earlier Data Table) via the system instruction.  Extension — Activity 5b: RAG with Pinecone (a persistent cloud vector database)", 75, "normal"),
     ("12:30 – 1:00", "Selected learners present their chatbots", 30, "normal"),
 ])
 schedule_table([("1:00 – 2:00", "Lunch Break", 60, "break")])

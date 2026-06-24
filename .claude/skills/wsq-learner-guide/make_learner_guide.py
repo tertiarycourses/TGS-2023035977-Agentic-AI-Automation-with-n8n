@@ -305,6 +305,51 @@ note("Get a few learners to present their chatbot and show it answering both a p
      "staff-record question (Data Table).")
 B.append(("test", "Ask a policy question (\"How many days of annual leave do I get?\") and a record question "
                   "(\"What is Alice's role?\") and confirm each is answered from the correct source."))
+rule()
+h2("Activity 5b — RAG with Pinecone (Persistent Vector Database)")
+p("**Folder:** `labs/activity5-rag/`  ·  workflows `Activity5b-Pinecone-Upload.json` (ingest) + `Activity5b-Pinecone-RAG.json` (chat)")
+h3("Goal")
+p("Activity 5 used an **in-memory** vector store that resets when the workflow restarts. Here you swap it for "
+  "**Pinecone**, a managed cloud **vector database**, so your knowledge base **persists** and scales. You upload "
+  "documents into a Pinecone index once, then the Telegram agent answers from it.")
+B.append(("img","labs/activity5-rag/Activity5b-Pinecone-RAG.png","Activity 5b workflow — Telegram agent answering from a Pinecone vector store (gpt-4.1-mini)"))
+h3("Why a vector database (Pinecone)?")
+bullets([
+    "An **in-memory** store is fine for a demo but is lost on restart.",
+    "**Pinecone** stores your embeddings in the cloud — persistent, fast, scales to millions of vectors.",
+    "Same RAG idea: embed documents once, then retrieve the closest chunks for each question.",
+])
+h3("Step 1 — Create a Pinecone account")
+steps([
+    "Open https://www.pinecone.io/ and click **Sign Up** (the free **Starter** tier is enough for this lab).",
+    "Register with your email (or Google/GitHub) and verify the account.",
+    "You land in the **Pinecone console** at https://app.pinecone.io.",
+])
+B.append(("img","courseware/assets/site-pinecone.png","Pinecone — the managed vector database; sign up for the free Starter tier"))
+h3("Step 2 — Create an API key and an index")
+steps([
+    "In the console, open **API Keys** and **create / copy** an API key (you'll paste it into n8n).",
+    "Open **Indexes → Create index** and give it a name, e.g. `n8n-course`.",
+    "Set **Dimensions = 1536** to match OpenAI `text-embedding-3-small` (the embeddings used in this lab).",
+    "Set **Metric = cosine**, then create the index.",
+])
+note("The embedding model on **both** the upload and the chat workflows must be the **same** (here, OpenAI "
+     "`text-embedding-3-small` = 1536 dims) — otherwise the vector dimensions won't match the index.")
+h3("Step 3 — Upload your documents into Pinecone")
+steps([
+    "Import `Activity5b-Pinecone-Upload.json`.",
+    "Add a **Pinecone** credential (paste your API key) and select your `n8n-course` index on the Pinecone node.",
+    "Add your **OpenAI** credential on the Embeddings node.",
+    "Provide your documents (e.g. the HR SOP / IT FAQ) and run the workflow to embed and insert them into Pinecone.",
+])
+h3("Step 4 — Chat with your Pinecone knowledge base")
+steps([
+    "Import `Activity5b-Pinecone-RAG.json` (Telegram → AI Agent + Pinecone Vector Store tool → reply).",
+    "Select the **same** Pinecone index and credential, your **OpenAI** key (gpt-4.1-mini), and your **Telegram** credential.",
+    "**Save** and toggle **Active**.",
+])
+B.append(("test","Upload a document, then ask the Telegram bot a question only answerable from it — the answer is retrieved from your Pinecone index, and it survives a workflow restart."))
+
 
 # ============================================================================
 # DAY 2 (Webhook + API)
@@ -347,22 +392,57 @@ bullets([
     "The **HTTP Request** node calls an endpoint with a method (GET/POST), headers, and query parameters.",
     "**API keys** authenticate you — keep them in credentials, never hard-coded.",
 ])
-h3("Get your API keys")
+h3("Step A — Get your Twelve Data API key (free)")
 steps([
-    "Twelve Data — sign in at https://twelvedata.com/login and copy your free API key.",
-    "NewsAPI — register at https://newsapi.org/ and copy your API key.",
+    "Open https://twelvedata.com/ and click **Sign Up** (the free **Basic** plan is enough for this lab).",
+    "Register with your email and verify the account.",
+    "Once logged in, go to **https://twelvedata.com/account/api-keys** (Account → API Keys).",
+    "Copy the **API key** shown there — you'll paste it into the workflow in Step C.",
 ])
-h3("Step-by-step")
+note("The free Twelve Data plan allows ~8 requests/minute and ~800 calls/day — plenty for testing. "
+     "All three candle requests in this activity use the **same** Twelve Data key.")
+B.append(("img","courseware/assets/site-twelvedata.png","Twelve Data home page — click Sign Up, then Account → API Keys to copy your key"))
+
+h3("Step B — Get your NewsAPI key (free)")
 steps([
-    "Import `Activity7-Finance-Advisor.json` into n8n.",
-    "Set your **Twelve Data** and **NewsAPI** keys (in credentials or the HTTP Request query params).",
-    "Re-select your **OpenAI** and **Telegram** credentials.",
+    "Open https://newsapi.org/ and click **Get API Key**.",
+    "Register with your email (choose the free **Developer** plan).",
+    "Your key appears on your account page at **https://newsapi.org/account** — copy it.",
+])
+
+B.append(("img","courseware/assets/site-newsapi.png","NewsAPI home page — click Get API Key and register for the free Developer plan"))
+h3("Step C — Put the keys into the workflow")
+p("Import `Activity7-Finance-Advisor.json` into n8n, then set the keys. **Twelve Data** and **NewsAPI** are "
+  "configured in two different ways:")
+p("**C1 — Twelve Data (3 HTTP Request nodes).** The key is a query parameter you paste directly:")
+steps([
+    "Open the **candles1min** node (an HTTP Request node).",
+    "Scroll to **Query Parameters** and find the parameter named **`apikey`**.",
+    "Replace its value `YOUR_TWELVEDATA_API_KEY` with the key you copied from Twelve Data.",
+    "Repeat for **candles15min** and **candles1hr** — all three call Twelve Data and need the same key.",
+])
+note("Tip — set it once: create a **Query Auth** credential (Name = `apikey`, Value = your Twelve Data key), "
+     "then on each candle node set **Authentication → Generic Credential Type → Query Auth** and delete the "
+     "inline `apikey` parameter. That way the key lives in one place.")
+p("**C2 — NewsAPI (the `news` node).** The key is stored as a credential:")
+steps([
+    "Open the **news** HTTP Request node. **Authentication** is already set to **Generic Credential Type → Query Auth**.",
+    "Click the **Credential** dropdown → **Create New Credential**.",
+    "Set **Name** = `apiKey` and **Value** = your NewsAPI key, then **Save**. "
+    "(NewsAPI expects the key in a query parameter called `apiKey`.)",
+    "Back on the `news` node, make sure your new credential is selected.",
+])
+
+h3("Step D — Finish & run")
+steps([
+    "Re-select your own **OpenAI** and **Telegram** credentials on the model and Telegram nodes.",
     "Review the flow: **Telegram Trigger → Extract Ticker (LLM) → HTTP candles (1m/15m/1h) + HTTP news → "
     "Aggregate/Merge → AI Agent → Telegram reply**.",
-    "**Save**, toggle **Active**. Optionally open `index.html`, set your Twelve Data key and bot username in "
-    "the dashboard settings.",
+    "**Save** the workflow and toggle it **Active**.",
+    "*(Optional)* open `index.html`, click the gear, and paste your Twelve Data key + Telegram bot username for the dashboard.",
 ])
-B.append(("test", "Message the bot \"Should I buy AAPL?\" and confirm it returns a recommendation with reasoning."))
+B.append(("test", "Message the bot \"Should I buy AAPL?\" and confirm it returns a recommendation with reasoning. "
+                  "If you get a 401/429 from an HTTP node, re-check the corresponding API key (401 = wrong key, 429 = rate limit)."))
 
 # ============================================================================
 # DAY 3 (Security + Capstone)
