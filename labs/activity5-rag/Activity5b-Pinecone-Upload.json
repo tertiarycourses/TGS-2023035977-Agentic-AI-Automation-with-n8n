@@ -1,245 +1,137 @@
 {
-  "updatedAt": "2025-12-26T16:48:42.874Z",
-  "createdAt": "2025-11-14T18:18:23.415Z",
-  "id": "dc68081ce045451a",
   "name": "Activity 5b — Upload Documents to Pinecone",
-  "description": null,
-  "active": false,
-  "isArchived": false,
   "nodes": [
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [
-        -304,
-        80
-      ],
-      "id": "198f5be2-cac8-4483-933b-2e7b37614c52",
-      "name": "When clicking ‘Execute workflow’"
-    },
-    {
-      "parameters": {
-        "resource": "fileFolder",
-        "returnAll": true,
-        "filter": {
-          "folderId": {
-            "__rl": true,
-            "value": "1HzpzDE9IpPirs7hieD05OcibpWDVy8g3",
-            "mode": "list",
-            "cachedResultName": "30 invoices (n8n training)",
-            "cachedResultUrl": "https://drive.google.com/drive/folders/1HzpzDE9IpPirs7hieD05OcibpWDVy8g3"
-          }
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        -80,
-        80
-      ],
-      "id": "3beb3c32-63d6-4f28-a616-b769a9eff0e8",
-      "name": "Search files and folders",
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "oq80XtOgxo7Wabow",
-          "name": "Google Drive (Agentic AI Account)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "download",
-        "fileId": {
-          "__rl": true,
-          "value": "={{ $json.id }}",
-          "mode": "id"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        144,
-        80
-      ],
-      "id": "213c6d20-dafa-4363-90ed-bb6161c8cae3",
-      "name": "Download file",
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "oq80XtOgxo7Wabow",
-          "name": "Google Drive (Agentic AI Account)"
-        }
-      }
-    },
     {
       "parameters": {
         "mode": "insert",
         "pineconeIndex": {
           "__rl": true,
+          "value": "microwave",
           "mode": "list",
-          "value": "YOUR_PINECONE_INDEX",
-          "cachedResultName": "YOUR_PINECONE_INDEX"
+          "cachedResultName": "microwave"
         },
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
       "typeVersion": 1.3,
       "position": [
-        848,
-        64
+        256,
+        112
       ],
-      "id": "3be6709f-fb27-40e6-82b1-31a474fbcb08",
-      "name": "Pinecone Vector Store",
+      "id": "9a0323d8-4af8-4db6-bf62-0f5725c3b734",
+      "name": "Pinecone Vector Store1",
       "credentials": {
         "pineconeApi": {
-          "id": "REPLACE_ME",
-          "name": "PineconeApi account"
+          "id": "ExVdpCgW9yebnO4F",
+          "name": "Pinecone account"
         }
       }
     },
     {
       "parameters": {
-        "dataType": "binary",
-        "loader": "pdfLoader",
-        "textSplittingMode": "custom",
         "options": {
-          "metadata": {
-            "metadataValues": [
-              {
-                "name": "Document ID",
-                "value": "={{ $json.name }}"
-              }
-            ]
-          }
+          "dimensions": 512
         }
-      },
-      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
-      "typeVersion": 1.1,
-      "position": [
-        1008,
-        288
-      ],
-      "id": "52b69791-7a13-4432-bfa9-02d19d49ccfe",
-      "name": "Default Data Loader"
-    },
-    {
-      "parameters": {
-        "chunkOverlap": 100,
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
-      "typeVersion": 1,
-      "position": [
-        976,
-        480
-      ],
-      "id": "e5bce2f1-47c9-4140-ab4e-00010eeac1e0",
-      "name": "Recursive Character Text Splitter"
-    },
-    {
-      "parameters": {
-        "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1.2,
       "position": [
-        768,
-        288
+        176,
+        416
       ],
-      "id": "e4ed3e47-dc61-4a62-acbd-6b86ad7e97f2",
-      "name": "Embeddings Google Gemini",
+      "id": "0c5144f3-aae4-4841-9dfe-03302ad03525",
+      "name": "Embeddings OpenAI",
       "credentials": {
         "openAiApi": {
-          "id": "REPLACE_ME",
-          "name": "OpenAi account"
+          "id": "HncP6z2nrPdrEcFY",
+          "name": "OpenAI account"
         }
       }
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "https://invoices-tu1r4ck.svc.aped-4627-b74a.pinecone.io/vectors/delete",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "pineconeApi",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        320
+      ],
+      "id": "050390fb-7963-416d-9b84-f3b394a5c699",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 1024
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter",
+      "typeVersion": 1,
+      "position": [
+        496,
+        528
+      ],
+      "id": "f6fd5771-3399-48cd-b67e-3131a505096e",
+      "name": "Token Splitter"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rag-upload",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -320,
+        112
+      ],
+      "id": "bb089fdb-9642-499b-9c29-1c5990296a4f",
+      "name": "Upload Webhook",
+      "webhookId": "5cea0e3d-728c-4737-8e51-d1ac4a22f91f"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
             {
-              "name": "deleteAll",
-              "value": "true"
+              "id": "6e2b2a5e-860b-41ef-b5b9-df29b41925c2",
+              "name": "documents",
+              "value": "={{ $json.body.documents[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "b4ca3d72-c252-4233-b47f-ecd63ac42b47",
+              "name": "",
+              "value": "",
+              "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
-        368,
-        -48
+        -32,
+        112
       ],
-      "id": "5fd817ed-de51-4767-a74b-1aef93674359",
-      "name": "HTTP Request",
-      "credentials": {
-        "pineconeApi": {
-          "id": "m6EE4x9ECxKZsFBr",
-          "name": "Pinecone API(Training9)"
-        }
-      },
-      "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
-        "mode": "chooseBranch",
-        "useDataOfInput": 2
-      },
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3.2,
-      "position": [
-        592,
-        64
-      ],
-      "id": "bccf365f-125d-4334-9146-7df49bfdb8c1",
-      "name": "Merge"
+      "id": "8a30c55f-ebdc-417c-a433-c20097a7bab5",
+      "name": "Edit Fields"
     }
   ],
+  "pinData": {},
   "connections": {
-    "When clicking ‘Execute workflow’": {
-      "main": [
+    "Embeddings OpenAI": {
+      "ai_embedding": [
         [
           {
-            "node": "Search files and folders",
-            "type": "main",
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Search files and folders": {
-      "main": [
-        [
-          {
-            "node": "Download file",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Download file": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 1
           }
         ]
       ]
@@ -248,14 +140,14 @@
       "ai_document": [
         [
           {
-            "node": "Pinecone Vector Store",
+            "node": "Pinecone Vector Store1",
             "type": "ai_document",
             "index": 0
           }
         ]
       ]
     },
-    "Recursive Character Text Splitter": {
+    "Token Splitter": {
       "ai_textSplitter": [
         [
           {
@@ -266,33 +158,22 @@
         ]
       ]
     },
-    "Embeddings Google Gemini": {
-      "ai_embedding": [
-        [
-          {
-            "node": "Pinecone Vector Store",
-            "type": "ai_embedding",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request": {
+    "Upload Webhook": {
       "main": [
         [
           {
-            "node": "Merge",
+            "node": "Edit Fields",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Merge": {
+    "Edit Fields": {
       "main": [
         [
           {
-            "node": "Pinecone Vector Store",
+            "node": "Pinecone Vector Store1",
             "type": "main",
             "index": 0
           }
@@ -300,40 +181,18 @@
       ]
     }
   },
+  "active": true,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
-  "staticData": null,
+  "versionId": "70a6a83c-04af-4aa9-aced-6ddd212d345a",
   "meta": {
-    "templateId": "tertiaryinfotech-n8n-course"
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fcdd11be6122db515fd1e031acff4a3eeab5f077f43f29bb025528511f775668"
   },
   "nodeGroups": [],
-  "pinData": {},
-  "versionId": "5e1f0611-079c-41bb-bb1f-574a9a41592d",
-  "activeVersionId": null,
-  "versionCounter": 2,
-  "triggerCount": 0,
-  "sourceWorkflowId": null,
-  "shared": [
-    {
-      "updatedAt": "2025-11-14T18:18:23.415Z",
-      "createdAt": "2025-11-14T18:18:23.415Z",
-      "role": "workflow:owner",
-      "workflowId": "FEuOZbUSxDzsfZac",
-      "projectId": "xqqapSDPpbdDPAUD",
-      "project": {
-        "updatedAt": "2026-02-27T17:43:44.345Z",
-        "createdAt": "2025-07-23T10:07:06.402Z",
-        "id": "xqqapSDPpbdDPAUD",
-        "name": "Alfred Ang <agenticai.tertiaryrobotics@gmail.com>",
-        "type": "personal",
-        "icon": null,
-        "description": null,
-        "customTelemetryTags": [],
-        "creatorId": "2587bb0c-7a6b-485c-b1d6-cdd4cb5d99bc"
-      }
-    }
-  ],
-  "tags": [],
-  "activeVersion": null
+  "id": "3JDyT26LLjp5VV5B",
+  "tags": []
 }
