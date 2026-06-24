@@ -1,5 +1,5 @@
 ---
-name: wsq-learner-guide
+name: tertiary-learner-guide
 description: Generate a Tertiary Infotech Academy WSQ Learner Guide as BOTH an aligned Markdown file (LEARNER-GUIDE.md) and a professionally formatted Word document (.docx) from a single source so the two never diverge. The DOCX has the WSQ cover page (course title + n8n & Tertiary logos + UEN), Document Version Control Record, auto Table of Contents, Arial 11pt body, embedded workflow screenshots, and a copyright + page-number footer on every page. Use when writing or updating a detailed step-by-step learner guide for a WSQ course.
 ---
 

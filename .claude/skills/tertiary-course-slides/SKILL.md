@@ -1,5 +1,5 @@
 ---
-name: wsq-course-slides
+name: tertiary-course-slides
 description: Generate a highly professional, all-white-theme WSQ course slide deck (python-pptx) for Tertiary Infotech Academy. Produces a cover page with course title + n8n & Tertiary logos + UEN, admin slides (digital attendance/TRAQOM, About the Trainer, Ground Rules, Lesson Plan, Learning Outcomes, Assessment), n8n key-concept slides, per-activity overview + workflow screenshot + step-by-step slides, and lunch/tea-break dividers. Use when creating or updating course/training slides for a Tertiary Infotech WSQ course.
 ---
 

@@ -1,6 +1,6 @@
 ---
-name: ppt-design-presentation
-description: Best-practice design system and rules for building highly professional, visual training/course slide decks with python-pptx (Tertiary Infotech house style). Use whenever creating or polishing a .pptx deck so the result is clean, white-theme, visual, and consistent — large readable fonts, brand colours, icon/card layouts, screenshots and diagrams instead of walls of text. Pair with the wsq-course-slides skill.
+name: tertiary-ppt-design
+description: Best-practice design system and rules for building highly professional, visual training/course slide decks with python-pptx (Tertiary Infotech house style). Use whenever creating or polishing a .pptx deck so the result is clean, white-theme, visual, and consistent — large readable fonts, brand colours, icon/card layouts, screenshots and diagrams instead of walls of text. Pair with the tertiary-course-slides skill.
 ---
 
 # PPT Design & Presentation — Best Practices
@@ -37,4 +37,4 @@ Apply these when generating or refining a course/training deck (python-pptx).
 - Activity titles and topic numbering must **match the Learner Guide and Lesson Plan exactly**.
 - Reuse helper functions (`content`, `two_col`, `cards3`, `website_slide`, `gallery_slide`, `img_slide`, `big_statement`, `section`, `step_slide`) so spacing/fonts stay uniform.
 
-Implementation lives in the **wsq-course-slides** skill (`make_slides.py`).
+Implementation lives in the **tertiary-course-slides** skill (`make_slides.py`).

@@ -1,5 +1,5 @@
 ---
-name: wsq-lesson-plan
+name: tertiary-lesson-plan
 description: Generate a Tertiary Infotech Academy WSQ Lesson Plan as a professionally formatted Word document (.docx) with the house cover page (course title + n8n & Tertiary logos + UEN), Document Version Control Record, auto Table of Contents, Arial 11pt body, colour-coded daily schedule tables, and a copyright + page-number footer on every page. Each training day totals exactly 8 instructional hours (9:30am–6:30pm with a 1-hour lunch; tea breaks counted within). Use when creating or updating a lesson plan / training schedule for a WSQ course.
 ---
 
