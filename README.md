@@ -133,10 +133,12 @@ TGS-2023035977-Agentic-AI-Automation-with-n8n/
 │   ├── index.html                   # HR & IT "Mission Control" dashboard + chat
 │   ├── make_it_faq.py               # Generates the sample IT Support FAQ
 │   ├── MyCompany-HR-SOP.docx        # HR SOP for the HR agent's vector store
-│   ├── MyCompany-IT-Support-FAQ.docx# IT FAQ for the IT agent's vector store
-│   └── courseware/                  # Slides + Learner Guide (PPTX / DOCX)
+│   └── MyCompany-IT-Support-FAQ.docx# IT FAQ for the IT agent's vector store
 │
-
+├── courseware/                      # Course slides + Learner Guide (PPTX / DOCX)
+│   ├── n8n-slides.pptx
+│   └── n8n Automation Learner Guide.docx
+│
 └── mini-projects/
     └── issue-tracking/              # Issue Reporting: n8n form + image → Postgres
         ├── issue-report-postgresql.json   # Submission workflow
