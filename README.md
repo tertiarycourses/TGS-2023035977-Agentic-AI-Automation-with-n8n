@@ -146,7 +146,8 @@ TGS-2023035977-Agentic-AI-Automation-with-n8n/
 │           ├── index.html, gallery.html       # QR/landing + report gallery pages
 │           └── README.md
 │
-└── courseware/                      # Course slides + Learner Guide (PPTX / DOCX)
+└── courseware/                      # Course slides, Lesson Plan + Learner Guide
+    ├── Lesson Plan - Agentic AI Automation with n8n.docx  # 3-day lesson plan
     ├── n8n-slides.pptx
     └── n8n Automation Learner Guide.docx
 ```
