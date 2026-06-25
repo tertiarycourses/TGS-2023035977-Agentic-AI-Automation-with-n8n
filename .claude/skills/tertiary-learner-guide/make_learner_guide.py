@@ -25,7 +25,7 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
-REPO = "/Users/alfredang/projects/labs-activities/TGS-2023035977-Agentic AI Automation with n8n"
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # ============================================================================
 # CONTENT
@@ -661,6 +661,8 @@ def render_docx(blocks):
         elif k == "steps":
             for i, s in enumerate(b[1], 1):
                 pr = doc.add_paragraph(style="List Number"); _runs(pr, s)
+                if i == 1:
+                    _restart_list(doc, pr)
         elif k == "bullets":
             for s in b[1]:
                 pr = doc.add_paragraph(style="List Bullet"); _runs(pr, s)
@@ -707,6 +709,62 @@ def render_docx(blocks):
     prodoc.enable_update_fields(doc)
     return doc
 
+def _restart_list(doc, para):
+    """Force a List Number paragraph to restart at 1 by injecting a new w:num with startOverride=1."""
+    try:
+        numbering_elem = doc.part.numbering_part._element
+    except Exception:
+        return
+    # Get the numId from the 'List Number' style definition
+    try:
+        style_pPr = doc.styles['List Number'].element.find(qn('w:pPr'))
+        style_numPr = style_pPr.find(qn('w:numPr')) if style_pPr is not None else None
+        style_numId = style_numPr.find(qn('w:numId')) if style_numPr is not None else None
+        base_num_id = int(style_numId.get(qn('w:val'))) if style_numId is not None else None
+    except Exception:
+        base_num_id = None
+    if base_num_id is None:
+        return
+    # Find abstractNumId
+    abstract_num_id = None
+    for num in numbering_elem.findall(qn('w:num')):
+        if num.get(qn('w:numId')) == str(base_num_id):
+            abs_ref = num.find(qn('w:abstractNumId'))
+            if abs_ref is not None:
+                abstract_num_id = abs_ref.get(qn('w:val'))
+            break
+    if abstract_num_id is None:
+        return
+    # Allocate a new numId
+    existing = [int(n.get(qn('w:numId'), 0)) for n in numbering_elem.findall(qn('w:num'))]
+    new_num_id = max(existing) + 1 if existing else 1
+    # Build w:num with lvlOverride startOverride=1
+    new_num = OxmlElement('w:num')
+    new_num.set(qn('w:numId'), str(new_num_id))
+    abs_elem = OxmlElement('w:abstractNumId')
+    abs_elem.set(qn('w:val'), abstract_num_id)
+    new_num.append(abs_elem)
+    lvl_override = OxmlElement('w:lvlOverride')
+    lvl_override.set(qn('w:ilvl'), '0')
+    start_over = OxmlElement('w:startOverride')
+    start_over.set(qn('w:val'), '1')
+    lvl_override.append(start_over)
+    new_num.append(lvl_override)
+    numbering_elem.append(new_num)
+    # Override numPr directly on the paragraph
+    pPr = para._p.get_or_add_pPr()
+    existing_numPr = pPr.find(qn('w:numPr'))
+    if existing_numPr is not None:
+        pPr.remove(existing_numPr)
+    numPr = OxmlElement('w:numPr')
+    ilvl = OxmlElement('w:ilvl')
+    ilvl.set(qn('w:val'), '0')
+    numPr.append(ilvl)
+    numId_elem = OxmlElement('w:numId')
+    numId_elem.set(qn('w:val'), str(new_num_id))
+    numPr.append(numId_elem)
+    pPr.append(numPr)
+
 def _shade_para(pr, hexc="F3F5F8"):
     ppr = pr._p.get_or_add_pPr(); shd = OxmlElement("w:shd")
     shd.set(qn("w:val"),"clear"); shd.set(qn("w:color"),"auto"); shd.set(qn("w:fill"),hexc); ppr.append(shd)
@@ -743,7 +801,7 @@ def insert_images(blocks):
 
 B = insert_images(B)
 md = render_markdown(B)
-with open(os.path.join(REPO, "LEARNER-GUIDE.md"), "w") as f:
+with open(os.path.join(REPO, "LEARNER-GUIDE.md"), "w", encoding="utf-8") as f:
     f.write(md)
 render_docx(B).save(os.path.join(REPO, "courseware/n8n Automation Learner Guide.docx"))
 
