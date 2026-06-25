@@ -374,7 +374,8 @@ steps([
     "Re-select your **OpenAI** and **Gmail** credentials on the AI Agent and Email nodes.",
     "Review the agent's compliance system instruction (no guaranteed returns, no personalised advice).",
     "**Save**, toggle **Active**, and copy the webhook **Production URL**.",
-    "Open `index.html` from the activity folder, click the settings/gear, and paste your webhook URL.",
+    "Paste the Production URL into `script.js` in the activity folder.",
+    "Open `index.html` from the activity folder.",
 ])
 note("Get a few learners to present their live website and chatbot.")
 B.append(("test", "On the website, send a chat message and submit the enquiry form; confirm the bot replies and the advisor receives the enquiry email."))
@@ -426,10 +427,10 @@ note("Tip — set it once: create a **Query Auth** credential (Name = `apikey`, 
      "inline `apikey` parameter. That way the key lives in one place.")
 p("**C2 — NewsAPI (the `news` node).** The key is stored as a credential:")
 steps([
-    "Open the **news** HTTP Request node. **Authentication** is already set to **Generic Credential Type → Query Auth**.",
+    "Open the **news** HTTP Request node.",
     "Click the **Credential** dropdown → **Create New Credential**.",
-    "Set **Name** = `apiKey` and **Value** = your NewsAPI key, then **Save**. "
-    "(NewsAPI expects the key in a query parameter called `apiKey`.)",
+    "Scroll to **Query Parameters** and find the parameter named **`apikey`**.",
+    "Replace its value `YOUR_NEWS_API_KEY` with the key you copied from NewsAPI.",
     "Back on the `news` node, make sure your new credential is selected.",
 ])
 

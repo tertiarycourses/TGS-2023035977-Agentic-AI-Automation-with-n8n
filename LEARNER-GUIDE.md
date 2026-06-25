@@ -414,7 +414,8 @@ Expose an AI agent to a **public website** using a **Webhook**. The provided one
 3. Re-select your **OpenAI** and **Gmail** credentials on the AI Agent and Email nodes.
 4. Review the agent's compliance system instruction (no guaranteed returns, no personalised advice).
 5. **Save**, toggle **Active**, and copy the webhook **Production URL**.
-6. Open `index.html` from the activity folder, click the settings/gear, and paste your webhook URL.
+6. Paste the Production URL into `script.js` in the activity folder.
+7. Open `index.html` from the activity folder.
 
 > **Note:** Get a few learners to present their live website and chatbot.
 
@@ -478,10 +479,11 @@ Import `Activity7-Finance-Advisor.json` into n8n, then set the keys. **Twelve Da
 
 **C2 — NewsAPI (the `news` node).** The key is stored as a credential:
 
-1. Open the **news** HTTP Request node. **Authentication** is already set to **Generic Credential Type → Query Auth**.
+1. Open the **news** HTTP Request node.
 2. Click the **Credential** dropdown → **Create New Credential**.
-3. Set **Name** = `apiKey` and **Value** = your NewsAPI key, then **Save**. (NewsAPI expects the key in a query parameter called `apiKey`.)
-4. Back on the `news` node, make sure your new credential is selected.
+3. Scroll to **Query Parameters** and find the parameter named **`apikey`**.
+4. Replace its value `YOUR_NEWS_API_KEY` with the key you copied from NewsAPI.
+5. Back on the `news` node, make sure your new credential is selected.
 
 ### Step D — Finish & run
 
@@ -547,14 +549,12 @@ Wrap an AI agent with **guardrails** so unsafe input never reaches the model and
 ### Step-by-step
 
 1. Take the Activity 6 webhook agent (or the Telegram agent).
-2. **Before** the AI Agent, add a check node (a Guardrails   node, or an LLM/If classifier) that inspects the user message for Secret keys , where you can also add extra guardrails as per your wish.
-3.	**After** the AI Agent, add a second check that scans the reply for keywords, violations; on a violation, feel free to change the keywords in the second guardrail and play around with it. (or send it for human review as in 8a).
-4.	If either of the guardrail fails it will reply with the false branch.
-5.	Only send the reply to the user when both guardrails pass.
-6.	**Save** and keep **Active**.
+2. **Before** the AI Agent, add a check node (a Guardrails node, or an LLM/If classifier) that inspects the user message; on a violation, branch to a safe canned response instead of the agent.
+3. **After** the AI Agent, add a second check that scans the reply for secrets/policy violations; on a violation, replace it with a safe message (or send it for human review as in 8a).
+4. Only send the reply to the user when both guardrails pass.
+5. **Save** and keep **Active**.
 
-
-> ✅ **Test it:** Send a normal question (passes through) and a disallowed one - send a message containing secret keys like (“my password is sk-12345678”) and another message containing keywords that you blocked (blocked by the pre-guardrail with a safe reply).
+> ✅ **Test it:** Send a normal question (passes through) and a disallowed one (blocked by the pre-guardrail with a safe reply).
 
 ---
 
