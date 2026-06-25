@@ -8,7 +8,8 @@ from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
 
-REPO = "/Users/alfredang/projects/labs-activities/TGS-2023035977-Agentic AI Automation with n8n"
+import os as _os
+REPO = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))
 
 NAVY=RGBColor(0x0B,0x12,0x20); BLUE=RGBColor(0x1F,0x6F,0xEB); TEAL=RGBColor(0x10,0xB9,0x81)
 AMBER=RGBColor(0xF5,0x9E,0x0B); INK=RGBColor(0x16,0x1B,0x26); GREY=RGBColor(0x5B,0x63,0x72)
@@ -514,12 +515,17 @@ activity_overview("ACT 5b","Activity 5b — RAG with Pinecone (Persistent Vector
 img_slide("Activity 5b - Pinecone RAG Workflow",IMG("labs/activity5-rag/Activity5b-Pinecone-RAG.png"),
  "Telegram agent answering from a Pinecone vector store (gpt-4.1-mini)",kicker="TOPIC 2 (cont.) - RAG")
 for i,t in enumerate([
- "Create a Pinecone account, API key and an index (1536 dims, cosine).",
- "Import Activity5b-Pinecone-Upload.json - upload your documents into the index (Embeddings OpenAI -> Pinecone insert).",
- "Import Activity5b-Pinecone-RAG.json - the Telegram agent with a Pinecone Vector Store tool.",
- "Add your Pinecone + OpenAI credentials and select your index on each Pinecone node.",
- "Save, Activate, and ask the bot a question answered from your uploaded documents."],1):
-    step_slide("TOPIC 2 (cont.) - RAG","Activity 5b — RAG with Pinecone (Persistent Vector Database)",i,5,t)
+ "Sign up at pinecone.io (free Starter tier) and open the console at app.pinecone.io.",
+ "Go to API Keys → create / copy an API key — paste it into n8n later.",
+ "Open Indexes → Create index; name it n8n-course.",
+ "Set Dimensions = 1536 and Metric = cosine, then create the index.",
+ "Import Activity5b-Pinecone-Upload.json into n8n.",
+ "Add a Pinecone credential and select your n8n-course index on the Pinecone node.",
+ "Add your OpenAI credential on the Embeddings node; provide documents and run to insert into Pinecone.",
+ "Import Activity5b-Pinecone-RAG.json (Telegram → AI Agent + Pinecone tool → reply).",
+ "Select the same Pinecone index and credential, your OpenAI (gpt-4.1-mini) and Telegram credentials.",
+ "Save and toggle Active."],1):
+    step_slide("TOPIC 2 (cont.) - RAG","Activity 5b — RAG with Pinecone (Persistent Vector Database)",i,10,t)
 test_slide("Activity 5b — RAG with Pinecone (Persistent Vector Database)","Upload a document, then ask the Telegram bot a question only answerable from it - the answer is retrieved from Pinecone.","TOPIC 2 (cont.) - RAG")
 brk("Lunch Break","1 hour",AMBER)
 
@@ -609,12 +615,16 @@ activity_block(dict(tag="ACT 7",title="Activity 7 — Finance API → Telegram (
  desc="Ask the Telegram bot about a stock; it resolves the ticker, pulls candles from Twelve Data and headlines from NewsAPI, and replies with a Buy/Sell/Hold call and reasoning.",
  build="Telegram → Extract ticker → HTTP (Twelve Data + NewsAPI) → AI Agent → reply",nodes="telegram, httpRequest, agent, lmChatOpenAi",
  img="labs/activity7-finance-advisor/Activity7-Finance-Advisor.png",cap="Multi-timeframe candles + news → AI day-trading agent",
- steps=["Get free API keys: Twelve Data (twelvedata.com/login) and NewsAPI (newsapi.org).",
+ steps=["Sign up at twelvedata.com (free Basic plan) → Account → API Keys → copy your key.",
+   "Sign up at newsapi.org (free Developer plan) → copy your key from newsapi.org/account.",
    "Import Activity7-Finance-Advisor.json into n8n.",
-   "Set your Twelve Data and NewsAPI keys (credentials or HTTP query params).",
-   "Re-select your OpenAI and Telegram credentials.",
-   "Review the flow: Telegram → Extract Ticker → HTTP candles (1m/15m/1h) + news → Aggregate → AI Agent → reply.",
-   "Save, Activate; optionally open index.html and set your key + bot username."],
+   "Open candles1min → Query Parameters → find apikey → replace with your Twelve Data key.",
+   "Repeat for candles15min and candles1hr — all three nodes need the same Twelve Data key.",
+   "Open the news node → Authentication: Generic Credential Type → Query Auth.",
+   "Credential → Create New; set Name = apiKey and Value = your NewsAPI key, then Save.",
+   "Re-select your OpenAI and Telegram credentials on the model and Telegram nodes.",
+   "Review: Telegram Trigger → Extract Ticker → candles (1m/15m/1h) + news → AI Agent → reply.",
+   "Save and toggle Active; optionally open index.html and paste your Twelve Data key + bot username."],
  test="Message the bot 'Should I buy AAPL?' and confirm it returns a recommendation with reasoning."))
 content("End of Day 2 — Recap",[
  "You grounded an agent with RAG over your own documents.",
@@ -647,11 +657,12 @@ activity_block(dict(tag="ACT 8b",title="Activity 8b — Pre & Post Guardrails fo
  build="Webhook → Pre-check → AI Agent → Post-check → Respond / Blocked",nodes="webhook, if, agent, respondToWebhook",
  img="labs/activity8-guardrails/Activity8b-Guardrails.png",cap="Pre/post checks gate the agent",
  steps=["Start from the Activity 6 webhook agent (or the Telegram agent).",
-   "Before the AI Agent, add a check that inspects the user message; on a violation, branch to a safe canned response.",
-   "After the AI Agent, add a check that scans the reply for secrets/policy violations.",
-   "Only send the reply when both guardrails pass; otherwise return a safe message.",
+   "Before the AI Agent, add a Guardrails node that checks the user message for secret keys or blocked keywords.",
+   "After the AI Agent, add a second Guardrails check on the reply; adjust the keyword list as you like.",
+   "If either guardrail fails, the false branch returns a safe canned response.",
+   "Only send the reply when both guardrails pass.",
    "Save and keep Active."],
- test="Send a normal question (passes through) and a disallowed one (blocked by the pre-guardrail)."))
+ test="Send a normal question (passes through) and a disallowed one — e.g. 'my password is sk-12345678' — and confirm the pre-guardrail blocks it with a safe reply."))
 brk("Lunch Break","1 hour",AMBER)
 
 # ---------- TOPIC 7: CAPSTONE ----------
@@ -677,6 +688,6 @@ txt(s,Inches(1.27),Inches(4.1),Inches(11.5),Inches(1.4),
   [("Powered by Tertiary Infotech Academy Pte Ltd  ·  www.tertiarycourses.com.sg",12,GREY,False)]],space=8)
 footer(s)
 
-OUT="courseware/n8n-slides.pptx"
+OUT="courseware/Agentic AI Automation with n8n.pptx"
 prs.save(f"{REPO}/{OUT}")
 print("Saved:",OUT,"| slides:",len(prs.slides._sldIdLst))
