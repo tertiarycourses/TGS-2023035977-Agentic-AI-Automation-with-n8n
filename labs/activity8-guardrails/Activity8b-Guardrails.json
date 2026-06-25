@@ -1,4 +1,5 @@
 {
+  "name": "Activity 8b — Pre & Post Guardrails for the AI Agent",
   "nodes": [
     {
       "parameters": {
@@ -12,49 +13,17 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        0,
-        0
+        -896,
+        144
       ],
-      "id": "b8a956d4-eec3-4bc9-a868-df1c0d7913f8",
+      "id": "75b632a6-c93d-4cdc-8c45-688c04eb9962",
       "name": "Chat Webhook",
       "webhookId": "317dfe7e-fa34-4806-9959-bf5ef28b62d0"
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": false,
-            "typeValidation": "loose",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "e9f53760-a3d1-4389-ba36-0c78da4af646",
-              "leftValue": "={{ $json.body.message.toLowerCase() }}",
-              "rightValue": "ignore previous",
-              "operator": {
-                "type": "string",
-                "operation": "notContains"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        240,
-        0
-      ],
-      "id": "219cce04-e880-45b1-ba8d-3ce56efb62ca",
-      "name": "Pre-Guardrail (input)"
-    },
-    {
-      "parameters": {
         "promptType": "define",
-        "text": "={{ $json.body.message }}",
+        "text": "={{ $('Chat Webhook').item.json.body.message }}",
         "options": {
           "systemMessage": "You are a helpful, safe assistant. Refuse unsafe or out-of-scope requests."
         }
@@ -62,10 +31,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        480,
-        -120
+        -480,
+        128
       ],
-      "id": "422a5538-52a8-4b4b-ab86-4e65a03c1178",
+      "id": "178364c4-10c3-4768-811f-00a061628040",
       "name": "AI Agent"
     },
     {
@@ -82,64 +51,31 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        420,
-        80
+        -496,
+        320
       ],
-      "id": "f64918b7-2c64-43e3-a02d-edca30eb786d",
+      "id": "883b5bf3-108d-4c38-abb4-9124c55d0ec3",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "UIBPmijf4wS4ngHz",
-          "name": "OpenAI account 2"
+          "id": "HncP6z2nrPdrEcFY",
+          "name": "OpenAI account"
         }
       }
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": false,
-            "typeValidation": "loose",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "d13f9ad3-1f32-4b46-962e-5f8de23dc739",
-              "leftValue": "={{ $json.output }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "notEmpty",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        720,
-        -120
-      ],
-      "id": "98c73d96-30b9-4878-99b5-49ff6dd45fd8",
-      "name": "Post-Guardrail (output)"
-    },
-    {
-      "parameters": {
         "respondWith": "text",
-        "responseBody": "={{ $json.output }}",
+        "responseBody": "={{ $json.guardrailsInput }}",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        960,
-        -160
+        112,
+        112
       ],
-      "id": "df1c6825-6926-49ad-b244-73bf8c7565f0",
+      "id": "ddf49669-cd1f-40c6-b21a-18271b002e39",
       "name": "Respond (allowed)"
     },
     {
@@ -151,37 +87,100 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        480,
-        200
+        112,
+        336
       ],
-      "id": "904cd567-5171-4e61-953d-502a0972ba71",
+      "id": "9f33c8f0-e936-439b-8347-9311402fc9a8",
       "name": "Respond (blocked)"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.body.message }}",
+        "guardrails": {
+          "secretKeys": {
+            "value": {
+              "permissiveness": "balanced"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 2,
+      "position": [
+        -688,
+        144
+      ],
+      "id": "d8ad5f22-b3e9-449e-accf-11440f125ed3",
+      "name": "Guardrails"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "guardrails": {
+          "keywords": "tiger, lion"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        128
+      ],
+      "id": "5c958431-0731-427a-ae9c-d954a941816f",
+      "name": "Guardrails2"
     }
   ],
+  "pinData": {
+    "Chat Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "jerrie-testy-hyperdeliciously.ngrok-free.dev",
+            "x-real-ip": "172.18.0.4",
+            "x-forwarded-for": "118.189.22.142, 172.18.0.4",
+            "x-forwarded-proto": "https",
+            "connection": "Upgrade",
+            "content-length": "138",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+            "accept": "application/json",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7,zh-TW;q=0.6,vi;q=0.5,ms;q=0.4,af;q=0.3",
+            "content-type": "application/json",
+            "origin": "null",
+            "priority": "u=1, i",
+            "sec-ch-ua": "\"Chromium\";v=\"148\", \"Google Chrome\";v=\"148\", \"Not/A)Brand\";v=\"99\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-host": "jerrie-testy-hyperdeliciously.ngrok-free.dev"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "type": "chat",
+            "message": "retire now",
+            "name": "woe ming",
+            "phone": "999",
+            "email": "tanwoe@gamfdsaf.com",
+            "source": "investment-advisor-website"
+          },
+          "webhookUrl": "https://jerrie-testy-hyperdeliciously.ngrok-free.dev/webhook/guarded-chat",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
   "connections": {
     "Chat Webhook": {
       "main": [
         [
           {
-            "node": "Pre-Guardrail (input)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Pre-Guardrail (input)": {
-      "main": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Respond (blocked)",
+            "node": "Guardrails",
             "type": "main",
             "index": 0
           }
@@ -192,7 +191,7 @@
       "main": [
         [
           {
-            "node": "Post-Guardrail (output)",
+            "node": "Guardrails2",
             "type": "main",
             "index": 0
           }
@@ -210,7 +209,25 @@
         ]
       ]
     },
-    "Post-Guardrail (output)": {
+    "Guardrails": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond (blocked)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardrails2": {
       "main": [
         [
           {
@@ -229,15 +246,17 @@
       ]
     }
   },
-  "name": "Activity 8b — Pre & Post Guardrails for the AI Agent",
   "active": false,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "pinData": {},
-  "id": "da3a8f98dc2c412b",
+  "versionId": "c91e83a3-1647-4d23-9adc-bf9723613a3f",
   "meta": {
-    "templateId": "tertiaryinfotech-n8n-course"
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fcdd11be6122db515fd1e031acff4a3eeab5f077f43f29bb025528511f775668"
   },
+  "nodeGroups": [],
+  "id": "Fr2X7ibXZOfRQfsy",
   "tags": []
 }
