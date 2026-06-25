@@ -8,10 +8,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        112,
-        96
+        304,
+        384
       ],
-      "id": "699418de-8bd9-48ac-96a8-08c9223853f0",
+      "id": "1e1d03a5-ae4a-49c3-b289-12b396c0c004",
       "name": "Merge"
     },
     {
@@ -22,10 +22,10 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        400,
-        112
+        592,
+        400
       ],
-      "id": "27fdb392-aff2-420a-92df-d9ffe6a21ed8",
+      "id": "2b58d4bd-51de-48cc-a876-cb0fdc6c886e",
       "name": "Aggregate"
     },
     {
@@ -37,10 +37,10 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.7,
       "position": [
-        288,
-        480
+        480,
+        768
       ],
-      "id": "e009a4ca-780a-4a9c-a2a2-f60429918e2d",
+      "id": "5e1aa356-5cd0-435d-942f-06e8685cdfab",
       "name": "Basic LLM Chain"
     },
     {
@@ -48,10 +48,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        688,
-        272
+        880,
+        560
       ],
-      "id": "aa32a1db-a46b-4c8a-8b03-3d5c89875c5a",
+      "id": "fc91751d-292e-4188-9428-ebabd7e5451a",
       "name": "Merge1"
     },
     {
@@ -62,17 +62,15 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        912,
-        272
+        1104,
+        560
       ],
-      "id": "94712a34-28f2-460b-98cd-59715b4997bc",
+      "id": "c457f12f-8c2c-4e52-99db-04b8cdeb753b",
       "name": "Aggregate1"
     },
     {
       "parameters": {
         "url": "https://newsapi.org/v2/everything",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpQueryAuth",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
@@ -83,6 +81,10 @@
             {
               "name": "from",
               "value": "={{$today.minus({ days: 1 }).toFormat('yy-MM-dd')}}"
+            },
+            {
+              "name": "apiKey",
+              "value": "YOUR_NEWS_API_KEY "
             }
           ]
         },
@@ -91,17 +93,11 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -112,
-        480
+        80,
+        768
       ],
-      "id": "22867ab3-d8dd-4333-94a3-bdaebf5fd2d8",
-      "name": "news",
-      "credentials": {
-        "httpQueryAuth": {
-          "id": "rW1SuLTZCSzIBGtR",
-          "name": "NewsAPI API Key"
-        }
-      }
+      "id": "d70bafb3-a51e-4e0c-b269-c296e9ce9b83",
+      "name": "news"
     },
     {
       "parameters": {
@@ -114,10 +110,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        1120,
-        272
+        1312,
+        560
       ],
-      "id": "e2fa428a-4e0f-4b25-96e2-0b7552a4b5d2",
+      "id": "552f1916-985b-440b-852c-945b76e9ff26",
       "name": "AI Agent"
     },
     {
@@ -130,16 +126,16 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -336,
-        112
+        -272,
+        0
       ],
-      "id": "07f12072-519c-4563-8c83-257b1b851e5a",
+      "id": "e37a3422-3397-4de8-8c11-7a201b2ae459",
       "name": "Telegram (Demo 2)",
       "webhookId": "ced7ac28-0f81-42a6-8640-373280c996a9",
       "credentials": {
         "telegramApi": {
-          "id": "7SbNsm7lQLiYQYKt",
-          "name": "Bell Telegram"
+          "id": "DxnORFpNl7rYItBc",
+          "name": "Telegram account"
         }
       }
     },
@@ -154,16 +150,16 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1472,
-        272
+        1664,
+        560
       ],
-      "id": "c0442bb7-bf3f-46df-aa3d-d07972743144",
+      "id": "e441ad54-c304-49d5-9de2-a136722f412d",
       "name": "Telegram (Demo 2)1",
       "webhookId": "55777382-3d17-44f4-af68-f354b715348c",
       "credentials": {
         "telegramApi": {
-          "id": "7SbNsm7lQLiYQYKt",
-          "name": "Bell Telegram"
+          "id": "DxnORFpNl7rYItBc",
+          "name": "Telegram account"
         }
       }
     },
@@ -196,10 +192,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -112,
-        -96
+        80,
+        192
       ],
-      "id": "d1a32af8-c20b-44dc-a279-58f7617ce73c",
+      "id": "a2933a48-fcaf-4f83-b339-e51f1743e696",
       "name": "candles1min"
     },
     {
@@ -231,10 +227,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -112,
-        112
+        80,
+        400
       ],
-      "id": "b564b280-9e04-43c5-b436-cecb2ba7e226",
+      "id": "9feea6e7-acce-405a-97b9-3d344ffd3f05",
       "name": "candles15min"
     },
     {
@@ -266,10 +262,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -112,
-        288
+        80,
+        576
       ],
-      "id": "3a0602f1-77b7-451c-8c70-bbf973372f59",
+      "id": "31d66797-9174-43ca-a6ef-7478962bc7d6",
       "name": "candles1hr"
     },
     {
@@ -286,15 +282,15 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        224,
-        688
+        416,
+        976
       ],
-      "id": "b522acc3-4115-45e8-bc8e-0a2a129f32ee",
+      "id": "fe5b9696-3913-47e7-b817-4e4b154b9ea3",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "9NEEqGTOW2vxkHwr",
-          "name": "OpenAI account 4"
+          "id": "HncP6z2nrPdrEcFY",
+          "name": "OpenAI account"
         }
       }
     },
@@ -312,15 +308,15 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        992,
-        480
+        1184,
+        768
       ],
-      "id": "0a62875f-1d01-41bf-b28b-29f8c87d52eb",
+      "id": "6f805861-242b-41ce-8d37-84f1af20f1b2",
       "name": "OpenAI Chat Model1",
       "credentials": {
         "openAiApi": {
-          "id": "9NEEqGTOW2vxkHwr",
-          "name": "OpenAI account 4"
+          "id": "HncP6z2nrPdrEcFY",
+          "name": "OpenAI account"
         }
       }
     },
@@ -333,10 +329,10 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.7,
       "position": [
-        -180,
-        -288
+        -96,
+        0
       ],
-      "id": "f1e2d3c4-b5a6-4789-9012-3456789abcde",
+      "id": "fc4a17fe-498f-4d13-8ac1-27c6f41e879c",
       "name": "Extract Ticker Symbol"
     },
     {
@@ -353,15 +349,15 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        -360,
-        -130
+        -96,
+        208
       ],
-      "id": "a9b8c7d6-e5f4-4321-8765-0fedcba98765",
+      "id": "22d0e526-5314-4500-918e-e14a61492cde",
       "name": "OpenAI Chat Model2",
       "credentials": {
         "openAiApi": {
-          "id": "9NEEqGTOW2vxkHwr",
-          "name": "OpenAI account 4"
+          "id": "HncP6z2nrPdrEcFY",
+          "name": "OpenAI account"
         }
       }
     }
@@ -555,12 +551,12 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "1793546d-f2b3-47af-95fd-2ef34f11e0ec",
+  "versionId": "3bf78e5b-937f-4b0e-9c6e-11795c548c8a",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "dd9d815cb100cab73a9cd63cc3f30fd090e73e9edbdc09a51a025bdf1bf015af"
+    "instanceId": "fcdd11be6122db515fd1e031acff4a3eeab5f077f43f29bb025528511f775668"
   },
   "nodeGroups": [],
-  "id": "7f832c6726bb4917",
+  "id": "Hs0rL4V1JSbpqH8E",
   "tags": []
 }
