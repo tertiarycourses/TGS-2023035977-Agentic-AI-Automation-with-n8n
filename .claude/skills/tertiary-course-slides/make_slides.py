@@ -100,15 +100,17 @@ def two_col(title,left,right,kicker=None,lhead="",rhead=""):
     bullets(s,Inches(1.1),Inches(2.7),Inches(5.2),Inches(3.8),left,size=17)
     bullets(s,Inches(7.2),Inches(2.7),Inches(5.05),Inches(3.8),right,size=17,mcolor=TEAL); footer(s); return s
 def img_slide(title,img,caption,kicker="WORKFLOW"):
+    import os
     s=slide(); head(s,title,kicker,TEAL)
-    pic=s.shapes.add_picture(img,Inches(1.0),Inches(1.85),width=Inches(11.3))
-    maxh=Inches(4.55)
-    if pic.height>maxh:
-        s.shapes._spTree.remove(pic._element)
-        pic=s.shapes.add_picture(img,Inches(1.0),Inches(1.85),height=maxh)
-        pic.left=int((SW-pic.width)/2)
-    else:
-        pic.left=int((SW-pic.width)/2)
+    if os.path.exists(img):
+        pic=s.shapes.add_picture(img,Inches(1.0),Inches(1.85),width=Inches(11.3))
+        maxh=Inches(4.55)
+        if pic.height>maxh:
+            s.shapes._spTree.remove(pic._element)
+            pic=s.shapes.add_picture(img,Inches(1.0),Inches(1.85),height=maxh)
+            pic.left=int((SW-pic.width)/2)
+        else:
+            pic.left=int((SW-pic.width)/2)
     txt(s,Inches(0.8),Inches(6.55),Inches(11.7),Inches(0.4),[[(caption,13,GREY,False)]],align=PP_ALIGN.CENTER)
     footer(s); return s
 def website_slide(title,img,items,kicker,note=""):
@@ -210,10 +212,11 @@ content("LMS / TMS",[
  "Download the slides and Learner Guide for reference during the open-book assessment."],kicker="COURSE PORTAL")
 two_col("Lesson Plan — 3 Days, 8 hours/day",[
  ("Day 1 — Workflow Automation + AI Agents",0),("Topic 1: n8n basics + Activities 1, 2, 3a, 3b",1),
- ("Topic 2: AI Agents — Activities 4a, 4b",1),("Day 2 — RAG, Webhooks, APIs",0),
- ("RAG (Activity 5)",1),("Webhooks (Activity 6) · APIs (Activity 7)",1)],
- [("Day 3 — Security & Capstone",0),("Human-in-the-loop + Guardrails (Activity 8)",1),
- ("Mini Capstone + presentations",1),("Daily timing",0),
+ ("Topic 2: AI Agents — Activities 4a, 4b",1),("Day 2 — Webhooks + API",0),
+ ("Topic 3: Webhooks — Activity 5",1),("Topic 4: API & HTTP — Activity 6",1)],
+ [("Day 3 — RAG, Security & Capstone",0),("Topic 5: RAG — Activity 7, 7b",1),
+ ("Topic 6: Security + Guardrails — Activity 8",1),
+ ("Topic 7: Mini Capstone + presentations",1),("Daily timing",0),
  ("9:30am–6:30pm · 1-hour lunch",1),("Short tea breaks within each day",1)],
  kicker="SCHEDULE",lhead="Days 1–2",rhead="Day 3 & timing")
 content("Learning Outcomes",[
@@ -257,6 +260,29 @@ content("Setting Up n8n",[
  "Option B — Local Docker Compose (persistent): docker compose up -d → http://localhost:5678.",
  "Trial Data Tables are not permanent — store anything you keep externally (Google Sheets).",
  "See labs/n8n-installation/docker-compose.yml in the course repo."],kicker="GET READY")
+# --- n8n Cloud Account Login Details ---
+_s=slide(); head(_s,"n8n Account Login Details",kicker="YOUR LOGIN · CLOUD INSTANCE")
+rect(_s,Inches(0.85),Inches(1.85),Inches(11.6),Inches(0.5),RGBColor(0xEB,0xF4,0xFF))
+txt(_s,Inches(1.05),Inches(1.89),Inches(2.2),Inches(0.44),[[("Workspace URL",13,BLUE,True)]],anchor=MSO_ANCHOR.MIDDLE)
+txt(_s,Inches(3.3),Inches(1.89),Inches(9.0),Inches(0.44),[[("http://n8n.srv923061.hstgr.cloud:5678",14,INK,False)]],anchor=MSO_ANCHOR.MIDDLE)
+rect(_s,Inches(0.85),Inches(2.43),Inches(11.6),Inches(0.5),RGBColor(0xEB,0xF4,0xFF))
+txt(_s,Inches(1.05),Inches(2.47),Inches(2.2),Inches(0.44),[[("Password",13,BLUE,True)]],anchor=MSO_ANCHOR.MIDDLE)
+txt(_s,Inches(3.3),Inches(2.47),Inches(3.5),Inches(0.44),[[("Tertiary@888",14,TEAL,True)]],anchor=MSO_ANCHOR.MIDDLE)
+txt(_s,Inches(6.9),Inches(2.47),Inches(4.8),Inches(0.44),[[("(same for all accounts)",12,GREY,False)]],anchor=MSO_ANCHOR.MIDDLE)
+_RH=Inches(0.355); _TY=Inches(3.08)
+for _ci in range(2):
+    _bx=Inches(0.85)+_ci*Inches(6.0); _cw=Inches(5.7); _nw=Inches(0.55)
+    _ew=_cw-_nw-Inches(0.1)
+    rect(_s,_bx,_TY,_cw,_RH,BLUE)
+    txt(_s,_bx+Inches(0.05),_TY,_nw,_RH,[[("No.",11,WHITE,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
+    txt(_s,_bx+_nw+Inches(0.1),_TY,_ew,_RH,[[("Email",11,WHITE,True)]],anchor=MSO_ANCHOR.MIDDLE)
+    for _ri in range(10):
+        _no=_ci*10+_ri+1; _em=f"n8n{1000+_no:04d}@tertiaryinfotech.com"
+        _ry=_TY+_RH*(_ri+1)
+        rect(_s,_bx,_ry,_cw,_RH,LIGHT if _ri%2==0 else WHITE,line=LINE)
+        txt(_s,_bx+Inches(0.05),_ry,_nw,_RH,[[(str(_no),11,INK,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
+        txt(_s,_bx+_nw+Inches(0.1),_ry,_ew,_RH,[[(_em,11,INK,False)]],anchor=MSO_ANCHOR.MIDDLE)
+footer(_s)
 content("Credential Setup",[
  "Add credentials once under Credentials → Add credential.",
  "Gmail / Outlook (OAuth2) for email; OpenAI / Gemini for AI.",
@@ -394,7 +420,7 @@ activity_block(dict(tag="ACT 3b",title="Activity 3b — Conditional Response (Go
 brk("Lunch Break","1 hour  ·  see you at 2:00 pm",AMBER)
 
 # ---------- TOPIC 2: AI AGENTS ----------
-section("TOPIC 2","AI Agents and RAG","02","LLM · Memory · Tools · System Instruction")
+section("TOPIC 2","AI Agents","02","LLM · Memory · Tools · System Instruction")
 content("What is Agentic AI?",[
  "Traditional automation follows fixed rules you wire by hand.",
  "An AI agent uses an LLM to understand language and decide what to do.",
@@ -464,72 +490,9 @@ activity_block(dict(tag="ACT 4b",title="Activity 4b — Telegram Agent + Data Ta
 content("End of Day 1 — Recap",[
  "You built form automations, conditional logic and data storage.",
  "You created a Telegram AI agent with memory and a Data Table tool.",
- "Tomorrow: RAG, Webhooks and external APIs."],kicker="WRAP-UP")
+ "Tomorrow: Webhooks, external APIs, RAG, and security guardrails."],kicker="WRAP-UP")
 
-# ---------- TOPIC 3: RAG ----------
-section("TOPIC 2 (cont.)","Retrieval-Augmented Generation (RAG)","02","Tokenization · Embeddings · Vector Stores")
-content("What is RAG?",[
- "RAG lets an agent answer from YOUR documents, not just its training data.",
- "Documents are split, embedded and stored; relevant chunks are retrieved per question.",
- "Reduces hallucination and keeps answers grounded and current."],kicker="CONCEPT")
-content("Text Embedding",[
- "Tokenization splits text into tokens the model can process.",
- "An embedding turns a chunk of text into a vector (list of numbers).",
- "Similar meanings produce vectors that are close together."],kicker="EMBEDDINGS")
-content("Vector Database",[
- "Vectors are stored in a vector store (in-memory, Pinecone, etc.).",
- "At query time, the question is embedded and the closest chunks are retrieved.",
- "Those chunks are given to the LLM as context to answer."],kicker="VECTOR STORE")
-img_slide("How RAG Works",IMG("courseware/assets/rag-flow.png"),
-          "User → Prompt → Data Retrieval (search/retrieve over your data sources) → Generator → Response",
-          kicker="TOPIC 2 · RAG")
-K3="TOPIC 2 · RAG"
-activity_block(dict(tag="ACT 5",title="Activity 5 — Add RAG to the Telegram Agent (Two Knowledge Sources)",kicker=K3,
- desc="Upgrade the agent to answer from documents (policies/FAQs) AND the Data Table. It must route to the right source for each question — two knowledge sources, one agent.",
- build="Telegram  →  AI Agent  +  Vector Store (RAG) + Data Table  →  reply",nodes="agent, vectorStoreInMemory, embeddingsOpenAi, dataTableTool",
- img="labs/activity5-rag/Activity5-RAG-Telegram.png",cap="Agent routes between a RAG vector store and a Data Table",
- steps=["Prepare documents: use MyCompany-HR-SOP.docx / IT-Support-FAQ.docx, or generate FAQs with Claude Code.",
-   "Build the ingestion path: upload → Embeddings (OpenAI) → Vector Store (Insert) with a Default Data Loader.",
-   "In your Telegram agent, add a Vector Store retrieval tool alongside the Data Table tool.",
-   "Rewrite the system instruction to route: knowledge base for policy/FAQ, Data Table for staff records.",
-   "Save and keep Active; have a few learners present their chatbot."],
- test="Ask a policy question and a staff-record question; confirm each is answered from the correct source."))
-content("From In-Memory to a Real Vector Database",[
- "The in-memory store resets when the workflow restarts - fine for a demo.",
- "For production, use a hosted vector database that persists your embeddings.",
- "Pinecone is a popular managed vector database that scales to millions of vectors.",
- "Same idea: embed your documents once, then retrieve the closest chunks per question."],kicker="WHY PINECONE")
-website_slide("Pinecone",IMG("courseware/assets/site-pinecone.png"),
- ["Pinecone is a managed (cloud) vector database for RAG.","Free 'Starter' tier is enough for this lab.","Create an index, then point n8n's Pinecone node at it."],
- kicker="VECTOR DATABASE")
-content("Create a Pinecone Index",[
- "1. Sign up at pinecone.io and open the console.",
- "2. Create an API key (Database -> API Keys) - you'll paste it into n8n.",
- "3. Create an Index: give it a name (e.g. n8n-course).",
- "4. Set Dimensions to match your embeddings - OpenAI text-embedding-3-small = 1536.",
- "5. Use metric 'cosine'. The index name + key go into the n8n Pinecone node."],kicker="SETUP")
-activity_overview("ACT 5b","Activity 5b — RAG with Pinecone (Persistent Vector Database)",
- "Swap the in-memory vector store for Pinecone so your knowledge base persists. Upload documents into a Pinecone index, then let the Telegram agent answer from it via a Vector Store tool.",
- "Upload -> Embeddings (OpenAI) -> Pinecone (insert)   |   Telegram -> AI Agent + Pinecone tool -> reply",
- "vectorStorePinecone, embeddingsOpenAi, toolVectorStore, agent",kicker="TOPIC 2 (cont.) - RAG")
-img_slide("Activity 5b - Pinecone RAG Workflow",IMG("labs/activity5-rag/Activity5b-Pinecone-RAG.png"),
- "Telegram agent answering from a Pinecone vector store (gpt-4.1-mini)",kicker="TOPIC 2 (cont.) - RAG")
-for i,t in enumerate([
- "Sign up at pinecone.io (free Starter tier) and open the console at app.pinecone.io.",
- "Go to API Keys → create / copy an API key — paste it into n8n later.",
- "Open Indexes → Create index; name it n8n-course.",
- "Set Dimensions = 1536 and Metric = cosine, then create the index.",
- "Import Activity5b-Pinecone-Upload.json into n8n.",
- "Add a Pinecone credential and select your n8n-course index on the Pinecone node.",
- "Add your OpenAI credential on the Embeddings node; provide documents and run to insert into Pinecone.",
- "Import Activity5b-Pinecone-RAG.json (Telegram → AI Agent + Pinecone tool → reply).",
- "Select the same Pinecone index and credential, your OpenAI (gpt-4.1-mini) and Telegram credentials.",
- "Save and toggle Active."],1):
-    step_slide("TOPIC 2 (cont.) - RAG","Activity 5b — RAG with Pinecone (Persistent Vector Database)",i,10,t)
-test_slide("Activity 5b — RAG with Pinecone (Persistent Vector Database)","Upload a document, then ask the Telegram bot a question only answerable from it - the answer is retrieved from Pinecone.","TOPIC 2 (cont.) - RAG")
-brk("Lunch Break","1 hour",AMBER)
-
-# ---------- TOPIC 4: WEBHOOKS ----------
+# ---------- TOPIC 3: WEBHOOKS ----------
 section("TOPIC 3","Webhooks","03","External triggers for your workflows")
 content("What is a Webhook?",[
  "A Webhook is a URL that external systems call to trigger your workflow.",
@@ -561,11 +524,11 @@ content("Webhook Authentication",[
  "Header Auth — a secret key in a request header.",
  "JWT — signed tokens for stronger security."],kicker="SECURING WEBHOOKS")
 K4="TOPIC 3 · WEBHOOKS"
-activity_block(dict(tag="ACT 6",title="Activity 6 — Website Chatbot via Webhook (Investment Advisor)",kicker=K4,
+activity_block(dict(tag="ACT 5",title="Activity 5 — Website Chatbot via Webhook (Investment Advisor)",kicker=K4,
  desc="Expose an AI agent to a public website via a Webhook. The Investment Advisor page has an enquiry form and a floating chatbot; both post to one n8n webhook.",
  build="Webhook  →  AI Agent  →  Respond to Webhook  (+ email the advisor)",nodes="webhook, agent, respondToWebhook, gmail",
- img="labs/activity6-investment-advisor/Activity6-Investment-Advisor.png",cap="One webhook, two paths: enquiry email + AI chat",
- steps=["Import Activity6-Investment-Advisor.json into n8n.",
+ img="labs/activity5-investment-advisor/Activity5-Investment-Advisor.png",cap="One webhook, two paths: enquiry email + AI chat",
+ steps=["Import Activity5-Investment-Advisor.json into n8n.",
    "Open the Webhook node(s) and set Allowed Origins (CORS) to *.",
    "Re-select your OpenAI and Gmail credentials on the agent and email nodes.",
    "Review the compliance system instruction (no guaranteed returns, no personalised advice).",
@@ -575,7 +538,7 @@ activity_block(dict(tag="ACT 6",title="Activity 6 — Website Chatbot via Webhoo
  test="On the website, send a chat message and submit the enquiry form; confirm the bot replies and the advisor gets the email."))
 brk("Tea Break","15 minutes",TEAL)
 
-# ---------- TOPIC 5: API ----------
+# ---------- TOPIC 4: API AND HTTP REQUEST ----------
 section("TOPIC 4","API and HTTP Request","04","Pull live data from external services")
 content("What is an API?",[
  "An API lets your workflow request data from another service over HTTP.",
@@ -612,13 +575,13 @@ website_slide("Twelve Data",IMG("courseware/assets/site-twelvedata.png"),
  ["Twelve Data provides live stock / forex / crypto market data.","Sign up (free Basic plan), then Account -> API Keys.","Paste the apikey into the 3 'candles' HTTP nodes."],kicker="MARKET DATA API")
 website_slide("NewsAPI",IMG("courseware/assets/site-newsapi.png"),
  ["NewsAPI returns recent news articles for a search query.","Register (free Developer plan) and copy your API key.","Store it as a Query Auth credential (name = apiKey) on the news node."],kicker="NEWS API")
-activity_block(dict(tag="ACT 7",title="Activity 7 — Finance API → Telegram (AI Day-Trading Agent)",kicker=K5,
+activity_block(dict(tag="ACT 6",title="Activity 6 — Finance API → Telegram (AI Day-Trading Agent)",kicker=K5,
  desc="Ask the Telegram bot about a stock; it resolves the ticker, pulls candles from Twelve Data and headlines from NewsAPI, and replies with a Buy/Sell/Hold call and reasoning.",
  build="Telegram → Extract ticker → HTTP (Twelve Data + NewsAPI) → AI Agent → reply",nodes="telegram, httpRequest, agent, lmChatOpenAi",
- img="labs/activity7-finance-advisor/Activity7-Finance-Advisor.png",cap="Multi-timeframe candles + news → AI day-trading agent",
+ img="labs/activity6-finance-advisor/Activity6-Finance-Advisor.png",cap="Multi-timeframe candles + news → AI day-trading agent",
  steps=["Sign up at twelvedata.com (free Basic plan) → Account → API Keys → copy your key.",
    "Sign up at newsapi.org (free Developer plan) → copy your key from newsapi.org/account.",
-   "Import Activity7-Finance-Advisor.json into n8n.",
+   "Import Activity6-Finance-Advisor.json into n8n.",
    "Open candles1min → Query Parameters → find apikey → replace with your Twelve Data key.",
    "Repeat for candles15min and candles1hr — all three nodes need the same Twelve Data key.",
    "Open the news HTTP Request node.",
@@ -631,13 +594,77 @@ activity_block(dict(tag="ACT 7",title="Activity 7 — Finance API → Telegram (
    "Save and toggle Active; optionally open index.html and paste your Twelve Data key + bot username."],
  test="Message the bot 'Should I buy AAPL?' and confirm it returns a recommendation with reasoning."))
 content("End of Day 2 — Recap",[
- "You grounded an agent with RAG over your own documents.",
- "You exposed an agent to a website via a webhook.",
- "You pulled live market + news data through APIs into a Telegram agent."],kicker="WRAP-UP")
+ "You exposed an AI agent to a public website via a webhook.",
+ "You pulled live market + news data through APIs into a Telegram agent.",
+ "Tomorrow: RAG, security guardrails, and the mini capstone."],kicker="WRAP-UP")
+brk("Lunch Break","1 hour",AMBER)
+
+# ---------- TOPIC 5: RAG ----------
+section("TOPIC 5","Retrieval-Augmented Generation (RAG)","05","Tokenization · Embeddings · Vector Stores")
+content("What is RAG?",[
+ "RAG lets an agent answer from YOUR documents, not just its training data.",
+ "Documents are split, embedded and stored; relevant chunks are retrieved per question.",
+ "Reduces hallucination and keeps answers grounded and current."],kicker="CONCEPT")
+content("Text Embedding",[
+ "Tokenization splits text into tokens the model can process.",
+ "An embedding turns a chunk of text into a vector (list of numbers).",
+ "Similar meanings produce vectors that are close together."],kicker="EMBEDDINGS")
+content("Vector Database",[
+ "Vectors are stored in a vector store (in-memory, Pinecone, etc.).",
+ "At query time, the question is embedded and the closest chunks are retrieved.",
+ "Those chunks are given to the LLM as context to answer."],kicker="VECTOR STORE")
+img_slide("How RAG Works",IMG("courseware/assets/rag-flow.png"),
+          "User → Prompt → Data Retrieval (search/retrieve over your data sources) → Generator → Response",
+          kicker="TOPIC 5 · RAG")
+K3="TOPIC 5 · RAG"
+activity_block(dict(tag="ACT 7",title="Activity 7 — Add RAG to the Telegram Agent (Two Knowledge Sources)",kicker=K3,
+ desc="Upgrade the agent to answer from documents (policies/FAQs) AND the Data Table. It must route to the right source for each question — two knowledge sources, one agent.",
+ build="Telegram  →  AI Agent  +  Vector Store (RAG) + Data Table  →  reply",nodes="agent, vectorStoreInMemory, embeddingsOpenAi, dataTableTool",
+ img="labs/activity7-rag/Activity7-RAG-Telegram.png",cap="Agent routes between a RAG vector store and a Data Table",
+ steps=["Prepare documents: use MyCompany-HR-SOP.docx / IT-Support-FAQ.docx, or generate FAQs with Claude Code.",
+   "Build the ingestion path: upload → Embeddings (OpenAI) → Vector Store (Insert) with a Default Data Loader.",
+   "In your Telegram agent, add a Vector Store retrieval tool alongside the Data Table tool.",
+   "Rewrite the system instruction to route: knowledge base for policy/FAQ, Data Table for staff records.",
+   "Save and keep Active; have a few learners present their chatbot."],
+ test="Ask a policy question and a staff-record question; confirm each is answered from the correct source."))
+content("From In-Memory to a Real Vector Database",[
+ "The in-memory store resets when the workflow restarts - fine for a demo.",
+ "For production, use a hosted vector database that persists your embeddings.",
+ "Pinecone is a popular managed vector database that scales to millions of vectors.",
+ "Same idea: embed your documents once, then retrieve the closest chunks per question."],kicker="WHY PINECONE")
+website_slide("Pinecone",IMG("courseware/assets/site-pinecone.png"),
+ ["Pinecone is a managed (cloud) vector database for RAG.","Free 'Starter' tier is enough for this lab.","Create an index, then point n8n's Pinecone node at it."],
+ kicker="VECTOR DATABASE")
+content("Create a Pinecone Index",[
+ "1. Sign up at pinecone.io and open the console.",
+ "2. Create an API key (Database -> API Keys) - you'll paste it into n8n.",
+ "3. Create an Index: give it a name (e.g. n8n-course).",
+ "4. Set Dimensions to match your embeddings - OpenAI text-embedding-3-small = 1536.",
+ "5. Use metric 'cosine'. The index name + key go into the n8n Pinecone node."],kicker="SETUP")
+activity_overview("ACT 7b","Activity 7b — RAG with Pinecone (Persistent Vector Database)",
+ "Swap the in-memory vector store for Pinecone so your knowledge base persists. Upload documents into a Pinecone index, then let the Telegram agent answer from it via a Vector Store tool.",
+ "Upload -> Embeddings (OpenAI) -> Pinecone (insert)   |   Telegram -> AI Agent + Pinecone tool -> reply",
+ "vectorStorePinecone, embeddingsOpenAi, toolVectorStore, agent",kicker="TOPIC 5 · RAG")
+img_slide("Activity 7b - Pinecone RAG Workflow",IMG("labs/activity7-rag/Activity7b-Pinecone-RAG.png"),
+ "Telegram agent answering from a Pinecone vector store (gpt-4.1-mini)",kicker="TOPIC 5 · RAG")
+for i,t in enumerate([
+ "Sign up at pinecone.io (free Starter tier) and open the console at app.pinecone.io.",
+ "Go to API Keys → create / copy an API key — paste it into n8n later.",
+ "Open Indexes → Create index; name it n8n-course.",
+ "Set Dimensions = 1536 and Metric = cosine, then create the index.",
+ "Import Activity7b-Pinecone-Upload.json into n8n.",
+ "Add a Pinecone credential and select your n8n-course index on the Pinecone node.",
+ "Add your OpenAI credential on the Embeddings node; provide documents and run to insert into Pinecone.",
+ "Import Activity7b-Pinecone-RAG.json (Telegram → AI Agent + Pinecone tool → reply).",
+ "Select the same Pinecone index and credential, your OpenAI (gpt-4.1-mini) and Telegram credentials.",
+ "Save and toggle Active."],1):
+    step_slide("TOPIC 5 · RAG","Activity 7b — RAG with Pinecone (Persistent Vector Database)",i,10,t)
+test_slide("Activity 7b — RAG with Pinecone (Persistent Vector Database)","Upload a document, then ask the Telegram bot a question only answerable from it - the answer is retrieved from Pinecone.","TOPIC 5 · RAG")
+brk("Lunch Break","1 hour",AMBER)
 
 # ---------- TOPIC 6: SECURITY ----------
-section("TOPIC 5","Security and Guardrails","05","Human-in-the-loop · Pre/Post guardrails")
-K6="TOPIC 5 · SECURITY"
+section("TOPIC 6","Security and Guardrails","06","Human-in-the-loop · Pre/Post guardrails")
+K6="TOPIC 6 · SECURITY"
 activity_block(dict(tag="ACT 8a",title="Activity 8a — Dashboard Data (Leave Balance & History)",kicker=K6,
  desc="Build a GET webhook that powers the HR portal's Dashboard tab — returning a staff member's leave balance and recent application history as JSON to the browser.",
  build="GET Webhook  →  Code (build data)  →  Respond to Webhook",nodes="webhook, code, respondToWebhook",
@@ -679,7 +706,7 @@ activity_block(dict(tag="ACT 8c",title="Activity 8c — AI Chatbot with Input & 
 brk("Lunch Break","1 hour",AMBER)
 
 # ---------- TOPIC 7: CAPSTONE ----------
-section("TOPIC 6","Mini Capstone Project","06","Design · Build · Present · Assess")
+section("TOPIC 7","Mini Capstone Project","07","Design · Build · Present · Assess")
 content("Mini Capstone Project",[
  "In small groups, design and build an end-to-end automation using what you learned.",
  "Include: a trigger, an AI agent with a tool or RAG source, an external API or storage, and a guardrail / human-in-the-loop step.",
