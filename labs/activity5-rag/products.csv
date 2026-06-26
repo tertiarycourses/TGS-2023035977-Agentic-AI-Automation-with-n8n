@@ -1,6 +1,0 @@
-SKU,Product,Category,PriceUSD,Description
-P-100,Starter Plan,SaaS,29,"Up to 5 users, email support"
-P-200,Pro Plan,SaaS,99,"Up to 25 users, priority support, API access"
-P-300,Enterprise,SaaS,499,"Unlimited users, SSO, dedicated manager"
-P-410,Onboarding Pack,Service,250,One-time setup and training
-P-420,Premium Support,Service,150,"24/7 support add-on, per month"
