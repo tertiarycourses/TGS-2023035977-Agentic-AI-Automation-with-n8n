@@ -1,0 +1,216 @@
+{
+  "name": "Activity8 - Leave Application & Manager Approval (Human-in-the-Loop)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "hr-leave-apply",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -960,
+        128
+      ],
+      "id": "9c2b84eb-c7ea-4cb4-9254-aaf4e8bc2edd",
+      "name": "Leave Submitted",
+      "webhookId": "f74d8826de7e470d"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"submitted\", \"message\": \"Your leave application was submitted and emailed to your manager for approval.\" } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -720,
+        128
+      ],
+      "id": "eaba1489-f96b-437f-a12c-713a1f137c7f",
+      "name": "Ack to Portal"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "staff@tertiaryinfotech.com",
+        "subject": "=Leave approval needed: {{ $('Leave Submitted').item.json.body.employee }}",
+        "message": "=Employee: {{ $('Leave Submitted').item.json.body.employee }}\nEmail: {{ $('Leave Submitted').item.json.body.email }}\nType: {{ $('Leave Submitted').item.json.body.leaveType }}\nDates: {{ $('Leave Submitted').item.json.body.startDate }} to {{ $('Leave Submitted').item.json.body.endDate }} ({{ $('Leave Submitted').item.json.body.days }} day(s))\nReason: {{ $('Leave Submitted').item.json.body.reason }}\n\nPlease approve or decline this leave request.",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        128
+      ],
+      "id": "72a63d09-714f-42d9-8698-9b81be397c50",
+      "name": "Manager Approval",
+      "webhookId": "6f70c8b7ccbb4444",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xhglhOJK9h9Yy6Fg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "75663a9a-4eea-44b3-b570-28c62c7a6d22",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -240,
+        128
+      ],
+      "id": "71c03aa7-bcf6-4c71-9d79-c3a6f7cf4c55",
+      "name": "If Approved"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Leave Submitted').item.json.body.email }}",
+        "subject": "=Your leave request is APPROVED",
+        "message": "=Hi {{ $('Leave Submitted').item.json.body.employee }},\n\nGood news! Your {{ $('Leave Submitted').item.json.body.leaveType }} leave from {{ $('Leave Submitted').item.json.body.startDate }} to {{ $('Leave Submitted').item.json.body.endDate }} has been APPROVED by your manager.\n\nEnjoy your time off!\nHR Buddy",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "aa2790e6-0259-432c-bef5-29332a27eb06",
+      "name": "Notify Approved",
+      "webhookId": "2005543e2f2145ce",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xhglhOJK9h9Yy6Fg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Leave Submitted').item.json.body.email }}",
+        "subject": "=Your leave request was declined",
+        "message": "=Hi {{ $('Leave Submitted').item.json.body.employee }},\n\nUnfortunately your {{ $('Leave Submitted').item.json.body.leaveType }} leave request from {{ $('Leave Submitted').item.json.body.startDate }} to {{ $('Leave Submitted').item.json.body.endDate }} was NOT approved. Please speak with your manager for details.\n\nHR Buddy",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        240
+      ],
+      "id": "986c46d6-1557-4925-ae32-b35dfa7645b9",
+      "name": "Notify Declined",
+      "webhookId": "f311ae202af640ee",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xhglhOJK9h9Yy6Fg",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Leave Submitted": {
+      "main": [
+        [
+          {
+            "node": "Ack to Portal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ack to Portal": {
+      "main": [
+        [
+          {
+            "node": "Manager Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manager Approval": {
+      "main": [
+        [
+          {
+            "node": "If Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Approved": {
+      "main": [
+        [
+          {
+            "node": "Notify Approved",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify Declined",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c7b6283f-29a6-4031-b168-5dd656b36d3e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fcdd11be6122db515fd1e031acff4a3eeab5f077f43f29bb025528511f775668"
+  },
+  "nodeGroups": [],
+  "id": "2G4CO7jF1C9ZEiba",
+  "tags": []
+}
