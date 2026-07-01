@@ -20,16 +20,20 @@ Generate two WSQ assessment instruments, each as a **question paper** and a matc
 - **Keep the question/task count stable** when revising an existing assessment — update the wording and answers, don't change the count, unless asked.
 
 ## How to use `build_assessment.py` (WA + PP)
-1. Copy `build_assessment.py` into the course repo's `assessment/` folder (it resolves the repo root as two levels up).
-2. It reuses **`prodoc.py`** from the sibling **tertiary-lesson-plan** skill for the cover page + version control + page numbers, so both skills should be installed. The import auto-falls-back from the project `.claude/skills/` to `~/.claude/skills/`.
-3. Edit the **CONFIG** block: `TITLE`, `Q_VER`/`A_VER` (file-name versions), the `*_VERSIONS` version-control rows, `ORG_LOGO`, `COURSE_LOGO`.
-4. Fill the two content lists **from the course materials**:
+The script lives **in this skill** and runs **in place** — do NOT copy it into the course repo. It auto-detects the course repo root by walking up from its own location to the nearest dir containing a `.git` folder (or both `courseware/` and `assessment/`), and writes the four DOCX into `<repo>/assessment/`. Override with `REPO=/path/to/course` if needed.
+
+1. Ensure the sibling **tertiary-lesson-plan** skill is installed — the script reuses its **`prodoc.py`** for the cover page + version control + page numbers (the import auto-falls-back from the project `.claude/skills/` to `~/.claude/skills/`).
+2. Edit the **CONFIG** block: `TITLE`, `Q_VER`/`A_VER` (single standardised version string, e.g. `"v5"`), the `*_VERSIONS` version-control rows, `ORG_LOGO`, `COURSE_LOGO`.
+3. Fill the two content lists **from the course materials**:
    - `WRITTEN` — `(criterion, context, question, [model-answer points])`. Read the concept slides and turn each key concept into one open-ended knowledge question. Keep it to the concepts actually taught.
    - `SCENARIO` + `PRACTICAL` — one continuous scenario, then `(label, criterion, task_prompt, box_caption, [model build-step points])` per task. Each task maps to one LO and to a class activity; the model points **are** the lab procedure (cite the activity numbers).
-5. Run `python3 assessment/build_assessment.py` → writes the four DOCX into `assessment/`:
-   `WA (SAQ) - <Title> - <Q_VER>.docx`, `Answer to WA (SAQ) - <Title> - <A_VER>.docx`,
-   `PP Assessment - <Title> - <Q_VER>.docx`, `Answer to PP Assessment - <Title> - <A_VER>.docx`.
-6. Optionally render PDFs: `soffice --headless --convert-to pdf --outdir assessment assessment/*.docx`.
+4. Run it in place — from the project copy of the skill:
+   `python3 .claude/skills/wsq-assessment/build_assessment.py`
+   (or `REPO=/path/to/course python3 ~/.claude/skills/wsq-assessment/build_assessment.py`). It writes into `<repo>/assessment/`:
+   `WA (SAQ) - <Title> - <VER>.docx`, `Answer to WA (SAQ) - <Title> - <VER>.docx`,
+   `PP Assessment - <Title> - <VER>.docx`, `Answer to PP Assessment - <Title> - <VER>.docx`.
+5. Optionally render PDFs: `soffice --headless --convert-to pdf --outdir assessment assessment/*.docx`.
+6. Keep the question paper and its answer key on the **same version string** (e.g. both `v5`) to avoid confusion.
 
 ## Document format (WSQ house style)
 - **Cover page** — same as the Lesson Plan / Learner Guide (Tertiary Infotech Academy logo, UEN, instrument name, "For", course logo, course title, TGS ref, "Conducted by", version) followed by a **Document Version Control Record** table.

@@ -15,7 +15,22 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
-REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# This script lives in the wsq-assessment skill (.claude/skills/wsq-assessment/) and runs in
+# place — it detects the course repo root by walking up to the nearest dir that has a .git
+# folder (or both courseware/ and assessment/). Override with env REPO=/path if needed.
+def _find_repo():
+    env = os.environ.get("REPO")
+    if env and os.path.isdir(env):
+        return os.path.abspath(env)
+    d = os.path.dirname(os.path.abspath(__file__))
+    while d != os.path.dirname(d):
+        if os.path.isdir(os.path.join(d, ".git")) or \
+           (os.path.isdir(os.path.join(d, "courseware")) and os.path.isdir(os.path.join(d, "assessment"))):
+            return d
+        d = os.path.dirname(d)
+    return os.getcwd()
+
+REPO = _find_repo()
 # prodoc.py (WSQ cover page + version control + page numbers, same as LP/LG) ships with the
 # tertiary-lesson-plan skill. Look for it at the project level first, then the user level.
 for _cand in (os.path.join(REPO, ".claude/skills/tertiary-lesson-plan"),
@@ -29,30 +44,30 @@ OUT   = os.path.join(REPO, "assessment")
 ORG_LOGO    = os.path.join(REPO, "courseware/assets/tertiary-infotech-logo.png")
 COURSE_LOGO = os.path.join(REPO, "courseware/assets/n8n-course-logo.png")
 
-Q_VER, A_VER = "v26", "v12"
+Q_VER, A_VER = "v5", "v5"   # single standardised version across all four files
 BRAND = RGBColor(0x1F, 0x6F, 0xEB); DARK = RGBColor(0x11, 0x18, 0x27); GREY = RGBColor(0x55, 0x5B, 0x66)
 
 WA_VERSIONS = [
-    ("v25", "Prior", "Baseline written assessment (12 SAQ knowledge questions)", "Tertiary Infotech Academy Pte Ltd"),
-    (Q_VER, "1 July 2026", "Aligned all 12 questions to the current slides (triggers, action nodes, AI-agent "
-                            "components, RAG, embeddings & the vector-dimension rule, persistent vector databases, "
-                            "guardrails, webhooks, LLM providers); added the WSQ cover page + version control",
+    ("v5", "1 July 2026", "Aligned all 12 SAQ knowledge questions to the current slides (triggers, action nodes, "
+                          "AI-agent components, RAG, embeddings & the 1536 vector-dimension rule, persistent vector "
+                          "databases, guardrails, webhooks, LLM providers); added the WSQ cover page + version control; "
+                          "standardised the version across the question paper and answer key",
      "Tertiary Infotech Academy Pte Ltd"),
 ]
 WAA_VERSIONS = [
-    ("v11", "Prior", "Baseline written-assessment answer key", "Tertiary Infotech Academy Pte Ltd"),
-    (A_VER, "1 July 2026", "Rewrote model answers to match the aligned questions and the current slides", "Tertiary Infotech Academy Pte Ltd"),
+    ("v5", "1 July 2026", "Model answers rewritten to match the aligned questions and the current slides; version "
+                          "standardised with the question paper", "Tertiary Infotech Academy Pte Ltd"),
 ]
 PP_VERSIONS = [
-    ("v25", "Prior", "Baseline practical assessment (5 tasks, LO1–LO5)", "Tertiary Infotech Academy Pte Ltd"),
-    (Q_VER, "1 July 2026", "Aligned the 5 practical tasks to the in-class activities (form→email + storage; "
-                            "Telegram/website AI agent + tool; RAG upload→vector store→agent; webhook/HTTP external "
-                            "data; input guardrail); synced the question paper with the answer key; added the WSQ cover page",
+    ("v5", "1 July 2026", "Aligned the 5 practical tasks (LO1–LO5) to the in-class activities (form→email + storage; "
+                          "Telegram/website AI agent + tool; RAG upload→vector store→agent; webhook/HTTP external "
+                          "data; input guardrail); synced the question paper with the answer key; added the WSQ cover "
+                          "page; standardised the version",
      "Tertiary Infotech Academy Pte Ltd"),
 ]
 PPA_VERSIONS = [
-    ("v11", "Prior", "Baseline practical-assessment answer key", "Tertiary Infotech Academy Pte Ltd"),
-    (A_VER, "1 July 2026", "Rewrote model answers as the lab build steps for each task and cited the activities", "Tertiary Infotech Academy Pte Ltd"),
+    ("v5", "1 July 2026", "Model answers rewritten as the lab build steps for each task and cited to the activities; "
+                          "version standardised with the question paper", "Tertiary Infotech Academy Pte Ltd"),
 ]
 
 # ---------------------------------------------------------------- WRITTEN (KNOWLEDGE)
