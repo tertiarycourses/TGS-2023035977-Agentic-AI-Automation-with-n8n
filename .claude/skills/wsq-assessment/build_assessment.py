@@ -46,29 +46,7 @@ COURSE_LOGO = os.path.join(REPO, "courseware/assets/n8n-course-logo.png")
 
 Q_VER, A_VER = "v5", "v5"   # single standardised version across all four files
 BRAND = RGBColor(0x1F, 0x6F, 0xEB); DARK = RGBColor(0x11, 0x18, 0x27); GREY = RGBColor(0x55, 0x5B, 0x66)
-
-WA_VERSIONS = [
-    ("v5", "1 July 2026", "Aligned all 12 SAQ knowledge questions to the current slides (triggers, action nodes, "
-                          "AI-agent components, RAG, embeddings & the 1536 vector-dimension rule, persistent vector "
-                          "databases, guardrails, webhooks, LLM providers); added the WSQ cover page + version control; "
-                          "standardised the version across the question paper and answer key",
-     "Tertiary Infotech Academy Pte Ltd"),
-]
-WAA_VERSIONS = [
-    ("v5", "1 July 2026", "Model answers rewritten to match the aligned questions and the current slides; version "
-                          "standardised with the question paper", "Tertiary Infotech Academy Pte Ltd"),
-]
-PP_VERSIONS = [
-    ("v5", "1 July 2026", "Aligned the 5 practical tasks (LO1–LO5) to the in-class activities (form→email + storage; "
-                          "Telegram/website AI agent + tool; RAG upload→vector store→agent; webhook/HTTP external "
-                          "data; input guardrail); synced the question paper with the answer key; added the WSQ cover "
-                          "page; standardised the version",
-     "Tertiary Infotech Academy Pte Ltd"),
-]
-PPA_VERSIONS = [
-    ("v5", "1 July 2026", "Model answers rewritten as the lab build steps for each task and cited to the activities; "
-                          "version standardised with the question paper", "Tertiary Infotech Academy Pte Ltd"),
-]
+# Assessments carry the cover page only — no Document Version Control Record.
 
 # ---------------------------------------------------------------- WRITTEN (KNOWLEDGE)
 # (criterion, context, question, [model-answer points])
@@ -302,7 +280,6 @@ def build_wa(answers):
     kind = "Written Assessment (SAQ) — Answer Key" if answers else "Written Assessment (SAQ)"
     prodoc.add_cover_page(doc, kind, TITLE, A_VER if answers else Q_VER,
                           org_logo=ORG_LOGO, course_logo=COURSE_LOGO)
-    prodoc.add_version_control(doc, WAA_VERSIONS if answers else WA_VERSIONS)
     para(doc, TITLE, size=15, bold=True, color=DARK, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
     para(doc, "Answers to Written Assessment (SAQ)" if answers else "Written Assessment (SAQ)",
          size=13, bold=True, color=BRAND, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
@@ -330,7 +307,6 @@ def build_pp(answers):
     kind = "Practical Performance (PP) — Answer Key" if answers else "Practical Performance (PP)"
     prodoc.add_cover_page(doc, kind, TITLE, A_VER if answers else Q_VER,
                           org_logo=ORG_LOGO, course_logo=COURSE_LOGO)
-    prodoc.add_version_control(doc, PPA_VERSIONS if answers else PP_VERSIONS)
     para(doc, TITLE, size=15, bold=True, color=DARK, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
     para(doc, "Answers to Practical Performance Assessment" if answers else "Practical Performance Assessment",
          size=13, bold=True, color=BRAND, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)

@@ -1,6 +1,6 @@
 ---
 name: wsq-assessment
-description: Generate WSQ course assessments as professionally formatted Word documents (.docx) — a Written Assessment (WA) that tests KNOWLEDGE and a practical instrument that tests PRACTICAL ability, each as a question paper PLUS a model-answer / marking guide. Two builders are provided. build_assessment.py produces WA (SAQ) + PP (Practical Performance): the WA is open-ended short-answer knowledge questions drawn from the course slides, and the PP is activity-based practical tasks (LO1..LOn) whose model answers are the in-class lab build steps; both carry the WSQ house COVER PAGE (same as the Lesson Plan / Learner Guide — course title + logos + UEN + version-control record). build_wsq_assessment.py is the alternate WA + Case Study (CS) variant. ALL questions are OPEN-ENDED (no multiple choice). Use when creating or revising assessments, written/practical/case-study questions, answer keys, or marking guides for a WSQ course.
+description: Generate WSQ course assessments as professionally formatted Word documents (.docx) — a Written Assessment (WA) that tests KNOWLEDGE and a practical instrument that tests PRACTICAL ability, each as a question paper PLUS a model-answer / marking guide. Two builders are provided. build_assessment.py produces WA (SAQ) + PP (Practical Performance): the WA is open-ended short-answer knowledge questions drawn from the course slides, and the PP is activity-based practical tasks (LO1..LOn) whose model answers are the in-class lab build steps; both carry the WSQ house COVER PAGE (same as the Lesson Plan / Learner Guide — course title + logos + UEN); assessments have the cover page only (no version-control record). build_wsq_assessment.py is the alternate WA + Case Study (CS) variant. ALL questions are OPEN-ENDED (no multiple choice). Use when creating or revising assessments, written/practical/case-study questions, answer keys, or marking guides for a WSQ course.
 ---
 
 # WSQ Assessment → DOCX (Written + Practical/Case-Study)
@@ -9,7 +9,7 @@ Generate two WSQ assessment instruments, each as a **question paper** and a matc
 
 | Builder | Instruments | Best for |
 |---------|-------------|----------|
-| **`build_assessment.py`** (primary) | **WA (SAQ)** knowledge + **PP (Practical Performance)** activity tasks | Hands-on courses where the practical is graded on tasks the learner built in class (e.g. the n8n / Tertiary courses). Carries the **WSQ house cover page** (course title + Tertiary & course logos + UEN + version-control record), identical to the Lesson Plan / Learner Guide. |
+| **`build_assessment.py`** (primary) | **WA (SAQ)** knowledge + **PP (Practical Performance)** activity tasks | Hands-on courses where the practical is graded on tasks the learner built in class (e.g. the n8n / Tertiary courses). Carries the **WSQ house cover page** (course title + Tertiary & course logos + UEN), identical to the Lesson Plan / Learner Guide — cover page only, no version-control record. |
 | **`build_wsq_assessment.py`** (alternate) | **WA** knowledge + **CS (Case Study)** one coherent scenario | Courses assessed via a single written case study rather than discrete practical tasks. |
 
 ## Hard rules (do not break)
@@ -23,7 +23,7 @@ Generate two WSQ assessment instruments, each as a **question paper** and a matc
 The script lives **in this skill** and runs **in place** — do NOT copy it into the course repo. It auto-detects the course repo root by walking up from its own location to the nearest dir containing a `.git` folder (or both `courseware/` and `assessment/`), and writes the four DOCX into `<repo>/assessment/`. Override with `REPO=/path/to/course` if needed.
 
 1. Ensure the sibling **tertiary-lesson-plan** skill is installed — the script reuses its **`prodoc.py`** for the cover page + version control + page numbers (the import auto-falls-back from the project `.claude/skills/` to `~/.claude/skills/`).
-2. Edit the **CONFIG** block: `TITLE`, `Q_VER`/`A_VER` (single standardised version string, e.g. `"v5"`), the `*_VERSIONS` version-control rows, `ORG_LOGO`, `COURSE_LOGO`.
+2. Edit the **CONFIG** block: `TITLE`, `Q_VER`/`A_VER` (single standardised version string, e.g. `"v5"`), `ORG_LOGO`, `COURSE_LOGO`.
 3. Fill the two content lists **from the course materials**:
    - `WRITTEN` — `(criterion, context, question, [model-answer points])`. Read the concept slides and turn each key concept into one open-ended knowledge question. Keep it to the concepts actually taught.
    - `SCENARIO` + `PRACTICAL` — one continuous scenario, then `(label, criterion, task_prompt, box_caption, [model build-step points])` per task. Each task maps to one LO and to a class activity; the model points **are** the lab procedure (cite the activity numbers).
@@ -36,7 +36,7 @@ The script lives **in this skill** and runs **in place** — do NOT copy it into
 6. Keep the question paper and its answer key on the **same version string** (e.g. both `v5`) to avoid confusion.
 
 ## Document format (WSQ house style)
-- **Cover page** — same as the Lesson Plan / Learner Guide (Tertiary Infotech Academy logo, UEN, instrument name, "For", course logo, course title, TGS ref, "Conducted by", version) followed by a **Document Version Control Record** table.
+- **Cover page** — same as the Lesson Plan / Learner Guide (Tertiary Infotech Academy logo, UEN, instrument name, "For", course logo, course title, TGS ref, "Conducted by", version). Cover page only — assessments do **not** include a Document Version Control Record.
 - **Question paper** — centred title block; **A: Trainee Information** (name, last 3 NRIC digits + alphabet, date); **B: Instructions to Candidate**; **C:** the questions/tasks with **boxed answer space**; and a **For Official Use Only** block (Grade C / NYC, assessor name/NRIC/date/signature).
 - **Answer document** — the model answers / marking guide: each question/task with "Suggestive answers (not exhaustive):" bullet points (WA cites the slide/module; PP lists the lab build steps and cites the activities).
 - Body is **Arial 11**; every page has the copyright + page-number footer.
@@ -49,6 +49,6 @@ The script lives **in this skill** and runs **in place** — do NOT copy it into
 - [ ] Zero multiple-choice questions anywhere.
 - [ ] Every WA question traces to a slide/module; every PP/CS answer traces to a class activity/lab.
 - [ ] One coherent PP scenario (not disconnected mini-cases).
-- [ ] Cover page + version-control record present; question paper has Trainee Information, Instructions, boxed answers, and For Official Use Only.
+- [ ] Cover page present (no version-control record); question paper has Trainee Information, Instructions, boxed answers, and For Official Use Only.
 - [ ] Answer-key wording is guidance ("award the mark where the candidate covers…"), not a rigid script.
 - [ ] Old/mismatched assessment files (previous versions, other courses) removed from the output folder.
