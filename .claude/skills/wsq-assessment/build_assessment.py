@@ -10,7 +10,7 @@ Body: Arial 11.
 import os, sys
 from docx import Document
 from docx.shared import Pt, Inches, RGBColor
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
@@ -243,21 +243,36 @@ def answer_box(doc, lines=None, height_pt=90):
         trh.set(qn('w:val'), str(int(height_pt*20))); trh.set(qn('w:hRule'), 'atLeast'); trPr.append(trh)
     doc.add_paragraph().paragraph_format.space_after = Pt(2)
 
+def page_break(doc):
+    doc.add_paragraph().add_run().add_break(WD_BREAK.PAGE)
+
 def candidate_block(doc):
-    heading(doc, "A: Trainee Information")
+    heading(doc, "Trainee Information")
     for label in ["Trainee Name (as per NRIC): ______________________________________",
                   "Last 3 digits and alphabet of NRIC/FIN: ____________________",
                   "Date: ____________________"]:
-        para(doc, label, size=11, after=4)
+        para(doc, label, size=11, after=6)
+
+# Assessment briefing (from the course slides — "Briefing for Assessment").
+BRIEFING = [
+    "Place phones and other materials under the table or on the floor.",
+    "No photos or recording of assessment scripts.",
+    "No discussion during the assessment.",
+    "Use a black/blue pen for hard-copy assessments.",
+    "No liquid paper / correction tape.",
+    "Scripts are collected when time is up.",
+]
 
 def instructions(doc, minutes_text):
-    heading(doc, "B: Instructions to Candidate")
-    for i, s in enumerate([
+    heading(doc, "Instructions to Candidate")
+    items = [
         "This is an individual exercise.",
         "This is an open-book assessment.",
         f"A total of {minutes_text} is given to complete this assessment.",
-        "Submit your answers on the document provided."], 1):
-        p = doc.add_paragraph(); p.paragraph_format.space_after = Pt(3)
+        "Submit your answers on the document provided.",
+    ] + BRIEFING
+    for i, s in enumerate(items, 1):
+        p = doc.add_paragraph(); p.paragraph_format.space_after = Pt(4)
         p.add_run(f"{i}.  {s}").font.size = Pt(11)
 
 def official_use(doc, what):
@@ -283,10 +298,12 @@ def build_wa(answers):
     para(doc, TITLE, size=15, bold=True, color=DARK, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
     para(doc, "Answers to Written Assessment (SAQ)" if answers else "Written Assessment (SAQ)",
          size=13, bold=True, color=BRAND, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
-    para(doc, "Course Code: TGS-2023035977", size=11, color=GREY, align=WD_ALIGN_PARAGRAPH.CENTER, after=10)
+    para(doc, "Course Code: TGS-2023035977", size=11, color=GREY, align=WD_ALIGN_PARAGRAPH.CENTER, after=12)
     if not answers:
+        # Page 2 — candidate information + instructions only; questions begin on the next page.
         candidate_block(doc); instructions(doc, "1 hour")
-    heading(doc, "C: Short-Answer Questions (Knowledge)")
+        page_break(doc)
+    para(doc, "Short-Answer Questions (Knowledge)", size=13, bold=True, color=BRAND, after=4)
     para(doc, "Answer all questions in your own words. Each question tests underpinning knowledge covered in the "
               "course slides.", size=10.5, italic=True, color=GREY, after=8)
     for i, (crit, ctx, q, pts) in enumerate(WRITTEN, 1):
@@ -310,10 +327,12 @@ def build_pp(answers):
     para(doc, TITLE, size=15, bold=True, color=DARK, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
     para(doc, "Answers to Practical Performance Assessment" if answers else "Practical Performance Assessment",
          size=13, bold=True, color=BRAND, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
-    para(doc, "Course Code: TGS-2023035977", size=11, color=GREY, align=WD_ALIGN_PARAGRAPH.CENTER, after=10)
+    para(doc, "Course Code: TGS-2023035977", size=11, color=GREY, align=WD_ALIGN_PARAGRAPH.CENTER, after=12)
     if not answers:
+        # Page 2 — candidate information + instructions only; the problem begins on the next page.
         candidate_block(doc); instructions(doc, "90 minutes")
-    heading(doc, "C: Practical Problem")
+        page_break(doc)
+    para(doc, "Practical Problem", size=13, bold=True, color=BRAND, after=4)
     para(doc, "Scenario", size=11.5, bold=True, after=2)
     para(doc, SCENARIO, size=11, after=8)
     for label, crit, prompt, cap, pts in PRACTICAL:
