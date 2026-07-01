@@ -275,10 +275,8 @@ def instructions(doc, minutes_text):
         p = doc.add_paragraph(); p.paragraph_format.space_after = Pt(4)
         p.add_run(f"{i}.  {s}").font.size = Pt(11)
 
-def official_use(doc, what):
-    doc.add_paragraph()
-    para(doc, "_" * 78, size=11, after=4, color=GREY)
-    heading(doc, "For Official Use Only")
+def grading(doc, what):
+    heading(doc, "Grading")
     para(doc, what, size=11, after=8)
     for ln in ["Grade: _______  (C / NYC)",
                "Assessor Name: __________________________   Assessor NRIC: ________________",
@@ -300,8 +298,10 @@ def build_wa(answers):
          size=13, bold=True, color=BRAND, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
     para(doc, "Course Code: TGS-2023035977", size=11, color=GREY, align=WD_ALIGN_PARAGRAPH.CENTER, after=12)
     if not answers:
-        # Page 2 — candidate information + instructions only; questions begin on the next page.
+        # Page 2 — candidate information, instructions and grading; questions begin on the next page.
         candidate_block(doc); instructions(doc, "1 hour")
+        grading(doc, "Candidate has answered all written questions and demonstrated the underpinning "
+                     "knowledge required for the course learning outcomes.")
         page_break(doc)
     para(doc, "Short-Answer Questions (Knowledge)", size=13, bold=True, color=BRAND, after=4)
     para(doc, "Answer all questions in your own words. Each question tests underpinning knowledge covered in the "
@@ -311,9 +311,6 @@ def build_wa(answers):
         para(doc, ctx, size=11, after=3)
         para(doc, f"{q}  ({crit})", size=11, bold=True, after=4)
         answer_box(doc, lines=pts if answers else None)
-    if not answers:
-        official_use(doc, "Candidate has answered all written questions and demonstrated the underpinning "
-                          "knowledge required for the course learning outcomes.")
     suffix = A_VER if answers else Q_VER
     name = (f"Answer to WA (SAQ) - {TITLE} - {suffix}.docx" if answers
             else f"WA (SAQ) - {TITLE} - {suffix}.docx")
@@ -329,8 +326,10 @@ def build_pp(answers):
          size=13, bold=True, color=BRAND, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
     para(doc, "Course Code: TGS-2023035977", size=11, color=GREY, align=WD_ALIGN_PARAGRAPH.CENTER, after=12)
     if not answers:
-        # Page 2 — candidate information + instructions only; the problem begins on the next page.
+        # Page 2 — candidate information, instructions and grading; the problem begins on the next page.
         candidate_block(doc); instructions(doc, "90 minutes")
+        grading(doc, "Candidate has successfully completed all PP tasks and can explain the overall "
+                     "functions and features used to achieve them.")
         page_break(doc)
     para(doc, "Practical Problem", size=13, bold=True, color=BRAND, after=4)
     para(doc, "Scenario", size=11.5, bold=True, after=2)
@@ -340,9 +339,6 @@ def build_pp(answers):
         para(doc, prompt, size=11, after=3)
         para(doc, cap, size=10.5, italic=True, color=GREY, after=4)
         answer_box(doc, lines=pts if answers else None, height_pt=150)
-    if not answers:
-        official_use(doc, "Candidate has successfully completed all PP tasks and can explain the overall "
-                          "functions and features used to achieve them.")
     suffix = A_VER if answers else Q_VER
     name = (f"Answer to PP Assessment - {TITLE} - {suffix}.docx" if answers
             else f"PP Assessment - {TITLE} - {suffix}.docx")
