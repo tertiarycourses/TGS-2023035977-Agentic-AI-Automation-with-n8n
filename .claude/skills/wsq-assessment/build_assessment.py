@@ -246,12 +246,15 @@ def answer_box(doc, lines=None, height_pt=90):
 def page_break(doc):
     doc.add_paragraph().add_run().add_break(WD_BREAK.PAGE)
 
+FILL_GAP = 6    # extra space below each fill-in line (paired with double line spacing for writing room)
+
 def candidate_block(doc):
     heading(doc, "Trainee Information")
     for label in ["Trainee Name (as per NRIC): ______________________________________",
                   "Last 3 digits and alphabet of NRIC/FIN: ____________________",
                   "Date: ____________________"]:
-        para(doc, label, size=11, after=6)
+        p = para(doc, label, size=11, after=FILL_GAP)
+        p.paragraph_format.line_spacing = 2.0
 
 # Assessment briefing (from the course slides — "Briefing for Assessment").
 BRIEFING = [
@@ -277,11 +280,12 @@ def instructions(doc, minutes_text):
 
 def grading(doc, what):
     heading(doc, "Grading")
-    para(doc, what, size=11, after=8)
+    para(doc, what, size=11, after=12)
     for ln in ["Grade: _______  (C / NYC)",
                "Assessor Name: __________________________   Assessor NRIC: ________________",
                "Date: ________________________                    Signature: ____________________"]:
-        para(doc, ln, size=11, after=4)
+        p = para(doc, ln, size=11, after=FILL_GAP)
+        p.paragraph_format.line_spacing = 2.0
 
 def finish(doc, path):
     prodoc.add_page_numbers(doc); prodoc.enable_update_fields(doc)
