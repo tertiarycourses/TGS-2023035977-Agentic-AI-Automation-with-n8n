@@ -26,6 +26,10 @@ LP_VERSIONS = [
                             "→ vector store → Telegram Q&A) and Activity 7b (customer-support RAG agent across "
                             "three vector databases: Supabase, Pinecone, Qdrant)",
      "Tertiary Infotech Academy Pte Ltd"),
+    ("3.1", "1 July 2026", "Added a page-numbered Table of Contents; verified daily-schedule table borders and "
+                            "footer page numbers; aligned the Lesson Plan with the slides, Learner Guide and lab "
+                            "workflows (activities 1–8 + capstone)",
+     "Tertiary Infotech Academy Pte Ltd"),
 ]
 
 BRAND = RGBColor(0x1F, 0x6F, 0xEB)
@@ -66,7 +70,7 @@ def add_heading(text, size=15, color=BRAND, space_before=12, space_after=6):
 
 # ============================ COVER + FRONT MATTER ============================
 prodoc.style_headings(doc)
-prodoc.add_cover_page(doc, "LESSON PLAN", "Agentic AI Automation with n8n", "3.0",
+prodoc.add_cover_page(doc, "LESSON PLAN", "Agentic AI Automation with n8n", "3.1",
     org_logo=os.path.join(REPO_DIR,"courseware/assets/tertiary-infotech-logo.png"),
     course_logo=os.path.join(REPO_DIR,"courseware/assets/n8n-course-logo.png"))
 prodoc.add_version_control(doc, LP_VERSIONS)

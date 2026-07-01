@@ -674,7 +674,7 @@ p("You're done — congratulations! Keep your local n8n running to continue buil
 # RENDERERS
 # ============================================================================
 TITLE = "Agentic AI Automation with n8n"
-VERSION = "6.0"
+VERSION = "6.1"
 VERSIONS = [
     ("1.0", "2 Feb 2023", "First version", "Dr. Alfred Ang"),
     ("2.0", "16 June 2025", "Updated course title and content", "Tertiary Infotech Pte Ltd"),
@@ -692,6 +692,11 @@ VERSIONS = [
                            "→ in-memory vector store → Telegram Q&A on an IT-Support FAQ); Activity 7b — "
                            "customer-support RAG agent for a training center across three vector databases "
                            "(Supabase pgvector, Pinecone, Qdrant); new workflow screenshots",
+     "Tertiary Infotech Academy Pte Ltd"),
+    ("6.1", "1 July 2026", "Added a page-numbered Table of Contents; embedded real n8n flow screenshots and "
+                           "activity website screenshots for every activity (5, 6, 7a, 7b, 8, capstone); expanded "
+                           "step-by-step detail; aligned the Learner Guide (DOCX + Markdown) with the slides, "
+                           "Lesson Plan and lab workflows",
      "Tertiary Infotech Academy Pte Ltd"),
 ]
 

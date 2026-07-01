@@ -1,6 +1,6 @@
 # Agentic AI Automation with n8n — Step-by-Step Learner Guide
 
-**Course Code:** TGS-2023035977  ·  **Version 6.0**  ·  Tertiary Infotech Academy Pte Ltd
+**Course Code:** TGS-2023035977  ·  **Version 6.1**  ·  Tertiary Infotech Academy Pte Ltd
 
 ### Document Version Control Record
 
@@ -12,6 +12,7 @@
 | 4.0 | 26 June 2026 | Renumbered Day 2 activities: Investment Advisor → Activity 5, Finance Advisor → Activity 6, RAG → Activity 7; rewrote Activity 8 as the integrated HR Service Portal (Leave Approval, Dashboard Data, AI Chatbot with Guardrails) | Tertiary Infotech Academy Pte Ltd |
 | 5.0 | 26 June 2026 | Added topic-level headings (Topic 1–6) to group activities; DOCX TOC now shows a two-level hierarchy of Topics and Activities | Tertiary Infotech Academy Pte Ltd |
 | 6.0 | 1 July 2026 | Replaced Activity 7 with two new RAG labs: Activity 7a — RAG chatbot (web PDF upload → in-memory vector store → Telegram Q&A on an IT-Support FAQ); Activity 7b — customer-support RAG agent for a training center across three vector databases (Supabase pgvector, Pinecone, Qdrant); new workflow screenshots | Tertiary Infotech Academy Pte Ltd |
+| 6.1 | 1 July 2026 | Added a page-numbered Table of Contents; embedded real n8n flow screenshots and activity website screenshots for every activity (5, 6, 7a, 7b, 8, capstone); expanded step-by-step detail; aligned the Learner Guide (DOCX + Markdown) with the slides, Lesson Plan and lab workflows | Tertiary Infotech Academy Pte Ltd |
 
 ## Table of Contents
 
