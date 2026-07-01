@@ -39,10 +39,23 @@ for _cand in (os.path.join(REPO, ".claude/skills/tertiary-lesson-plan"),
         sys.path.insert(0, _cand); break
 import prodoc  # cover page + version control + page numbers (same as LP/LG)
 
-TITLE = "Agentic AI Automation with n8n"
+# ─── EDIT PER COURSE ────────────────────────────────────────────────────────
+TITLE       = "Agentic AI Automation with n8n"   # <<Course Title>>
+COURSE_CODE = "TGS-2023035977"                    # <<Course Code, e.g. TGS-XXXXXXXXXX>>
+# ────────────────────────────────────────────────────────────────────────────
 OUT   = os.path.join(REPO, "assessment")
-ORG_LOGO    = os.path.join(REPO, "courseware/assets/tertiary-infotech-logo.png")
-COURSE_LOGO = os.path.join(REPO, "courseware/assets/n8n-course-logo.png")
+
+# Logos: prefer the course's own courseware/assets, else fall back to the copies bundled
+# in this skill (so the assessment builds even outside this project). Replace the course
+# logo per course; the Tertiary Infotech logo is the same for every WSQ course.
+def _logo(name):
+    here = os.path.dirname(os.path.abspath(__file__))
+    for p in (os.path.join(REPO, "courseware/assets", name), os.path.join(here, "assets", name)):
+        if os.path.exists(p):
+            return p
+    return None
+ORG_LOGO    = _logo("tertiary-infotech-logo.png")
+COURSE_LOGO = _logo("n8n-course-logo.png")
 
 Q_VER, A_VER = "v5", "v5"   # single standardised version across all four files
 BRAND = RGBColor(0x1F, 0x6F, 0xEB); DARK = RGBColor(0x11, 0x18, 0x27); GREY = RGBColor(0x55, 0x5B, 0x66)
@@ -296,11 +309,11 @@ def build_wa(answers):
     doc = base_doc()
     kind = "Written Assessment (SAQ) — Answer Key" if answers else "Written Assessment (SAQ)"
     prodoc.add_cover_page(doc, kind, TITLE, A_VER if answers else Q_VER,
-                          org_logo=ORG_LOGO, course_logo=COURSE_LOGO)
+                          org_logo=ORG_LOGO, course_logo=COURSE_LOGO, course_code=COURSE_CODE)
     para(doc, TITLE, size=15, bold=True, color=DARK, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
     para(doc, "Answers to Written Assessment (SAQ)" if answers else "Written Assessment (SAQ)",
          size=13, bold=True, color=BRAND, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
-    para(doc, "Course Code: TGS-2023035977", size=11, color=GREY, align=WD_ALIGN_PARAGRAPH.CENTER, after=12)
+    para(doc, f"Course Code: {COURSE_CODE}", size=11, color=GREY, align=WD_ALIGN_PARAGRAPH.CENTER, after=12)
     if not answers:
         # Page 2 — candidate information, instructions and grading; questions begin on the next page.
         candidate_block(doc); instructions(doc, "1 hour")
@@ -324,11 +337,11 @@ def build_pp(answers):
     doc = base_doc()
     kind = "Practical Performance (PP) — Answer Key" if answers else "Practical Performance (PP)"
     prodoc.add_cover_page(doc, kind, TITLE, A_VER if answers else Q_VER,
-                          org_logo=ORG_LOGO, course_logo=COURSE_LOGO)
+                          org_logo=ORG_LOGO, course_logo=COURSE_LOGO, course_code=COURSE_CODE)
     para(doc, TITLE, size=15, bold=True, color=DARK, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
     para(doc, "Answers to Practical Performance Assessment" if answers else "Practical Performance Assessment",
          size=13, bold=True, color=BRAND, align=WD_ALIGN_PARAGRAPH.CENTER, after=2)
-    para(doc, "Course Code: TGS-2023035977", size=11, color=GREY, align=WD_ALIGN_PARAGRAPH.CENTER, after=12)
+    para(doc, f"Course Code: {COURSE_CODE}", size=11, color=GREY, align=WD_ALIGN_PARAGRAPH.CENTER, after=12)
     if not answers:
         # Page 2 — candidate information, instructions and grading; the problem begins on the next page.
         candidate_block(doc); instructions(doc, "90 minutes")

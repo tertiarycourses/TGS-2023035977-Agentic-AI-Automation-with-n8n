@@ -61,18 +61,20 @@ def _img(doc, path, width_in):
     return False
 
 def add_cover_page(doc, kind, title, version, conducted_by=ORG,
-                   org_logo=None, course_logo=None):
+                   org_logo=None, course_logo=None, course_code=None):
     """kind: 'Learner Guide' or 'LESSON PLAN'.
-    org_logo: Tertiary Infotech Academy logo path; course_logo: n8n course logo path."""
+    org_logo: Tertiary Infotech Academy logo path; course_logo: course logo path.
+    course_code: e.g. 'TGS-2023035977' (defaults to the module constant if not given)."""
+    tgs_line = f"TGS Ref No: {course_code}" if course_code else TGS
     doc.add_paragraph()
     _img(doc, org_logo, 2.1)                              # Tertiary Infotech Academy logo
     _line(doc, ORG, 13, bold=True, color=DARK, before=2, after=1)
     _line(doc, UEN, 10, color=GREY, after=10)
     _line(doc, kind.upper(), 26, bold=True, color=BRAND, after=4)
     _line(doc, "For", 12, color=GREY, before=4, after=8)
-    _img(doc, course_logo, 1.0)                           # n8n course logo
+    _img(doc, course_logo, 1.0)                           # course logo
     _line(doc, title, 20, bold=True, color=DARK, before=4, after=2)   # Course Title
-    _line(doc, TGS, 12, color=DARK, before=4, after=14)
+    _line(doc, tgs_line, 12, color=DARK, before=4, after=14)
     _line(doc, "Conducted by", 11, color=GREY, after=2)
     _line(doc, conducted_by, 13, bold=True, color=DARK, after=2)
     _line(doc, UEN, 11, color=GREY, after=12)

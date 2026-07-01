@@ -16,6 +16,10 @@ AMBER=RGBColor(0xF5,0x9E,0x0B); INK=RGBColor(0x16,0x1B,0x26); GREY=RGBColor(0x5B
 LIGHT=RGBColor(0xF5,0xF8,0xFC); WHITE=RGBColor(0xFF,0xFF,0xFF); LINE=RGBColor(0xE2,0xE8,0xF0)
 VIOLET=RGBColor(0x7C,0x3A,0xED)
 VERSION="v42"; VERSION_DATE="1 July 2026"
+# ─── EDIT PER COURSE ─────────────────────────────────────────────
+TITLE       = "Agentic AI Automation with n8n"   # <<Course Title>>
+COURSE_CODE = "TGS-2023035977"                    # <<Course Code, e.g. TGS-XXXXXXXXXX>>
+# ─────────────────────────────────────────────────────────────────
 
 prs=Presentation(); prs.slide_width=Inches(13.333); prs.slide_height=Inches(7.5)
 SW,SH=prs.slide_width,prs.slide_height; BLANK=prs.slide_layouts[6]; FONT="Arial"
@@ -53,7 +57,7 @@ def bullets(s,x,y,w,h,items,size=18,color=INK,gap=10,mcolor=BLUE):
 PAGE={"n":0}
 def footer(s,dark=False):
     PAGE["n"]+=1; c=WHITE if dark else GREY
-    txt(s,Inches(0.55),Inches(7.08),Inches(6.2),Inches(0.3),[[("Agentic AI Automation with n8n  ·  TGS-2023035977",8.5,c,False)]])
+    txt(s,Inches(0.55),Inches(7.08),Inches(6.2),Inches(0.3),[[(f"{TITLE}  ·  {COURSE_CODE}",8.5,c,False)]])
     txt(s,Inches(6.0),Inches(7.08),Inches(6),Inches(0.3),[[("© 2026 Tertiary Infotech Academy Pte Ltd",8.5,c,False)]],align=PP_ALIGN.CENTER)
     txt(s,Inches(11.9),Inches(7.08),Inches(0.9),Inches(0.3),[[(str(PAGE["n"]),9,c,True)]],align=PP_ALIGN.RIGHT)
 def head(s,title,kicker=None,kcolor=BLUE):
@@ -65,21 +69,28 @@ def head(s,title,kicker=None,kcolor=BLUE):
     rect(s,Inches(0.8),Inches(1.55),Inches(12.0),Pt(2),LINE)
 
 ASSETS=f"{REPO}/courseware/assets"
+# Logo lookup: prefer the course's courseware/assets, else the copies bundled in this skill.
+_SKILL_ASSETS=_os.path.join(_os.path.dirname(_os.path.abspath(__file__)),"assets")
+def _logo(name):
+    for base in (ASSETS,_SKILL_ASSETS):
+        p=_os.path.join(base,name)
+        if _os.path.exists(p): return p
+    return None
 def cover():
     import os
     s=slide(); rect(s,0,0,SW,SH,WHITE)
     rect(s,0,0,SW,Inches(0.22),BLUE)
     rect(s,0,Inches(7.28),SW,Inches(0.22),TEAL)
     # Tertiary Infotech Academy logo (top-left) + n8n course logo (top-right)
-    if os.path.exists(f"{ASSETS}/tertiary-infotech-logo.png"):
-        s.shapes.add_picture(f"{ASSETS}/tertiary-infotech-logo.png",Inches(0.85),Inches(0.7),height=Inches(1.05))
-    if os.path.exists(f"{ASSETS}/n8n-course-logo.png"):
-        s.shapes.add_picture(f"{ASSETS}/n8n-course-logo.png",Inches(11.4),Inches(0.72),height=Inches(1.0))
+    _org=_logo("tertiary-infotech-logo.png")
+    if _org: s.shapes.add_picture(_org,Inches(0.85),Inches(0.7),height=Inches(1.05))
+    _crs=_logo("n8n-course-logo.png")
+    if _crs: s.shapes.add_picture(_crs,Inches(11.4),Inches(0.72),height=Inches(1.0))
     txt(s,Inches(0.9),Inches(2.3),Inches(12),Inches(0.6),[[("LEARNER GUIDE  ·  COURSE SLIDES",16,BLUE,True)]])
-    txt(s,Inches(0.9),Inches(2.9),Inches(12.0),Inches(1.6),[[("Agentic AI Automation with n8n",46,INK,True)]])
+    txt(s,Inches(0.9),Inches(2.9),Inches(12.0),Inches(1.6),[[(TITLE,46,INK,True)]])
     rect(s,Inches(0.92),Inches(4.3),Inches(2.4),Inches(0.06),TEAL)
     txt(s,Inches(0.9),Inches(4.65),Inches(12),Inches(1.4),
-        [[("WSQ Course Code: TGS-2023035977",16,GREY,False)],
+        [[(f"WSQ Course Code: {COURSE_CODE}",16,GREY,False)],
          [("Conducted by Tertiary Infotech Academy Pte Ltd  ·  UEN 201200696W",14,GREY,False)]],space=6)
     txt(s,Inches(0.9),Inches(6.55),Inches(12),Inches(0.4),
         [[(f"Version {VERSION}  ·  {VERSION_DATE}",12,GREY,False)]])
@@ -796,6 +807,6 @@ txt(s,Inches(1.27),Inches(4.1),Inches(11.5),Inches(1.4),
   [("Powered by Tertiary Infotech Academy Pte Ltd  ·  www.tertiarycourses.com.sg",12,GREY,False)]],space=8)
 footer(s)
 
-OUT=f"courseware/Agentic AI Automation with n8n-{VERSION}.pptx"
+OUT=f"courseware/{TITLE}-{VERSION}.pptx"
 prs.save(f"{REPO}/{OUT}")
 print("Saved:",OUT,"| slides:",len(prs.slides._sldIdLst))

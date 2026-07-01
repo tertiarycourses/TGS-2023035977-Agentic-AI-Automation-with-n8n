@@ -31,6 +31,19 @@ from docx.oxml import OxmlElement
 
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+# Logo lookup: prefer the course's courseware/assets, else the copies bundled in this skill.
+def _logo(name):
+    here = os.path.dirname(os.path.abspath(__file__))
+    for p in (os.path.join(REPO, "courseware/assets", name), os.path.join(here, "assets", name)):
+        if os.path.exists(p):
+            return p
+    return None
+
+# ─── EDIT PER COURSE ─────────────────────────────────────────────
+TITLE       = "Agentic AI Automation with n8n"   # <<Course Title>>
+COURSE_CODE = "TGS-2023035977"                    # <<Course Code, e.g. TGS-XXXXXXXXXX>>
+# ─────────────────────────────────────────────────────────────────
+
 # ============================================================================
 # CONTENT
 # ============================================================================
@@ -49,9 +62,9 @@ def note(t):  B.append(("note", t))
 def rule():   B.append(("rule",))
 
 # ---------------------------------------------------------------- Title / intro
-h1("Agentic AI Automation with n8n — Step-by-Step Learner Guide")
+h1(f"{TITLE} — Step-by-Step Learner Guide")
 p("Welcome! This guide takes you click-by-click through every hands-on lab in the WSQ course "
-  "**Agentic AI Automation with n8n** (Course Code: TGS-2023035977). Over three days you will go from "
+  f"**{TITLE}** (Course Code: {COURSE_CODE}). Over three days you will go from "
   "simple form automations to AI agents, Retrieval-Augmented Generation (RAG), webhooks, external APIs, "
   "and finally human-in-the-loop guardrails — then build a mini capstone of your own.")
 p("Work through the activities in order: each one builds on the skills (and sometimes the workflow) of the "
@@ -673,7 +686,6 @@ p("You're done — congratulations! Keep your local n8n running to continue buil
 # ============================================================================
 # RENDERERS
 # ============================================================================
-TITLE = "Agentic AI Automation with n8n"
 VERSION = "6.1"
 VERSIONS = [
     ("1.0", "2 Feb 2023", "First version", "Dr. Alfred Ang"),
@@ -722,7 +734,7 @@ def render_markdown(blocks):
         if k == "h1":
             out.append(f"# {b[1]}\n")
             if not injected:
-                out.append(f"**Course Code:** TGS-2023035977  ·  **Version {VERSION}**  ·  Tertiary Infotech Academy Pte Ltd\n")
+                out.append(f"**Course Code:** {COURSE_CODE}  ·  **Version {VERSION}**  ·  Tertiary Infotech Academy Pte Ltd\n")
                 out.append("### Document Version Control Record\n")
                 out.append("| Version | Effective Date | Summary of Changes | Author |")
                 out.append("| --- | --- | --- | --- |")
@@ -783,9 +795,9 @@ def render_docx(blocks):
     doc = Document()
     nrm = doc.styles["Normal"]; nrm.font.name = "Arial"; nrm.font.size = Pt(11)
     prodoc.style_headings(doc)
-    prodoc.add_cover_page(doc, "Learner Guide", TITLE, VERSION,
-        org_logo=os.path.join(REPO,"courseware/assets/tertiary-infotech-logo.png"),
-        course_logo=os.path.join(REPO,"courseware/assets/n8n-course-logo.png"))
+    prodoc.add_cover_page(doc, "Learner Guide", TITLE, VERSION, course_code=COURSE_CODE,
+        org_logo=_logo("tertiary-infotech-logo.png"),
+        course_logo=_logo("n8n-course-logo.png"))
     prodoc.add_version_control(doc, VERSIONS)
     prodoc.add_toc(doc, levels="1-2")
     for b in blocks:
@@ -944,7 +956,7 @@ B = insert_images(B)
 md = render_markdown(B)
 with open(os.path.join(REPO, "LEARNER-GUIDE.md"), "w", encoding="utf-8") as f:
     f.write(md)
-DOCX_OUT = os.path.join(REPO, "courseware/LG-Agentic AI Automation with n8n.docx")
+DOCX_OUT = os.path.join(REPO, f"courseware/LG-{TITLE}.docx")
 render_docx(B).save(DOCX_OUT)
 
 # Update the TOC field in the saved DOCX using Word automation (Windows only).

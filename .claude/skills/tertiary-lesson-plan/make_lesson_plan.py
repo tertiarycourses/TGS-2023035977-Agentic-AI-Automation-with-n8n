@@ -8,6 +8,19 @@ import prodoc
 
 REPO_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+# Logo lookup: prefer the course's courseware/assets, else the copies bundled in this skill.
+def _logo(name):
+    here = os.path.dirname(os.path.abspath(__file__))
+    for p in (os.path.join(REPO_DIR, "courseware/assets", name), os.path.join(here, "assets", name)):
+        if os.path.exists(p):
+            return p
+    return None
+
+# ─── EDIT PER COURSE ─────────────────────────────────────────────
+TITLE       = "Agentic AI Automation with n8n"   # <<Course Title>>
+COURSE_CODE = "TGS-2023035977"                    # <<Course Code, e.g. TGS-XXXXXXXXXX>>
+# ─────────────────────────────────────────────────────────────────
+
 from docx import Document
 from docx.shared import Pt, RGBColor, Inches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -70,16 +83,16 @@ def add_heading(text, size=15, color=BRAND, space_before=12, space_after=6):
 
 # ============================ COVER + FRONT MATTER ============================
 prodoc.style_headings(doc)
-prodoc.add_cover_page(doc, "LESSON PLAN", "Agentic AI Automation with n8n", "3.1",
-    org_logo=os.path.join(REPO_DIR,"courseware/assets/tertiary-infotech-logo.png"),
-    course_logo=os.path.join(REPO_DIR,"courseware/assets/n8n-course-logo.png"))
+prodoc.add_cover_page(doc, "LESSON PLAN", TITLE, "3.1", course_code=COURSE_CODE,
+    org_logo=_logo("tertiary-infotech-logo.png"),
+    course_logo=_logo("n8n-course-logo.png"))
 prodoc.add_version_control(doc, LP_VERSIONS)
 prodoc.add_toc(doc, levels="1-2")
 
 # ============================ COURSE INFO ============================
 info = [
-    ("Course Title", "Agentic AI Automation with n8n"),
-    ("Course Code", "TGS-2023035977"),
+    ("Course Title", TITLE),
+    ("Course Code", COURSE_CODE),
     ("Duration", "3 Days (24 training hours)"),
     ("Daily Schedule", "9:30 AM – 6:30 PM (8 training hours/day, excluding lunch)"),
     ("Lunch Break", "1:00 PM – 2:00 PM (1 hour)"),
@@ -160,7 +173,7 @@ day_header("Day 1", "Workflow Automation with n8n  ·  AI Agents")
 
 session_label("Morning Session  ·  9:30 AM – 1:00 PM")
 schedule_table([
-    ("9:30 – 9:45",  "Welcome, course objectives & overview (TGS-2023035977)", 15, "normal"),
+    ("9:30 – 9:45",  f"Welcome, course objectives & overview ({COURSE_CODE})", 15, "normal"),
     ("9:45 – 12:25", "Topic 1: Workflow Automation with n8n", None, "topic"),
     ("9:45 – 10:05", "Overview of n8n", 20, "normal"),
     ("10:05 – 10:35","Set up n8n — create trial accounts (15 learners) and install locally with Docker Compose", 30, "normal"),
@@ -271,7 +284,7 @@ doc.add_paragraph(
 prodoc.add_page_numbers(doc)
 prodoc.enable_update_fields(doc)
 
-OUT = os.path.join(REPO_DIR, "courseware/LP-Agentic AI Automation with n8n.docx")
+OUT = os.path.join(REPO_DIR, f"courseware/LP-{TITLE}.docx")
 doc.save(OUT)
 print("Saved:", OUT)
 
