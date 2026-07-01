@@ -32,7 +32,7 @@ The script lives **in this skill** and runs **in place** — do NOT copy it into
    (or `REPO=/path/to/course python3 ~/.claude/skills/wsq-assessment/build_assessment.py`). It writes into `<repo>/assessment/`:
    `WA (SAQ) - <Title> - <VER>.docx`, `Answer to WA (SAQ) - <Title> - <VER>.docx`,
    `PP Assessment - <Title> - <VER>.docx`, `Answer to PP Assessment - <Title> - <VER>.docx`.
-5. Optionally render PDFs: `soffice --headless --convert-to pdf --outdir assessment assessment/*.docx`.
+5. Assessments are delivered as **DOCX only** — do not generate PDFs for the assessment set.
 6. Keep the question paper and its answer key on the **same version string** (e.g. both `v5`) to avoid confusion.
 
 ## Document format (WSQ house style)
