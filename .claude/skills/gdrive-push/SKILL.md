@@ -24,6 +24,13 @@ used folder. Confirm the link before the first real (non-dry-run) push of a sess
 | Learner Guide | `LG-*.docx` + `LG-*.pdf` + the slides `.pdf` |
 | Lesson Plan | `LP-*.docx` + `LP-*.pdf` |
 | Assessment | all `assessment/*.docx` (WA + PP papers and answer keys) |
+| Activities | the whole `labs/` tree (structure preserved) |
+
+**Change detection — only changed files are pushed.** Every file's MD5 is compared
+with the Drive copy first; identical files are skipped (no re-upload, no archiving).
+The labs sync uses `rclone sync --checksum --backup-dir Activities/Archive`, so
+unchanged lab files are skipped and replaced/removed ones are MOVED to the archive,
+never deleted.
 
 Before each upload, existing Drive files of the same family (same base name ignoring
 the `-vNN` version suffix, same extension) are MOVED to `<subfolder>/Archive/`.
