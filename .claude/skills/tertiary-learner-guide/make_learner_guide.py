@@ -31,10 +31,10 @@ from docx.oxml import OxmlElement
 
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-# Logo lookup: prefer the course's courseware/assets, else the copies bundled in this skill.
+# Logo lookup: prefer the course's .claude/skills/tertiary-course-slides/assets, else the copies bundled in this skill.
 def _logo(name):
     here = os.path.dirname(os.path.abspath(__file__))
-    for p in (os.path.join(REPO, "courseware/assets", name), os.path.join(here, "assets", name)):
+    for p in (os.path.join(REPO, ".claude/skills/tertiary-course-slides/assets", name), os.path.join(here, "assets", name)):
         if os.path.exists(p):
             return p
     return None
@@ -358,7 +358,7 @@ steps([
 ])
 note("The free Twelve Data plan allows ~8 requests/minute and ~800 calls/day — plenty for testing. "
      "All three candle requests in this activity use the **same** Twelve Data key.")
-B.append(("img","courseware/assets/site-twelvedata.png","Twelve Data home page — click Sign Up, then Account → API Keys to copy your key"))
+B.append(("img",".claude/skills/tertiary-course-slides/assets/site-twelvedata.png","Twelve Data home page — click Sign Up, then Account → API Keys to copy your key"))
 
 h3("Step B — Get your NewsAPI key (free)")
 steps([
@@ -366,7 +366,7 @@ steps([
     "Register with your email (choose the free **Developer** plan).",
     "Your key appears on your account page at **https://newsapi.org/account** — copy it.",
 ])
-B.append(("img","courseware/assets/site-newsapi.png","NewsAPI home page — click Get API Key and register for the free Developer plan"))
+B.append(("img",".claude/skills/tertiary-course-slides/assets/site-newsapi.png","NewsAPI home page — click Get API Key and register for the free Developer plan"))
 
 h3("Step C — Put the keys into the workflow")
 p("Import `Activity6-Finance-Advisor.json` into n8n, then set the keys. **Twelve Data** and **NewsAPI** are "
@@ -418,7 +418,7 @@ bullets([
     "**Embeddings** — each chunk of a document becomes a vector (a list of numbers capturing meaning).",
     "**Vector store** — those vectors are saved so the most relevant chunks can be retrieved for a question.",
 ])
-B.append(("img", "courseware/assets/rag-flow.png",
+B.append(("img", ".claude/skills/tertiary-course-slides/assets/rag-flow.png",
           "How RAG works — User → Prompt → Data Retrieval (search/retrieve over your data sources) → Generator → Response"))
 B.append(("img","labs/activity7-rag/Activity7a-RAG-Telegram.png","Activity 7a workflow — PDF ingestion path (Upload Webhook → Gemini Embeddings → Simple Vector Store) and Telegram chat path (AI Agent + knowledge_base tool)"))
 h3("Step 1 — Import the workflow and connect credentials")
@@ -697,7 +697,7 @@ p("You're done — congratulations! Keep your local n8n running to continue buil
 # ============================================================================
 # RENDERERS
 # ============================================================================
-VERSION = "6.2"
+VERSION = "6.3"
 VERSIONS = [
     ("1.0", "2 Feb 2023", "First version", "Dr. Alfred Ang"),
     ("2.0", "16 June 2025", "Updated course title and content", "Tertiary Infotech Pte Ltd"),
@@ -726,6 +726,9 @@ VERSIONS = [
                            "chunks (one brochure = one vector); CX Agent webhook fixed to POST + Respond to "
                            "Webhook with a Pinecone retriever tool and Gemini chat model; added the matching "
                            "upload/retrieval namespace rule; new workflow screenshots",
+     "Tertiary Infotech Academy Pte Ltd"),
+    ("6.3", "3 July 2026", "Relocated courseware assets and build scripts into the .claude/skills folder; "
+                           "updated embedded image links accordingly (no content changes)",
      "Tertiary Infotech Academy Pte Ltd"),
 ]
 

@@ -45,12 +45,12 @@ COURSE_CODE = "TGS-2023035977"                    # <<Course Code, e.g. TGS-XXXX
 # ────────────────────────────────────────────────────────────────────────────
 OUT   = os.path.join(REPO, "assessment")
 
-# Logos: prefer the course's own courseware/assets, else fall back to the copies bundled
+# Logos: prefer the course's own .claude/skills/tertiary-course-slides/assets, else fall back to the copies bundled
 # in this skill (so the assessment builds even outside this project). Replace the course
 # logo per course; the Tertiary Infotech logo is the same for every WSQ course.
 def _logo(name):
     here = os.path.dirname(os.path.abspath(__file__))
-    for p in (os.path.join(REPO, "courseware/assets", name), os.path.join(here, "assets", name)):
+    for p in (os.path.join(REPO, ".claude/skills/tertiary-course-slides/assets", name), os.path.join(here, "assets", name)):
         if os.path.exists(p):
             return p
     return None

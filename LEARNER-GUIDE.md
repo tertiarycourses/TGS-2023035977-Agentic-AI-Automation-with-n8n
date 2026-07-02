@@ -1,6 +1,6 @@
 # Agentic AI Automation with n8n — Step-by-Step Learner Guide
 
-**Course Code:** TGS-2023035977  ·  **Version 6.2**  ·  Tertiary Infotech Academy Pte Ltd
+**Course Code:** TGS-2023035977  ·  **Version 6.3**  ·  Tertiary Infotech Academy Pte Ltd
 
 ### Document Version Control Record
 
@@ -14,6 +14,7 @@
 | 6.0 | 1 July 2026 | Replaced Activity 7 with two new RAG labs: Activity 7a — RAG chatbot (web PDF upload → in-memory vector store → Telegram Q&A on an IT-Support FAQ); Activity 7b — customer-support RAG agent for a training center across three vector databases (Supabase pgvector, Pinecone, Qdrant); new workflow screenshots | Tertiary Infotech Academy Pte Ltd |
 | 6.1 | 1 July 2026 | Added a page-numbered Table of Contents; embedded real n8n flow screenshots and activity website screenshots for every activity (5, 6, 7a, 7b, 8, capstone); expanded step-by-step detail; aligned the Learner Guide (DOCX + Markdown) with the slides, Lesson Plan and lab workflows | Tertiary Infotech Academy Pte Ltd |
 | 6.2 | 3 July 2026 | Updated Activity 7b to the fixed lab flows: Pinecone ingestion + CX Agent now use Google Gemini gemini-embedding-001 embeddings (3072-dim index) with whole-brochure chunks (one brochure = one vector); CX Agent webhook fixed to POST + Respond to Webhook with a Pinecone retriever tool and Gemini chat model; added the matching upload/retrieval namespace rule; new workflow screenshots | Tertiary Infotech Academy Pte Ltd |
+| 6.3 | 3 July 2026 | Relocated courseware assets and build scripts into the .claude/skills folder; updated embedded image links accordingly (no content changes) | Tertiary Infotech Academy Pte Ltd |
 
 ## Table of Contents
 
@@ -385,7 +386,7 @@ Combine **APIs/HTTP Requests** with an AI agent. Ask the Telegram bot about a st
 
 > **Note:** The free Twelve Data plan allows ~8 requests/minute and ~800 calls/day — plenty for testing. All three candle requests in this activity use the **same** Twelve Data key.
 
-![Twelve Data home page — click Sign Up, then Account → API Keys to copy your key](courseware/assets/site-twelvedata.png)
+![Twelve Data home page — click Sign Up, then Account → API Keys to copy your key](.claude/skills/tertiary-course-slides/assets/site-twelvedata.png)
 
 *Twelve Data home page — click Sign Up, then Account → API Keys to copy your key*
 
@@ -395,7 +396,7 @@ Combine **APIs/HTTP Requests** with an AI agent. Ask the Telegram bot about a st
 2. Register with your email (choose the free **Developer** plan).
 3. Your key appears on your account page at **https://newsapi.org/account** — copy it.
 
-![NewsAPI home page — click Get API Key and register for the free Developer plan](courseware/assets/site-newsapi.png)
+![NewsAPI home page — click Get API Key and register for the free Developer plan](.claude/skills/tertiary-course-slides/assets/site-newsapi.png)
 
 *NewsAPI home page — click Get API Key and register for the free Developer plan*
 
@@ -453,7 +454,7 @@ Build the **complete RAG loop** with no-code blocks. A single web page extracts 
 - **Embeddings** — each chunk of a document becomes a vector (a list of numbers capturing meaning).
 - **Vector store** — those vectors are saved so the most relevant chunks can be retrieved for a question.
 
-![How RAG works — User → Prompt → Data Retrieval (search/retrieve over your data sources) → Generator → Response](courseware/assets/rag-flow.png)
+![How RAG works — User → Prompt → Data Retrieval (search/retrieve over your data sources) → Generator → Response](.claude/skills/tertiary-course-slides/assets/rag-flow.png)
 
 *How RAG works — User → Prompt → Data Retrieval (search/retrieve over your data sources) → Generator → Response*
 

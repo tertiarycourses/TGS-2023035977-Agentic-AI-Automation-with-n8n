@@ -15,7 +15,7 @@ NAVY=RGBColor(0x0B,0x12,0x20); BLUE=RGBColor(0x1F,0x6F,0xEB); TEAL=RGBColor(0x10
 AMBER=RGBColor(0xF5,0x9E,0x0B); INK=RGBColor(0x16,0x1B,0x26); GREY=RGBColor(0x5B,0x63,0x72)
 LIGHT=RGBColor(0xF5,0xF8,0xFC); WHITE=RGBColor(0xFF,0xFF,0xFF); LINE=RGBColor(0xE2,0xE8,0xF0)
 VIOLET=RGBColor(0x7C,0x3A,0xED)
-VERSION="v43"; VERSION_DATE="3 July 2026"
+VERSION="v44"; VERSION_DATE="3 July 2026"
 # ─── EDIT PER COURSE ─────────────────────────────────────────────
 TITLE       = "Agentic AI Automation with n8n"   # <<Course Title>>
 COURSE_CODE = "TGS-2023035977"                    # <<Course Code, e.g. TGS-XXXXXXXXXX>>
@@ -68,8 +68,8 @@ def head(s,title,kicker=None,kcolor=BLUE):
     txt(s,Inches(0.8),y,Inches(12.0),Inches(0.85),[[(title,29,INK,True)]])
     rect(s,Inches(0.8),Inches(1.55),Inches(12.0),Pt(2),LINE)
 
-ASSETS=f"{REPO}/courseware/assets"
-# Logo lookup: prefer the course's courseware/assets, else the copies bundled in this skill.
+ASSETS=f"{REPO}/.claude/skills/tertiary-course-slides/assets"
+# Logo lookup: prefer the course's .claude/skills/tertiary-course-slides/assets, else the copies bundled in this skill.
 _SKILL_ASSETS=_os.path.join(_os.path.dirname(_os.path.abspath(__file__)),"assets")
 def _logo(name):
     for base in (ASSETS,_SKILL_ASSETS):
@@ -91,9 +91,8 @@ def cover():
     rect(s,Inches(0.92),Inches(4.3),Inches(2.4),Inches(0.06),TEAL)
     txt(s,Inches(0.9),Inches(4.65),Inches(12),Inches(1.4),
         [[(f"WSQ Course Code: {COURSE_CODE}",16,GREY,False)],
-         [("Conducted by Tertiary Infotech Academy Pte Ltd  ·  UEN 201200696W",14,GREY,False)]],space=6)
-    txt(s,Inches(0.9),Inches(6.55),Inches(12),Inches(0.4),
-        [[(f"Version {VERSION}  ·  {VERSION_DATE}",12,GREY,False)]])
+         [("Conducted by Tertiary Infotech Academy Pte Ltd  ·  UEN 201200696W",14,GREY,False)],
+         [(f"Version {VERSION}  ·  {VERSION_DATE}",14,BLUE,True)]],space=6)
     txt(s,Inches(0.9),Inches(6.55),Inches(12),Inches(0.34),[[("© 2026 Tertiary Infotech Academy Pte Ltd. All rights reserved.  ·  www.tertiarycourses.com.sg",10,GREY,False)]])
 def section(kicker,title,n,sub=""):
     s=slide(); rect(s,0,0,SW,SH,WHITE)
@@ -261,7 +260,7 @@ cards3("Features of n8n",[
  (TEAL,"Run anywhere",["Cloud or self-host (Docker)","Webhooks, schedules, queues","Version & export workflows"]),
  (VIOLET,"AI-native",["AI Agent + LangChain nodes","Memory, tools, RAG, MCP","Use any LLM (OpenAI, Gemini...)"])],kicker="FEATURES")
 big_statement("One canvas to connect apps, data and AI.","n8n lets you automate work and build AI agents without gluing code together by hand.","WHY USE n8n",color=BLUE)
-website_slide("n8n.io",IMG("courseware/assets/site-n8n.png"),
+website_slide("n8n.io",IMG(".claude/skills/tertiary-course-slides/assets/site-n8n.png"),
  ["n8n is an open, fair-code workflow automation platform.","Free cloud trial at n8n.io, or self-host with Docker.","Same visual editor in both."],
  kicker="THE PLATFORM")
 content("Why Automate?",[
@@ -304,7 +303,7 @@ content("The n8n Editor",[
  "Node panel — search 400+ nodes by name.",
  "Execute Workflow — run and inspect data at each step.",
  "Each node shows input and output data as JSON."],kicker="UI TOUR")
-img_slide("The n8n Editor",IMG("courseware/assets/n8n-editor.png"),
+img_slide("The n8n Editor",IMG(".claude/skills/tertiary-course-slides/assets/n8n-editor.png"),
  "n8n canvas: left sidebar navigation · centre canvas · node toolbar · Editor / Executions / Evaluations tabs",
  kicker="UI TOUR")
 two_col("n8n Nodes",[
@@ -323,7 +322,7 @@ two_col("Triggers Available in n8n",[
  ("Email (IMAP) - on new email",0),
  ("App triggers - Gmail, Sheets, Notion, ...",0)],
  kicker="WHEN A WORKFLOW RUNS",lhead="Core triggers",rhead="Chat & app triggers")
-img_slide("Triggers Available in n8n",IMG("courseware/assets/n8n-triggers.png"),
+img_slide("Triggers Available in n8n",IMG(".claude/skills/tertiary-course-slides/assets/n8n-triggers.png"),
  "n8n trigger nodes: Manual · Schedule · WhatsApp · Telegram · Gmail · Chat · Form · Webhook",
  kicker="WHEN A WORKFLOW RUNS")
 two_col("Key Nodes in n8n",[
@@ -338,7 +337,7 @@ two_col("Key Nodes in n8n",[
  ("Vector Store - RAG retrieval",0),
  ("Respond to Webhook - reply to caller",0)],
  kicker="THE WORKHORSE NODES",lhead="Actions",rhead="Logic & AI")
-img_slide("Key Nodes in n8n",IMG("courseware/assets/n8n-key-nodes.png"),
+img_slide("Key Nodes in n8n",IMG(".claude/skills/tertiary-course-slides/assets/n8n-key-nodes.png"),
  "If · Switch · Filter · Edit Fields · Split Out · Aggregate · Merge · Loop · Date & Time · Execute Workflow · Wait · Code",
  kicker="THE WORKHORSE NODES")
 content("Triggers and Actions",[
@@ -368,7 +367,7 @@ content("Pin Data & Execution History",[
  "Pin data to freeze a node's output while you build downstream nodes.",
  "Edit output to test different scenarios without re-running triggers.",
  "Execution History shows every run, its data, and any errors."],kicker="DEBUGGING")
-img_slide("Pin Data & Execution History",IMG("courseware/assets/n8n-execution-history.png"),
+img_slide("Pin Data & Execution History",IMG(".claude/skills/tertiary-course-slides/assets/n8n-execution-history.png"),
  "Execution History tab — each run shows status, duration, ID and the full data at every node",
  kicker="DEBUGGING")
 content("Transforming Data",[
@@ -521,7 +520,7 @@ content("What is a Webhook?",[
  "A Webhook is a URL that external systems call to trigger your workflow.",
  "Use cases: website chat, form submissions, payments, app notifications.",
  "Pair the Webhook trigger with a Respond to Webhook node to reply."],kicker="CONCEPT")
-img_slide("What is a Webhook?",IMG("courseware/assets/n8n-webhook.png"),
+img_slide("What is a Webhook?",IMG(".claude/skills/tertiary-course-slides/assets/n8n-webhook.png"),
  "Webhook node starts the workflow when called · Respond to Webhook node returns data back to the caller",
  kicker="CONCEPT")
 content("How a Webhook Works",[
@@ -601,13 +600,13 @@ content("HTTP Request Node",[
  "Configure method, URL, headers and query parameters.",
  "Store API keys in credentials, never hard-coded.",
  "Parse the JSON response and pass fields to the next node."],kicker="IN n8n")
-img_slide("HTTP Request Node",IMG("courseware/assets/n8n-http-request.png"),
+img_slide("HTTP Request Node",IMG(".claude/skills/tertiary-course-slides/assets/n8n-http-request.png"),
  "HTTP Request node — makes an HTTP request and returns the response data",
  kicker="IN n8n")
 K5="TOPIC 4 · API & HTTP"
-website_slide("Twelve Data",IMG("courseware/assets/site-twelvedata.png"),
+website_slide("Twelve Data",IMG(".claude/skills/tertiary-course-slides/assets/site-twelvedata.png"),
  ["Twelve Data provides live stock / forex / crypto market data.","Sign up (free Basic plan), then Account -> API Keys.","Paste the apikey into the 3 'candles' HTTP nodes."],kicker="MARKET DATA API")
-website_slide("NewsAPI",IMG("courseware/assets/site-newsapi.png"),
+website_slide("NewsAPI",IMG(".claude/skills/tertiary-course-slides/assets/site-newsapi.png"),
  ["NewsAPI returns recent news articles for a search query.","Register (free Developer plan) and copy your API key.","Store it as a Query Auth credential (name = apiKey) on the news node."],kicker="NEWS API")
 activity_block(dict(tag="ACT 6",title="Activity 6 — Finance API → Telegram (AI Day-Trading Agent)",kicker=K5,
  desc="Ask the Telegram bot about a stock; it resolves the ticker, pulls candles from Twelve Data and headlines from NewsAPI, and replies with a Buy/Sell/Hold call and reasoning.",
@@ -652,7 +651,7 @@ content("Vector Database",[
  "Vectors are stored in a vector store (in-memory, Pinecone, etc.).",
  "At query time, the question is embedded and the closest chunks are retrieved.",
  "Those chunks are given to the LLM as context to answer."],kicker="VECTOR STORE")
-img_slide("How RAG Works",IMG("courseware/assets/rag-flow.png"),
+img_slide("How RAG Works",IMG(".claude/skills/tertiary-course-slides/assets/rag-flow.png"),
           "User → Prompt → Data Retrieval (search/retrieve over your data sources) → Generator → Response",
           kicker="TOPIC 5 · RAG")
 K3="TOPIC 5 · RAG"
@@ -690,7 +689,7 @@ content("Embedding Model Sets the Dimension",[
  "The Pinecone flow & CX Agent embed with Google Gemini gemini-embedding-001 → 3072-dim.",
  "The store's dimension MUST equal the embedding model's output dimension.",
  "Mismatched dimensions are the #1 cause of failed inserts."],kicker="DIMENSION RULE")
-website_slide("Pinecone — Example Managed Store",IMG("courseware/assets/site-pinecone.png"),
+website_slide("Pinecone — Example Managed Store",IMG(".claude/skills/tertiary-course-slides/assets/site-pinecone.png"),
  ["Pinecone is a managed (cloud) vector database for RAG.","Free 'Starter' tier is enough for this lab.","Create an index: Dimensions = 3072 (Gemini), Metric = cosine."],
  kicker="VECTOR DATABASE")
 
