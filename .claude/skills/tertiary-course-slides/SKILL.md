@@ -45,3 +45,14 @@ Every content update to a courseware artifact MUST, in the same change:
 3. **Regenerate the outputs**, remove (`git rm`) the superseded versioned files, and update any references to the versioned filename (README, slides that cite the document, etc.).
 
 Never regenerate an artifact with content changes while keeping the old version number.
+
+## HARD RULES — WSQ deck admin slides (non-negotiable)
+
+Every WSQ slide deck built with this skill MUST satisfy all of the following:
+
+1. **About the Trainer — always TWO slides, as visual profile cards** (avatar badge + name/role panel + labelled info tiles — never plain bullets): first a blank **General Trainer** template (grey theme, "?" avatar, fill-in lines: Name, Title/Designation, Qualifications, Areas of expertise, Training & industry experience, Contact) for the trainer to complete, then the **named trainer** (accent theme, initials avatar, filled tiles).
+2. **Assessment Flow — a horizontal numbered flow diagram** (numbered chips joined by chevrons): TRAQOM → Assessment digital attendance → Sit WA then PP → Submit on the LMS → Sign the Assessment Summary Record.
+3. **TRAQOM · SSG Digital Attendance slide** at the FRONT of the deck and repeated at the END.
+4. **Assessment admin pages repeated at the END**, immediately before Thank You, in this order: Assessment (reminder) → Assessment Flow (flow diagram) → Digital Attendance (Mandatory).
+5. **Briefing for Assessment comes BEFORE the Assessment slide** in the front admin section.
+6. **Use the wsq-slides visual components everywhere** (tile_grid, flow_h, trainer_slide, cards, flows — port them from the wsq-slides skill's reference/build_slides.py); never hand-roll plain bullet walls for admin slides (Ground Rules, Learning Outcomes, etc.).

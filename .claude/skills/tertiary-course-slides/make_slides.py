@@ -9,13 +9,14 @@ from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
 
 import os as _os
+import math
 REPO = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))
 
 NAVY=RGBColor(0x0B,0x12,0x20); BLUE=RGBColor(0x1F,0x6F,0xEB); TEAL=RGBColor(0x10,0xB9,0x81)
 AMBER=RGBColor(0xF5,0x9E,0x0B); INK=RGBColor(0x16,0x1B,0x26); GREY=RGBColor(0x5B,0x63,0x72)
 LIGHT=RGBColor(0xF5,0xF8,0xFC); WHITE=RGBColor(0xFF,0xFF,0xFF); LINE=RGBColor(0xE2,0xE8,0xF0)
 VIOLET=RGBColor(0x7C,0x3A,0xED)
-VERSION="v44"; VERSION_DATE="3 July 2026"
+VERSION="v45"; VERSION_DATE="3 July 2026"
 # ─── EDIT PER COURSE ─────────────────────────────────────────────
 TITLE       = "Agentic AI Automation with n8n"   # <<Course Title>>
 COURSE_CODE = "TGS-2023035977"                    # <<Course Code, e.g. TGS-XXXXXXXXXX>>
@@ -205,24 +206,91 @@ content("Digital Attendance (Mandatory)",[
  "The trainer/administrator will display the digital attendance QR code generated from the SSG portal.",
  "Scan the QR code with your mobile phone camera and submit your attendance.",
  "A minimum of 75% attendance is required to be eligible for assessment and funding."],kicker="TRAQOM · SSG DIGITAL ATTENDANCE")
-content("About the Trainer",[
- "Dr. Alfred Ang — Principal Trainer, Tertiary Infotech Academy Pte. Ltd.",
- "PhD; specialises in Artificial Intelligence, automation and software engineering.",
- "Designs and delivers WSQ courses on AI agents, automation (n8n) and app development.",
- "Founder and lead instructor at Tertiary Infotech / Tertiary Courses."],kicker="YOUR TRAINER")
+# --- About the Trainer — ALWAYS two profile-card slides (wsq-slides hard rule):
+#     a blank General Trainer template + the named trainer. Never plain bullets.
+PALETTE=[BLUE,TEAL,VIOLET,AMBER]
+def trainer_slide(kicker,name,role,rows,initials,accent=BLUE):
+    """Profile-card layout: avatar badge + name/role panel on the left, labelled
+    info tiles on the right. rows: list of (LABEL, value); blank value → fill-in line."""
+    s=slide(); head(s,"About the Trainer",kicker=kicker,kcolor=accent)
+    lx=Inches(0.85); lw=Inches(3.65)
+    rect(s,lx,Inches(1.95),lw,Inches(4.7),LIGHT); rect(s,lx,Inches(1.95),lw,Inches(0.12),accent)
+    bd=Inches(1.7); ax=int(lx+(lw-bd)/2)
+    oval(s,ax,Inches(2.5),bd,bd,accent)
+    txt(s,ax,Inches(2.5),bd,bd,[[(initials,44,WHITE,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
+    txt(s,lx+Inches(0.15),Inches(4.55),lw-Inches(0.3),Inches(0.6),[[(name,21,INK,True)]],align=PP_ALIGN.CENTER)
+    txt(s,lx+Inches(0.15),Inches(5.2),lw-Inches(0.3),Inches(1.2),[[(role,13,GREY,False)]],align=PP_ALIGN.CENTER)
+    rx=Inches(4.9); rw=Inches(7.6); ry=Inches(1.95); rh=Inches(4.7)
+    n=len(rows); gy=Inches(0.2); th=int((rh-gy*(n-1))/n)
+    for i,(label,val) in enumerate(rows):
+        y=int(ry+(th+gy)*i); col=PALETTE[i%len(PALETTE)]
+        rect(s,rx,y,rw,th,LIGHT); rect(s,rx,y,Inches(0.1),th,col)
+        vruns=[(val,14,INK,False)] if val else [("____________________________________________",13,LINE,False)]
+        txt(s,rx+Inches(0.32),y,rw-Inches(0.6),th,
+            [[(label.upper(),11,col,True)],vruns],anchor=MSO_ANCHOR.MIDDLE,space=3)
+    footer(s); return s
+trainer_slide("YOUR TRAINER · GENERAL","Your Trainer","General Trainer template —\nto be completed by the trainer",
+ [("Name",""),("Title / Designation",""),("Qualifications",""),
+  ("Areas of expertise",""),("Training & industry experience",""),("Contact","")],
+ initials="?",accent=GREY)
+trainer_slide("YOUR TRAINER","Dr. Alfred Ang","Principal Trainer\nTertiary Infotech Academy Pte. Ltd.",
+ [("Role","Principal Trainer, Tertiary Infotech Academy Pte. Ltd."),
+  ("Qualifications","PhD — specialises in AI, automation and software engineering."),
+  ("Delivers","WSQ courses on AI agents, automation (n8n) and app development."),
+  ("Founder","Founder and lead instructor at Tertiary Infotech / Tertiary Courses.")],
+ initials="AA",accent=BLUE)
+def tile_grid(title,items,kicker=None,cols=2,size=15,icons=None,accent=BLUE):
+    """Grid of light panels, each with a coloured icon/number badge + text (wsq-slides component)."""
+    s=slide(); head(s,title,kicker=kicker,kcolor=accent)
+    n=len(items); rows=math.ceil(n/cols)
+    X0=Inches(0.85); Y0=Inches(1.95); TOTW=Inches(11.63); AREAH=Inches(4.78)
+    gx=Inches(0.3); gy=Inches(0.26)
+    cw=int((TOTW-gx*(cols-1))/cols); ch=int((AREAH-gy*(rows-1))/rows)
+    bd=Inches(0.6)
+    for i,it in enumerate(items):
+        r=i//cols; c=i%cols
+        x=int(X0+(cw+gx)*c); y=int(Y0+(ch+gy)*r); col=PALETTE[i%len(PALETTE)]
+        rect(s,x,y,cw,ch,LIGHT); rect(s,x,y,Inches(0.1),ch,col)
+        oval(s,x+Inches(0.28),int(y+ch/2-bd/2),bd,bd,col)
+        ic=icons[i] if icons else str(i+1)
+        txt(s,x+Inches(0.28),int(y+ch/2-bd/2),bd,bd,[[(ic,19,WHITE,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
+        tx=x+Inches(1.08); tw=cw-Inches(1.32)
+        txt(s,tx,int(y+Inches(0.1)),tw,int(ch-Inches(0.16)),[[(it,size,INK,False)]],anchor=MSO_ANCHOR.MIDDLE)
+    footer(s); return s
+def flow_h(title,steps,kicker=None,color=BLUE):
+    """Horizontal numbered flow: coloured chips connected by chevrons (wsq-slides component)."""
+    s=slide(); head(s,title,kicker=kicker,kcolor=color)
+    n=len(steps); X0=Inches(0.85); TOTW=Inches(11.63); gap=Inches(0.34)
+    cw=int((TOTW-gap*(n-1))/n); y=Inches(2.55); ch=Inches(3.15); bd=Inches(0.82)
+    for i,st in enumerate(steps):
+        x=int(X0+(cw+gap)*i)
+        rect(s,x,y,cw,ch,LIGHT); rect(s,x,y,cw,Inches(0.1),color)
+        oval(s,int(x+cw/2-bd/2),int(y+Inches(0.42)),bd,bd,color)
+        txt(s,int(x+cw/2-bd/2),int(y+Inches(0.42)),bd,bd,[[(str(i+1),30,WHITE,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
+        txt(s,x+Inches(0.16),int(y+Inches(1.55)),cw-Inches(0.32),int(ch-Inches(1.7)),[[(st,14,INK,False)]],align=PP_ALIGN.CENTER)
+        if i<n-1:
+            txt(s,int(x+cw-Inches(0.04)),int(y+ch/2-Inches(0.3)),int(gap+Inches(0.08)),Inches(0.6),
+                [[("▶",15,color,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
+    footer(s); return s
 content("Let's Know Each Other",[
  "Your name and organisation / role.",
  "Your experience with automation or AI tools (if any).",
  "What you want to automate after this course."],kicker="ICE-BREAKER")
-content("Ground Rules",[
+tile_grid("Ground Rules",[
  "Set your mobile phone to silent mode.","Participate actively — no question is too small.",
  "Mutual respect: agree to disagree.","One conversation at a time.",
- "Be punctual; return from breaks on time.","Step out quietly for calls or toilet breaks.",
- "75% attendance is required."])
+ "Be punctual; return from breaks on time.","75% attendance is required."],
+ kicker="HOUSEKEEPING",cols=2,size=15)
 content("LMS / TMS",[
  "Access your course materials, attendance and assessment on the LMS/TMS portal.",
  "Portal: https://lms-tms.tertiaryinfotech.com",
  "Download the slides and Learner Guide for reference during the open-book assessment."],kicker="COURSE PORTAL")
+tile_grid("Download the Course Flows (GitHub)",[
+ "Open the course repo: github.com/tertiarycourses/TGS-2023035977-Agentic-AI-Automation-with-n8n",
+ "Code ▾ → Download ZIP (or git clone) — all workflows are in the labs/ folder.",
+ "In n8n: Workflows → Add workflow → ⋯ → Import from File → pick the activity .json.",
+ "After importing, re-select YOUR OWN credentials on each node, then Save & Publish."],
+ kicker="GET THE WORKFLOWS",cols=1,size=15)
 two_col("Lesson Plan — 3 Days, 8 hours/day",[
  ("Day 1 — Workflow Automation + AI Agents",0),("Topic 1: n8n basics + Activities 1, 2, 3a, 3b",1),
  ("Topic 2: AI Agents — Activities 4a, 4b",1),("Day 2 — Webhooks + API",0),
@@ -232,21 +300,28 @@ two_col("Lesson Plan — 3 Days, 8 hours/day",[
  ("Topic 7: Mini Capstone + presentations",1),("Daily timing",0),
  ("9:30am–6:30pm · 1-hour lunch",1),("Short tea breaks within each day",1)],
  kicker="SCHEDULE",lhead="Days 1–2",rhead="Day 3 & timing")
-content("Learning Outcomes",[
+tile_grid("Learning Outcomes",[
  "LO1: Build automated workflows in n8n using triggers, actions, nodes and flows.",
  "LO2: Design AI agents with LLMs, memory and tools, triggered from chat / Telegram.",
  "LO3: Apply Retrieval-Augmented Generation (RAG) to ground agents in your documents.",
  "LO4: Integrate external systems via webhooks, APIs and HTTP requests.",
- "LO5: Apply human-in-the-loop and guardrails to secure agentic automations."],kicker="WHAT YOU'LL ACHIEVE")
-content("Assessment",[
- "Written Assessment (SAQ) — 1 hour.","Practical Performance (PP) — 1 hour.",
- "Format: Open Book — slides, Learner Guide and approved materials only.",
- "A mini capstone project is presented on Day 3.","An appeal process is available if required."],kicker="FINAL ASSESSMENT")
+ "LO5: Apply human-in-the-loop and guardrails to secure agentic automations."],
+ kicker="WHAT YOU'LL ACHIEVE",cols=1,size=15)
 content("Briefing for Assessment",[
  "Place phones and other materials under the table or on the floor.",
  "No photos or recording of assessment scripts.","No discussion during the assessment.",
  "Use a black/blue pen for hard-copy assessments.","No liquid paper / correction tape.",
  "Scripts are collected when time is up."])
+content("Assessment",[
+ "Written Assessment (SAQ) — 1 hour.","Practical Performance (PP) — 1 hour.",
+ "Format: Open Book — slides, Learner Guide and approved materials only.",
+ "A mini capstone project is presented on Day 3.","An appeal process is available if required."],kicker="FINAL ASSESSMENT")
+flow_h("Assessment Flow",[
+ "TRAQOM survey — scan the QR code on the LMS",
+ "Assessment digital attendance — scan the SSG QR",
+ "Sit WA (SAQ) then PP — open book",
+ "Submit your answers on the LMS",
+ "Sign the Assessment Summary Record"],kicker="ON ASSESSMENT DAY")
 
 # ---------- TOPIC 1: WORKFLOW AUTOMATION ----------
 section("TOPIC 1","Workflow Automation with n8n","01","Triggers · Actions · Nodes · Flows")
@@ -792,6 +867,24 @@ content("Presentation & Assessment",[
  "Written Assessment (SAQ) — 1 hour · Practical Performance (PP) — 1 hour.",
  "Open book: slides, Learner Guide and approved materials.",
  "Remember to take the Assessment digital attendance (TRAQOM)."],kicker="WRAP-UP")
+
+# ---------- ASSESSMENT ADMIN (repeated at END before Thank You — wsq-slides hard rule) ----------
+content("Assessment",[
+ "Written Assessment (SAQ) — 1 hour.  Practical Performance (PP) — 1 hour.",
+ "Open book: slides, Learner Guide and approved materials only.",
+ "Remember to take the Assessment digital attendance (TRAQOM).",
+ "Submit your completed answers on the LMS at https://lms-tms.tertiaryinfotech.com/."],kicker="WRAP-UP")
+flow_h("Assessment Flow",[
+ "TRAQOM survey — scan the QR code on the LMS",
+ "Assessment digital attendance — scan the SSG QR",
+ "Sit WA (SAQ) then PP — open book",
+ "Submit your answers on the LMS",
+ "Sign the Assessment Summary Record"],kicker="ON ASSESSMENT DAY")
+content("Digital Attendance (Mandatory)",[
+ "It is mandatory to take the AM, PM and Assessment digital attendance for WSQ-funded courses.",
+ "The trainer/administrator displays the digital attendance QR code from the SSG portal.",
+ "Scan the QR code with your mobile phone camera and submit your attendance.",
+ "A minimum of 75% attendance is required to be eligible for assessment and funding."],kicker="TRAQOM · SSG DIGITAL ATTENDANCE")
 
 # ---------- CLOSING ----------
 s=slide(); rect(s,0,0,SW,SH,WHITE); rect(s,0,0,Inches(0.28),SH,BLUE)
