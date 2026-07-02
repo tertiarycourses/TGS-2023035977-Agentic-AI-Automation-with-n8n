@@ -72,7 +72,7 @@ This repository contains the complete, working lab materials for the **WSQ Agent
 | **5** | **Website Chatbot (Investment Advisor)** | Webhook trigger, CORS, `Respond to Webhook`, branded front end |
 | **6** | **Finance API → Telegram (Day Trader)** | HTTP Request, Twelve Data + NewsAPI, multi-timeframe analysis |
 | **7a** | **RAG Chatbot (PDF → Telegram)** | PDF upload, embeddings (Gemini), in-memory vector store, retrieve-as-tool |
-| **7b** | **Customer-Support RAG Agent** | Google Drive ingestion, vector databases — Supabase, Pinecone, Qdrant |
+| **7b** | **Customer-Support RAG Agent** | Google Drive ingestion, vector databases — Supabase, Pinecone (Gemini embeddings), Qdrant |
 | **8a / 8b / 8c** | **HR Service Portal (Guardrails)** | Human-in-the-loop approval, live dashboard, pre/post LLM guardrails |
 | **Capstone** | **Mini Capstone** | End-to-end build (Issue Reporting: form + image → Postgres + gallery) |
 
@@ -85,7 +85,7 @@ This repository contains the complete, working lab materials for the **WSQ Agent
 | Category | Technology |
 |----------|------------|
 | **Automation Platform** | [n8n](https://n8n.io) (cloud trial or local Docker; workflows, triggers, Data Tables) |
-| **LLM** | OpenAI (chat + `text-embedding-3-small`) and Google Gemini (chat + embeddings) |
+| **LLM** | OpenAI (chat + `text-embedding-3-small`) and Google Gemini (chat + `gemini-embedding-001`) |
 | **Agent Framework** | n8n LangChain nodes (AI Agent, Memory, Vector Store, Tools) |
 | **Vector Databases** | In-memory store · Supabase (pgvector) · Pinecone · Qdrant |
 | **Chat / Messaging** | Telegram (Bot trigger + send) |
@@ -111,7 +111,7 @@ DAY 2 — Webhooks · APIs · RAG
   Act 5  Website ─▶ Webhook ─▶ AI Agent ─▶ Respond      (Investment Advisor)
   Act 6  Telegram ─▶ HTTP (Twelve Data + NewsAPI) ─▶ AI Agent ─▶ reply  (Day Trader)
   Act 7a Web upload ─▶ Embeddings (Gemini) ─▶ Vector Store │ Telegram ─▶ Agent + knowledge_base ─▶ reply
-  Act 7b Drive ─▶ split ─▶ Embeddings (OpenAI) ─▶ Supabase / Pinecone / Qdrant │ Website ─▶ Webhook ─▶ CX Agent ─▶ reply
+  Act 7b Drive ─▶ split ─▶ Embeddings (OpenAI / Gemini) ─▶ Supabase / Pinecone / Qdrant │ Website ─▶ Webhook ─▶ CX Agent ─▶ reply
 
 DAY 3 — Security & Guardrails + Capstone
   Act 8a Form ─▶ Manager Approval (Send & Wait) ─▶ IF ─▶ confirm / decline
@@ -147,7 +147,7 @@ TGS-2023035977-Agentic-AI-Automation-with-n8n/
 │   └── mini-capstone/issue-tracking/ # Capstone: Form + image → Postgres + gallery
 │
 └── courseware/                       # Course slides, Lesson Plan + Learner Guide
-    ├── Agentic AI Automation with n8n-v42.pptx   # 3-day slide deck (+ PDF)
+    ├── Agentic AI Automation with n8n-v43.pptx   # 3-day slide deck (+ PDF)
     ├── LG-Agentic AI Automation with n8n.docx    # detailed step-by-step (+ PDF)
     └── LP-Agentic AI Automation with n8n.docx    # 3-day lesson plan (+ PDF)
 ```

@@ -35,3 +35,7 @@ reference flows/
 # Python cache
 __pycache__/
 *.pyc
+
+# WSQ assessment materials (confidential — never pushed)
+/assessment/
+/assessment\ /

@@ -15,7 +15,7 @@ NAVY=RGBColor(0x0B,0x12,0x20); BLUE=RGBColor(0x1F,0x6F,0xEB); TEAL=RGBColor(0x10
 AMBER=RGBColor(0xF5,0x9E,0x0B); INK=RGBColor(0x16,0x1B,0x26); GREY=RGBColor(0x5B,0x63,0x72)
 LIGHT=RGBColor(0xF5,0xF8,0xFC); WHITE=RGBColor(0xFF,0xFF,0xFF); LINE=RGBColor(0xE2,0xE8,0xF0)
 VIOLET=RGBColor(0x7C,0x3A,0xED)
-VERSION="v42"; VERSION_DATE="1 July 2026"
+VERSION="v43"; VERSION_DATE="3 July 2026"
 # ─── EDIT PER COURSE ─────────────────────────────────────────────
 TITLE       = "Agentic AI Automation with n8n"   # <<Course Title>>
 COURSE_CODE = "TGS-2023035977"                    # <<Course Code, e.g. TGS-XXXXXXXXXX>>
@@ -276,26 +276,23 @@ content("Setting Up n8n",[
  "See labs/n8n-installation/docker-compose.yml in the course repo."],kicker="GET READY")
 # --- n8n Cloud Account Login Details ---
 _s=slide(); head(_s,"n8n Account Login Details",kicker="YOUR LOGIN · CLOUD INSTANCE")
-rect(_s,Inches(0.85),Inches(1.85),Inches(11.6),Inches(0.5),RGBColor(0xEB,0xF4,0xFF))
-txt(_s,Inches(1.05),Inches(1.89),Inches(2.2),Inches(0.44),[[("Workspace URL",13,BLUE,True)]],anchor=MSO_ANCHOR.MIDDLE)
-txt(_s,Inches(3.3),Inches(1.89),Inches(9.0),Inches(0.44),[[("http://n8n.srv923061.hstgr.cloud:5678",14,INK,False)]],anchor=MSO_ANCHOR.MIDDLE)
-rect(_s,Inches(0.85),Inches(2.43),Inches(11.6),Inches(0.5),RGBColor(0xEB,0xF4,0xFF))
-txt(_s,Inches(1.05),Inches(2.47),Inches(2.2),Inches(0.44),[[("Password",13,BLUE,True)]],anchor=MSO_ANCHOR.MIDDLE)
-txt(_s,Inches(3.3),Inches(2.47),Inches(3.5),Inches(0.44),[[("Tertiary@888",14,TEAL,True)]],anchor=MSO_ANCHOR.MIDDLE)
-txt(_s,Inches(6.9),Inches(2.47),Inches(4.8),Inches(0.44),[[("(same for all accounts)",12,GREY,False)]],anchor=MSO_ANCHOR.MIDDLE)
-_RH=Inches(0.355); _TY=Inches(3.08)
-for _ci in range(2):
-    _bx=Inches(0.85)+_ci*Inches(6.0); _cw=Inches(5.7); _nw=Inches(0.55)
-    _ew=_cw-_nw-Inches(0.1)
-    rect(_s,_bx,_TY,_cw,_RH,BLUE)
-    txt(_s,_bx+Inches(0.05),_TY,_nw,_RH,[[("No.",11,WHITE,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
-    txt(_s,_bx+_nw+Inches(0.1),_TY,_ew,_RH,[[("Email",11,WHITE,True)]],anchor=MSO_ANCHOR.MIDDLE)
-    for _ri in range(10):
-        _no=_ci*10+_ri+1; _em=f"n8n{1000+_no:04d}@tertiaryinfotech.com"
-        _ry=_TY+_RH*(_ri+1)
-        rect(_s,_bx,_ry,_cw,_RH,LIGHT if _ri%2==0 else WHITE,line=LINE)
-        txt(_s,_bx+Inches(0.05),_ry,_nw,_RH,[[(str(_no),11,INK,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
-        txt(_s,_bx+_nw+Inches(0.1),_ry,_ew,_RH,[[(_em,11,INK,False)]],anchor=MSO_ANCHOR.MIDDLE)
+_TY=Inches(1.78); _RH=Inches(0.247); _bx=Inches(0.85)
+_wNo=Inches(0.55); _wUrl=Inches(4.95); _wEm=Inches(4.35); _wPw=Inches(1.75)
+_cols=[(_bx,_wNo,"No.",PP_ALIGN.CENTER),
+       (_bx+_wNo+Inches(0.1),_wUrl-Inches(0.1),"Workspace URL",PP_ALIGN.LEFT),
+       (_bx+_wNo+_wUrl+Inches(0.1),_wEm-Inches(0.1),"Login (Email)",PP_ALIGN.LEFT),
+       (_bx+_wNo+_wUrl+_wEm+Inches(0.1),_wPw-Inches(0.1),"Password",PP_ALIGN.LEFT)]
+rect(_s,_bx,_TY,_wNo+_wUrl+_wEm+_wPw,_RH,BLUE)
+for _cx,_cw2,_lbl,_al in _cols:
+    txt(_s,_cx,_TY,_cw2,_RH,[[(_lbl,11,WHITE,True)]],align=_al,anchor=MSO_ANCHOR.MIDDLE)
+for _ri in range(20):
+    _no=_ri+1; _acct=f"n8n{1000+_no:04d}"
+    _ry=_TY+_RH*(_ri+1)
+    rect(_s,_bx,_ry,_wNo+_wUrl+_wEm+_wPw,_RH,LIGHT if _ri%2==0 else WHITE,line=LINE)
+    for (_cx,_cw2,_lbl,_al),(_val,_c,_b) in zip(_cols,
+        [(str(_no),INK,True),(f"https://{_acct}.app.n8n.cloud/signin",BLUE,False),
+         (f"{_acct}@tertiaryinfotech.com",INK,False),("Tertiary@888",TEAL,False)]):
+        txt(_s,_cx,_ry,_cw2,_RH,[[(_val,10,_c,_b)]],align=_al,anchor=MSO_ANCHOR.MIDDLE)
 footer(_s)
 content("Credential Setup",[
  "Add credentials once under Credentials → Add credential.",
@@ -688,24 +685,24 @@ cards3("Three Vector Databases",[
  (TEAL,"Supabase (pgvector)",["Postgres + vector extension","SQL table + match function","Self-host or hosted; great if you already use Postgres"]),
  (BLUE,"Pinecone",["Fully managed SaaS","Just create an index (no schema)","Zero-ops, serverless, scales fast"]),
  (VIOLET,"Qdrant",["Open-source vector DB","Run via Docker or Qdrant Cloud","Full control / self-hosted"])],kicker="ACT 7b · CHOOSE ONE")
-content("One Embedding Model, One Dimension",[
- "All three stores ingest the same 20 brochures using OpenAI text-embedding-3-small.",
- "That model outputs 1536-dimension vectors — the store's dimension MUST equal 1536.",
- "Change the embedding model and the dimension changes too (e.g. -3-large = 3072).",
+content("Embedding Model Sets the Dimension",[
+ "Supabase & Qdrant flows embed with OpenAI text-embedding-3-small → 1536-dim vectors.",
+ "The Pinecone flow & CX Agent embed with Google Gemini gemini-embedding-001 → 3072-dim.",
+ "The store's dimension MUST equal the embedding model's output dimension.",
  "Mismatched dimensions are the #1 cause of failed inserts."],kicker="DIMENSION RULE")
 website_slide("Pinecone — Example Managed Store",IMG("courseware/assets/site-pinecone.png"),
- ["Pinecone is a managed (cloud) vector database for RAG.","Free 'Starter' tier is enough for this lab.","Create an index: Dimensions = 1536, Metric = cosine."],
+ ["Pinecone is a managed (cloud) vector database for RAG.","Free 'Starter' tier is enough for this lab.","Create an index: Dimensions = 3072 (Gemini), Metric = cosine."],
  kicker="VECTOR DATABASE")
 
 # ===== Activity 7b — Customer-support RAG agent for a training center =====
 activity_overview("ACT 7b","Activity 7b — Customer-Support RAG Agent (Cook & Bake Academy)",
  "A cooking & bakery training center's website has a support chatbot. Ingest 20 course brochures from Google Drive into a vector database, then a CX Agent answers visitor questions about course duration, fees, location and schedule — grounded in the brochures.",
- "Manual Trigger → Drive (list+download) → Split → Embeddings (OpenAI) → Vector Store   |   Website → Webhook → AI Agent + retriever → reply",
- "manualTrigger, googleDrive, textSplitter, embeddingsOpenAi, vectorStore (Supabase/Pinecone/Qdrant), agent, webhook, respondToWebhook",kicker=K3)
+ "Manual Trigger → Drive (list+download) → Split → Embeddings → Vector Store   |   Website → Webhook (POST) → AI Agent + retriever tool → Respond to Webhook",
+ "manualTrigger, googleDrive, textSplitter, embeddings (OpenAI/Gemini), vectorStore (Supabase/Pinecone/Qdrant), agent, lmChatGoogleGemini, webhook, respondToWebhook",kicker=K3)
 img_slide("Activity 7b — Ingestion Workflow",IMG("labs/activity7-rag/Activity7b-Pinecone-Upload.png"),
- "Ingestion pattern (shown: Pinecone) — list & download brochures → split → embed (OpenAI 1536-d) → upsert. Same flow for Supabase & Qdrant.",kicker=K3)
+ "Ingestion pattern (shown: Pinecone) — list & download brochures → whole-brochure split (1 brochure = 1 chunk) → embed (Gemini 3072-d) → upsert. Supabase & Qdrant use OpenAI 1536-d.",kicker=K3)
 img_slide("Activity 7b — CX Agent Workflow",IMG("labs/activity7-rag/Activity7b-CX-Agent.png"),
- "The answering agent: website webhook → retrieve from the vector store → respond to the chat widget",kicker=K3)
+ "The answering agent: website webhook (POST) → AI Agent with Pinecone retriever tool + Gemini chat model → respond to the chat widget",kicker=K3)
 website_slide("Cook & Bake Academy — Support Chatbot",IMG("labs/activity7-rag/Activity7b-website.png"),
  ["A one-page training-center site with a floating chat widget.",
   "Visitors ask about any course — duration, fee, location, schedule.",
@@ -713,14 +710,14 @@ website_slide("Cook & Bake Academy — Support Chatbot",IMG("labs/activity7-rag/
   "Set WEBHOOK_URL in script.js to your n8n CX Agent URL."],kicker="ACT 7b · THE WEBSITE")
 for i,t in enumerate([
  "Upload the 20 course brochures (labs/activity7-rag/brochures/) to a Google Drive folder named 'Course Brochures'; copy the folder ID from the URL.",
- "Choose one vector database — Supabase, Pinecone or Qdrant. All use OpenAI text-embedding-3-small (1536-dim); the store must match 1536.",
+ "Choose one vector database — Supabase, Pinecone or Qdrant. Supabase/Qdrant use OpenAI text-embedding-3-small (1536-dim); Pinecone uses Google Gemini gemini-embedding-001 (3072-dim).",
  "Supabase: create a project, enable pgvector, run the SQL to create the documents table + match_documents function, then add a Supabase credential.",
- "Pinecone: create an index 'course-brochures' (Dimensions = 1536, Metric = cosine); add a Pinecone credential.",
+ "Pinecone: create an index 'course-brochures' (Dimensions = 3072, Metric = cosine); add Pinecone + Google Gemini credentials. Upload & retrieval must use the SAME namespace (both default).",
  "Qdrant: create a cluster (Qdrant Cloud) or run via Docker; create collection 'course-brochures' (size 1536, Cosine); add a Qdrant credential.",
- "Import the matching ingestion workflow (Activity7b-Supabase / Pinecone / Qdrant-Upload.json). Set the Drive folder ID on 'List Brochures in Folder' and your OpenAI + Drive + DB credentials.",
- "Click Execute workflow — it lists, downloads, splits, embeds and upserts ~30–60 vectors. Verify the rows / vectors appear in your DB.",
- "Import Activity7b-CX-Agent.json. Point its retriever vector-store node at the same store you ingested into (same 1536-dim embeddings); add OpenAI + DB credentials.",
- "Activate and copy the Webhook production URL. Set WEBHOOK_URL in website/script.js to it.",
+ "Import the matching ingestion workflow (Activity7b-Supabase / Pinecone / Qdrant-Upload.json). Set the Drive folder ID on 'List Brochures in Folder' and your Drive + embeddings + DB credentials.",
+ "Click Execute workflow. Pinecone keeps 1 brochure = 1 chunk (similar brochures confuse retrieval if split) → exactly 20 vectors; Supabase/Qdrant upsert ~30–60 chunks.",
+ "Import Activity7b-CX-Agent.json. Point its Pinecone retriever tool at the same 'course-brochures' index — same Gemini embeddings (3072-dim) and same (default) namespace.",
+ "Activate and copy the Webhook production URL (the webhook accepts POST and replies via Respond to Webhook). Set WEBHOOK_URL in website/script.js to it.",
  "Open website/index.html, click the 💬 chat button, and ask 'How much is the sourdough course?'"],1):
     step_slide(K3,"Activity 7b — Customer-Support RAG Agent (Cook & Bake Academy)",i,10,t)
 test_slide("Activity 7b — Customer-Support RAG Agent (Cook & Bake Academy)","On the website chat widget ask 'How long is the French Pastry course?' or 'Where are you located?' — the chatbot answers grounded in the brochures retrieved from your vector database.",K3)
@@ -728,7 +725,7 @@ content("Vector Databases — Quick Comparison",[
  "Supabase (pgvector): Postgres + extension · SQL table & function · self-host or hosted · best if you already use Postgres.",
  "Pinecone: managed SaaS · just create an index · zero-ops · scales fast.",
  "Qdrant: open-source · Docker or Qdrant Cloud · full control / self-hosted.",
- "All three store the same 1536-dim OpenAI embeddings — swap the store, keep the RAG flow."],kicker="ACT 7b · RECAP")
+ "Match the store's dimension to the embedding model (OpenAI 1536 / Gemini 3072) — swap the store, keep the RAG flow."],kicker="ACT 7b · RECAP")
 brk("Lunch Break","1 hour",AMBER)
 
 # ---------- TOPIC 6: SECURITY ----------

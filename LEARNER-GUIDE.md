@@ -1,6 +1,6 @@
 # Agentic AI Automation with n8n — Step-by-Step Learner Guide
 
-**Course Code:** TGS-2023035977  ·  **Version 6.1**  ·  Tertiary Infotech Academy Pte Ltd
+**Course Code:** TGS-2023035977  ·  **Version 6.2**  ·  Tertiary Infotech Academy Pte Ltd
 
 ### Document Version Control Record
 
@@ -13,6 +13,7 @@
 | 5.0 | 26 June 2026 | Added topic-level headings (Topic 1–6) to group activities; DOCX TOC now shows a two-level hierarchy of Topics and Activities | Tertiary Infotech Academy Pte Ltd |
 | 6.0 | 1 July 2026 | Replaced Activity 7 with two new RAG labs: Activity 7a — RAG chatbot (web PDF upload → in-memory vector store → Telegram Q&A on an IT-Support FAQ); Activity 7b — customer-support RAG agent for a training center across three vector databases (Supabase pgvector, Pinecone, Qdrant); new workflow screenshots | Tertiary Infotech Academy Pte Ltd |
 | 6.1 | 1 July 2026 | Added a page-numbered Table of Contents; embedded real n8n flow screenshots and activity website screenshots for every activity (5, 6, 7a, 7b, 8, capstone); expanded step-by-step detail; aligned the Learner Guide (DOCX + Markdown) with the slides, Lesson Plan and lab workflows | Tertiary Infotech Academy Pte Ltd |
+| 6.2 | 3 July 2026 | Updated Activity 7b to the fixed lab flows: Pinecone ingestion + CX Agent now use Google Gemini gemini-embedding-001 embeddings (3072-dim index) with whole-brochure chunks (one brochure = one vector); CX Agent webhook fixed to POST + Respond to Webhook with a Pinecone retriever tool and Gemini chat model; added the matching upload/retrieval namespace rule; new workflow screenshots | Tertiary Infotech Academy Pte Ltd |
 
 ## Table of Contents
 
@@ -496,9 +497,9 @@ Build the **complete RAG loop** with no-code blocks. A single web page extracts 
 
 A cooking & bakery training center (**Cook & Bake Academy**) has a website **support chatbot**. You ingest **20 course brochures** from Google Drive into a **vector database**, then a **CX Agent** answers visitor questions about course **duration, fees, location and schedule** — grounded in the brochures. You will try **three** vector databases — **Supabase (pgvector)**, **Pinecone** and **Qdrant** — and see that the RAG flow is identical; only the store changes.
 
-![Activity 7b CX Agent — website webhook → retrieve from the vector store → respond to the chat widget](labs/activity7-rag/Activity7b-CX-Agent.png)
+![Activity 7b CX Agent — website webhook (POST) → AI Agent with a Pinecone retriever tool + Gemini chat model → respond to the chat widget](labs/activity7-rag/Activity7b-CX-Agent.png)
 
-*Activity 7b CX Agent — website webhook → retrieve from the vector store → respond to the chat widget*
+*Activity 7b CX Agent — website webhook (POST) → AI Agent with a Pinecone retriever tool + Gemini chat model → respond to the chat widget*
 
 #### Why a real vector database?
 
@@ -507,7 +508,7 @@ A cooking & bakery training center (**Cook & Bake Academy**) has a website **sup
 - **Pinecone** — fully-managed SaaS; just create an index, zero-ops.
 - **Qdrant** — open-source; run it via Docker or use Qdrant Cloud for full control.
 
-> **Note:** All three stores use OpenAI **`text-embedding-3-small` (1536 dimensions)**. The table/index/collection dimension **must** equal 1536 or inserts will fail. Change the embedding model and the dimension changes too.
+> **Note:** The **Supabase** and **Qdrant** flows embed with OpenAI **`text-embedding-3-small` (1536 dimensions)**; the **Pinecone** flow and the **CX Agent** embed with Google Gemini **`gemini-embedding-001` (3072 dimensions)**. The table/index/collection dimension **must** equal the embedding model's dimension or inserts will fail.
 
 #### Step 1 — Upload the brochures to Google Drive
 
@@ -517,7 +518,7 @@ A cooking & bakery training center (**Cook & Bake Academy**) has a website **sup
 
 #### Step 2 — Set up ONE vector database
 
-Pick **one** of the three. Each ingestion workflow is the **same shape** — **Manual Trigger → List Drive folder → Download each brochure → Recursive Character Text Splitter → Embeddings (OpenAI) → Vector Store (Insert)** — only the final **Vector Store** node changes.
+Pick **one** of the three. Each ingestion workflow is the **same shape** — **Manual Trigger → List Drive folder → Download each brochure → Text Splitter → Embeddings → Vector Store (Insert)** — only the final **Vector Store** node (and its matching embedding model) changes.
 
 #### Step 2A — Supabase (pgvector)
 
@@ -532,13 +533,17 @@ Pick **one** of the three. Each ingestion workflow is the **same shape** — **M
 
 #### Step 2B — Pinecone
 
-1. At https://app.pinecone.io create an index named **`course-brochures`**, **Dimensions = 1536**, **Metric = cosine** (serverless region).
-2. Copy your **API key** (API Keys), then add a **Pinecone API** credential in n8n.
-3. Import `Activity7b-Pinecone-Upload.json`; in the Pinecone Vector Store node select the `course-brochures` index (brochures are stored under namespace **`brochures`**).
+1. At https://app.pinecone.io create an index named **`course-brochures`**, **Dimensions = 3072** (Gemini `gemini-embedding-001`), **Metric = cosine** (serverless region).
+2. Copy your **API key** (API Keys), then add **Pinecone API** and **Google Gemini** credentials in n8n.
+3. Import `Activity7b-Pinecone-Upload.json`; in the Pinecone Vector Store node select the `course-brochures` index.
 
-![Pinecone ingestion — same flow, ending at a Pinecone Vector Store (Insert) node](labs/activity7-rag/Activity7b-Pinecone-Upload.png)
+> **Note:** **Namespace rule:** the upload flow and the CX Agent's retriever must use the **same namespace** — both are left on the **default namespace**. If you set a namespace on one side, set the identical value on the other, or the agent searches an empty namespace and returns nothing.
 
-*Pinecone ingestion — same flow, ending at a Pinecone Vector Store (Insert) node*
+> **Note:** **One brochure = one chunk:** the 20 brochures are very similar, so small chunks make retrieval mix up courses. The **Whole-Brochure Splitter** (chunk size 4000, overlap 0) keeps each brochure as a single vector, so the agent always retrieves complete brochures and never confuses one course's fees with another's.
+
+![Pinecone ingestion — whole-brochure chunks embedded with Gemini (3072-d) into a Pinecone Vector Store (Insert) node](labs/activity7-rag/Activity7b-Pinecone-Upload.png)
+
+*Pinecone ingestion — whole-brochure chunks embedded with Gemini (3072-d) into a Pinecone Vector Store (Insert) node*
 
 #### Step 2C — Qdrant
 
@@ -553,13 +558,13 @@ Pick **one** of the three. Each ingestion workflow is the **same shape** — **M
 #### Step 3 — Ingest the brochures
 
 1. Open the ingestion workflow you imported in Step 2.
-2. Set the **Drive folder ID** on **List Brochures in Folder**, and select your **Google Drive**, **OpenAI** and **vector-DB** credentials.
-3. Click **Execute workflow**. It lists, downloads, splits, embeds and upserts ~**30–60 vectors**. Verify the rows/points appear in your DB.
+2. Set the **Drive folder ID** on **List Brochures in Folder**, and select your **Google Drive**, **embeddings** (OpenAI or Gemini) and **vector-DB** credentials.
+3. Click **Execute workflow**. Supabase/Qdrant upsert ~**30–60 chunks**; Pinecone keeps one brochure per chunk, so expect exactly **20 vectors**. Verify the rows/points appear in your DB.
 
 #### Step 4 — Connect the CX Agent to the website
 
-1. Import **`Activity7b-CX-Agent.json`** (the answering workflow: Webhook → AI Agent + retriever → Respond to Webhook).
-2. Point its **retriever** vector-store node at the **same** store/index/collection you ingested into (same 1536-dim embeddings); add your OpenAI + DB credentials.
+1. Import **`Activity7b-CX-Agent.json`** (the answering workflow: Webhook (POST) → AI Agent with a Pinecone retriever tool + Google Gemini chat model → Respond to Webhook).
+2. Point its **Pinecone retriever tool** at the **same** `course-brochures` index you ingested into — same Gemini embeddings (3072-dim) and same (default) **namespace**; add your Pinecone + Google Gemini credentials.
 3. **Activate** and copy the **Webhook production URL**.
 4. In `website/script.js`, set `WEBHOOK_URL` to that URL, then open `website/index.html` and click the 💬 chat button.
 

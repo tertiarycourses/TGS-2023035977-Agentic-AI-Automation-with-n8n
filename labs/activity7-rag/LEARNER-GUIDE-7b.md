@@ -15,7 +15,7 @@ questions about course **duration, fees, locations** and more.
   (20 .txt)     └───────────────────┬─────────────────────────┘
                                     │  (Manual Trigger workflow)
                                     ▼
-        n8n: List files ► Download ► Split ► Embed (OpenAI) ► Upsert
+        n8n: List files ► Download ► Split ► Embed ► Upsert
                                     │
               ┌─────────────────────┼─────────────────────┐
               ▼                     ▼                     ▼
@@ -27,12 +27,17 @@ questions about course **duration, fees, locations** and more.
 ```
 
 You need **one** vector database to run the demo. This guide shows all three so you
-can compare them. The embedding model used is OpenAI `text-embedding-3-small`
-(**1536 dimensions**) — every vector store below must match this dimension.
+can compare them. The workflows use different embedding models:
 
-> ⚠️ **Dimension rule:** if you change the embedding model, the vector dimension
-> changes too (e.g. `text-embedding-3-large` = 3072). The DB/index/collection
-> dimension **must** equal the embedding dimension or inserts will fail.
+| Workflow | Embedding model | Dimensions |
+|----------|-----------------|------------|
+| Supabase upload | OpenAI `text-embedding-3-small` | **1536** |
+| Qdrant upload | OpenAI `text-embedding-3-small` | **1536** |
+| Pinecone upload + CX Agent | Google Gemini `gemini-embedding-001` | **3072** |
+
+> ⚠️ **Dimension rule:** the DB/index/collection dimension **must** equal the
+> embedding model's dimension or inserts will fail. If you change the embedding
+> model, the vector dimension changes too (e.g. `text-embedding-3-large` = 3072).
 
 ---
 
@@ -41,7 +46,8 @@ can compare them. The embedding model used is OpenAI `text-embedding-3-small`
 | Item | Where to get it |
 |------|-----------------|
 | n8n (cloud or self-hosted) | https://n8n.io |
-| OpenAI API key | https://platform.openai.com/api-keys |
+| OpenAI API key (Supabase / Qdrant flows) | https://platform.openai.com/api-keys |
+| Google Gemini API key (Pinecone flow + CX Agent) | https://aistudio.google.com/apikey |
 | Google Drive OAuth credential | n8n → Credentials → Google Drive OAuth2 |
 | A vector DB account | Supabase / Pinecone / Qdrant (below) |
 
@@ -114,7 +120,7 @@ create index if not exists documents_embedding_idx
    Service Role Secret = service_role key.
 
 ### Ingest
-4. Import [`n8n-workflows/1_Upload_Brochures_to_Supabase_Manual.json`](n8n-workflows/1_Upload_Brochures_to_Supabase_Manual.json),
+4. Import [`Activity7b-Supabase-Upload.json`](Activity7b-Supabase-Upload.json),
    set the Drive folder ID + credentials, and click **Execute workflow**.
 
 ---
@@ -124,7 +130,7 @@ create index if not exists documents_embedding_idx
 ### Create the index
 1. Go to https://app.pinecone.io → **Create index**.
    - **Name:** `course-brochures`
-   - **Dimensions:** `1536`
+   - **Dimensions:** `3072` (matches the Google Gemini `gemini-embedding-001` model used by this flow)
    - **Metric:** `cosine`
    - Choose a serverless region (e.g. AWS `us-east-1`).
 2. Copy your **API key** (left sidebar → API Keys).
@@ -133,10 +139,23 @@ create index if not exists documents_embedding_idx
 3. n8n → **Credentials → New → Pinecone API** → paste the API key.
 
 ### Ingest
-4. Import [`n8n-workflows/2_Upload_Brochures_to_Pinecone_Manual.json`](n8n-workflows/2_Upload_Brochures_to_Pinecone_Manual.json).
+4. Import [`Activity7b-Pinecone-Upload.json`](Activity7b-Pinecone-Upload.json).
    - In **Pinecone Vector Store (Insert)**, select the `course-brochures` index.
-   - The brochures are stored under the namespace **`brochures`** (set in node options).
 5. Set the Drive folder ID + credentials, then click **Execute workflow**.
+
+> ⚠️ **Namespace rule — upload and retrieval MUST use the same namespace.**
+> The upload flow and the CX Agent's retriever both use the **default namespace**
+> (the Namespace option is left empty in both Pinecone nodes). If you set a
+> namespace on one side (e.g. `brochures`), you must set the **identical**
+> namespace on the other side — otherwise the agent searches an empty namespace
+> and returns no results.
+
+> 💡 **One brochure = one chunk.** The 20 course brochures are very similar to
+> each other (same structure, similar wording), so splitting them into small
+> chunks makes retrieval mix up content from different courses. The flow's
+> **Whole-Brochure Splitter** uses chunk size `4000` with `0` overlap so each
+> brochure stays intact as a single vector — the agent always retrieves whole
+> brochures and never confuses one course's fees or schedule with another's.
 
 > 💡 Pinecone is fully managed and serverless — no schema/SQL needed, just the
 > index dimension + metric.
@@ -168,7 +187,7 @@ curl -X PUT http://localhost:6333/collections/course-brochures \
 3. n8n → **Credentials → New → Qdrant API** → URL + API key.
 
 ### Ingest
-4. Import [`n8n-workflows/3_Upload_Brochures_to_Qdrant_Manual.json`](n8n-workflows/3_Upload_Brochures_to_Qdrant_Manual.json),
+4. Import [`Activity7b-Qdrant-Upload.json`](Activity7b-Qdrant-Upload.json),
    select the `course-brochures` collection, set Drive folder + credentials,
    and click **Execute workflow**.
 
@@ -179,19 +198,23 @@ curl -X PUT http://localhost:6333/collections/course-brochures \
 | DB | How to check |
 |----|--------------|
 | **Supabase** | Table Editor → `documents` should have rows with `content` + `embedding`. |
-| **Pinecone** | Index → namespace `brochures` shows a non-zero vector count. |
+| **Pinecone** | Index → the **default namespace** shows a non-zero vector count. |
 | **Qdrant** | Dashboard → collection `course-brochures` → Points count > 0. |
 
-Each brochure is split into ~1–3 chunks, so expect roughly **30–60 vectors** total.
+Supabase/Qdrant split each brochure into ~1–3 chunks (**30–60 vectors** total).
+Pinecone keeps one brochure = one chunk, so expect exactly **20 vectors**.
 
 ---
 
 ## 5. Connect the Chatbot (CX Agent with RAG)
 
-1. Import / open **`CX Agent with RAG_superbase.json`** (the answering workflow).
-2. Point its **retriever** vector-store node at the same table/index/collection you
-   ingested into above, using the same embedding model (1536-dim).
-3. Copy the **Webhook / Chat Trigger production URL**.
+1. Import / open [`Activity7b-CX-Agent.json`](Activity7b-CX-Agent.json) (the answering workflow).
+   It uses a **Webhook (POST) → AI Agent → Respond to Webhook** chain, with a
+   **Pinecone retriever tool** (Gemini embeddings) and a **Google Gemini chat model**.
+2. Point its **Pinecone Vector Store** retriever at the same `course-brochures`
+   index you ingested into above — same embedding model (Gemini, 3072-dim) and
+   **same namespace** as the upload flow (both use the default namespace).
+3. **Activate** the workflow and copy the webhook **Production URL**.
 4. In [`website/script.js`](website/script.js), set:
    ```js
    const CONFIG = { WEBHOOK_URL: "https://YOUR-N8N-HOST/webhook/xxxx", ... };
@@ -219,8 +242,17 @@ Each brochure is split into ~1–3 chunks, so expect roughly **30–60 vectors**
 
 ## 7. Troubleshooting
 
-- **"expected 1536 dimensions, got N"** → embedding model ≠ DB dimension. Recreate
+- **"expected X dimensions, got N"** → embedding model ≠ DB dimension (OpenAI
+  `text-embedding-3-small` = 1536, Gemini `gemini-embedding-001` = 3072). Recreate
   the index/table/collection at the correct size, or switch the embedding model.
+- **No results from chatbot (Pinecone)** → the upload and retrieval **namespaces
+  don't match**. Check the Namespace option in both the insert node and the CX
+  Agent's Pinecone retriever — leave both empty (default namespace) or set both
+  to the identical value.
+- **Chatbot mixes up courses / quotes the wrong fees** → the brochures were split
+  into small chunks. Because the brochures are so similar, keep **one brochure =
+  one chunk** (chunk size 4000, overlap 0) so each retrieval returns a complete,
+  unambiguous brochure.
 - **No results from chatbot** → confirm the retriever points at the *same* store you
   ingested into and uses the *same* embedding model.
 - **Google Drive node returns 0 files** → wrong folder ID, or the OAuth account

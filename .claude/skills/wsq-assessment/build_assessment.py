@@ -279,17 +279,41 @@ BRIEFING = [
     "Scripts are collected when time is up.",
 ]
 
+LMS_URL = "https://lms-tms.tertiaryinfotech.com/"
+
+def add_hyperlink(p, url, text):
+    """Add a real clickable Word hyperlink (blue, underlined) to paragraph p."""
+    r_id = p.part.relate_to(
+        url, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink",
+        is_external=True)
+    link = OxmlElement("w:hyperlink"); link.set(qn("r:id"), r_id)
+    run = OxmlElement("w:r"); rPr = OxmlElement("w:rPr")
+    sz = OxmlElement("w:sz"); sz.set(qn("w:val"), "22"); rPr.append(sz)  # 11pt
+    color = OxmlElement("w:color"); color.set(qn("w:val"), "0563C1"); rPr.append(color)
+    u = OxmlElement("w:u"); u.set(qn("w:val"), "single"); rPr.append(u)
+    run.append(rPr)
+    t = OxmlElement("w:t"); t.text = text; run.append(t)
+    link.append(run); p._p.append(link)
+    return link
+
 def instructions(doc, minutes_text):
     heading(doc, "Instructions to Candidate")
+    # None marks the upload instruction, which carries a clickable LMS hyperlink.
     items = [
         "This is an individual exercise.",
         "This is an open-book assessment.",
         f"A total of {minutes_text} is given to complete this assessment.",
-        "Submit your answers on the document provided.",
+        None,
     ] + BRIEFING
     for i, s in enumerate(items, 1):
         p = doc.add_paragraph(); p.paragraph_format.space_after = Pt(4)
-        p.add_run(f"{i}.  {s}").font.size = Pt(11)
+        if s is None:
+            p.add_run(f"{i}.  Complete your answers on the document provided and "
+                      "upload the completed answers to the LMS at ").font.size = Pt(11)
+            add_hyperlink(p, LMS_URL, LMS_URL)
+            p.add_run(".").font.size = Pt(11)
+        else:
+            p.add_run(f"{i}.  {s}").font.size = Pt(11)
 
 def grading(doc, what):
     heading(doc, "Grading")

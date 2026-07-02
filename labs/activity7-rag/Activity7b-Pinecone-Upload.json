@@ -5,37 +5,45 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [-720, 240],
-      "id": "b1111111-1111-4111-8111-111111111111",
+      "position": [
+        0,
+        384
+      ],
+      "id": "a877aa7e-ec36-416a-9562-7bb26a5182f1",
       "name": "When clicking 'Execute workflow'"
     },
     {
       "parameters": {
         "resource": "fileFolder",
-        "queryString": "",
         "filter": {
           "folderId": {
             "__rl": true,
-            "value": "REPLACE_WITH_DRIVE_FOLDER_ID",
+            "value": "1tBBELUsZGzrlK4jXNp_EAt7owmRYEwOL",
             "mode": "list",
-            "cachedResultName": "Course Brochures",
-            "cachedResultUrl": "https://drive.google.com/drive/folders/REPLACE_WITH_DRIVE_FOLDER_ID"
+            "cachedResultName": "brochures",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1tBBELUsZGzrlK4jXNp_EAt7owmRYEwOL"
           }
         },
         "options": {
-          "returnAll": true,
-          "fields": ["id", "name", "mimeType"]
+          "fields": [
+            "id",
+            "name",
+            "mimeType"
+          ]
         }
       },
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
-      "position": [-500, 240],
-      "id": "b2222222-2222-4222-8222-222222222222",
+      "position": [
+        224,
+        384
+      ],
+      "id": "1b1dd686-b04b-43df-8f43-6d1d3672119f",
       "name": "List Brochures in Folder",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "REPLACE_GDRIVE_CRED",
-          "name": "Google Drive OAuth"
+          "id": "1OavGmjBWXAfi1BN",
+          "name": "Google Drive OAuth2 API"
         }
       }
     },
@@ -51,13 +59,16 @@
       },
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
-      "position": [-280, 240],
-      "id": "b3333333-3333-4333-8333-333333333333",
+      "position": [
+        448,
+        384
+      ],
+      "id": "4d5eb993-a242-435d-8f2a-76c10c29e652",
       "name": "Download Each Brochure",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "REPLACE_GDRIVE_CRED",
-          "name": "Google Drive OAuth"
+          "id": "1OavGmjBWXAfi1BN",
+          "name": "Google Drive OAuth2 API"
         }
       }
     },
@@ -70,35 +81,20 @@
           "mode": "list",
           "cachedResultName": "course-brochures"
         },
-        "options": {
-          "pineconeNamespace": "brochures"
-        }
+        "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
       "typeVersion": 1.3,
-      "position": [-20, 200],
-      "id": "b4444444-4444-4444-8444-444444444444",
+      "position": [
+        704,
+        352
+      ],
+      "id": "e735369d-f8b8-48a9-9e2b-50f50b48881b",
       "name": "Pinecone Vector Store (Insert)",
       "credentials": {
         "pineconeApi": {
-          "id": "REPLACE_PINECONE_CRED",
-          "name": "PineconeApi account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
-      "typeVersion": 1.2,
-      "position": [-100, 440],
-      "id": "b5555555-5555-4555-8555-555555555555",
-      "name": "Embeddings OpenAI",
-      "credentials": {
-        "openAiApi": {
-          "id": "REPLACE_OPENAI_CRED",
-          "name": "OpenAi account"
+          "id": "4P7nN4UFvrslSzmo",
+          "name": "Pinecone account 2"
         }
       }
     },
@@ -108,67 +104,165 @@
         "options": {
           "metadata": {
             "metadataValues": [
-              { "name": "source", "value": "={{ $('Download Each Brochure').item.json.name }}" },
-              { "name": "file_id", "value": "={{ $('Download Each Brochure').item.json.id }}" }
+              {
+                "name": "source",
+                "value": "={{ $('Download Each Brochure').item.json.name }}"
+              },
+              {
+                "name": "file_id",
+                "value": "={{ $('Download Each Brochure').item.json.id }}"
+              }
             ]
           }
-        }
+        },
+        "textSplittingMode": "custom"
       },
       "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
       "typeVersion": 1.1,
-      "position": [120, 440],
-      "id": "b6666666-6666-4666-8666-666666666666",
+      "position": [
+        848,
+        576
+      ],
+      "id": "ef565223-ee07-4e3e-96e0-8e4d1c1d1ad9",
       "name": "Default Data Loader"
     },
     {
       "parameters": {
-        "chunkSize": 1000,
-        "chunkOverlap": 150,
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
-      "typeVersion": 1,
-      "position": [180, 640],
-      "id": "b7777777-7777-4777-8777-777777777777",
-      "name": "Recursive Character Text Splitter"
-    },
-    {
-      "parameters": {
-        "content": "## Manual ingestion → Pinecone\n\n1. Upload the 20 brochures to a Google Drive folder.\n2. Set the folder ID in **List Brochures in Folder**.\n3. Pick your Google Drive, Pinecone & OpenAI credentials.\n4. In Pinecone, create an index named `course-brochures` with **dimension 1536** and metric **cosine** (see LEARNER-GUIDE.md).\n5. Click **Execute workflow** to embed & upsert all brochures into the `brochures` namespace.",
+        "content": "## Manual ingestion \u2192 Pinecone (whole-brochure chunks)\n\n1. Upload the 20 brochures to a Google Drive folder.\n2. Set the folder ID in **List Brochures in Folder**.\n3. Pick your Google Drive, Pinecone & Gemini credentials.\n4. In Pinecone, create an index named `course-brochures` with **dimension 3072** (Gemini `gemini-embedding-001` embeddings) and metric **cosine**.\n5. **If re-ingesting: delete all existing records/namespaces in the index first** to avoid duplicates and leftovers.\n6. Click **Execute workflow**. Each brochure is embedded as ONE vector into the DEFAULT namespace \u2192 20 records; the CX agent retrieves from the default namespace too (no namespace set on either side).",
         "height": 300,
         "width": 380,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [-720, -140],
-      "id": "b8888888-8888-4888-8888-888888888888",
+      "position": [
+        0,
+        0
+      ],
+      "id": "ce3fa488-6de4-4ea2-89ad-7b9ab6ebf0c5",
       "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        624,
+        560
+      ],
+      "id": "ca853f09-2e33-4c00-b2cd-617264118707",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "k7EdQ13D9mQ8Na3k",
+          "name": "Google API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkSize": 4000,
+        "chunkOverlap": 0,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        908,
+        776
+      ],
+      "id": "f3a1c2d4-5e6b-4a7c-8d9e-0f1a2b3c4d5e",
+      "name": "Whole-Brochure Splitter"
     }
   ],
   "pinData": {},
   "connections": {
     "When clicking 'Execute workflow'": {
-      "main": [[{ "node": "List Brochures in Folder", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "List Brochures in Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "List Brochures in Folder": {
-      "main": [[{ "node": "Download Each Brochure", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Download Each Brochure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Download Each Brochure": {
-      "main": [[{ "node": "Pinecone Vector Store (Insert)", "type": "main", "index": 0 }]]
-    },
-    "Embeddings OpenAI": {
-      "ai_embedding": [[{ "node": "Pinecone Vector Store (Insert)", "type": "ai_embedding", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store (Insert)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Default Data Loader": {
-      "ai_document": [[{ "node": "Pinecone Vector Store (Insert)", "type": "ai_document", "index": 0 }]]
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store (Insert)",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Recursive Character Text Splitter": {
-      "ai_textSplitter": [[{ "node": "Default Data Loader", "type": "ai_textSplitter", "index": 0 }]]
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store (Insert)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Whole-Brochure Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
-  "settings": { "executionOrder": "v1", "binaryMode": "separate" },
-  "meta": { "templatecredsSetupCompleted": false },
-  "tags": [{ "name": "RAG Ingestion" }]
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ec85d140-ac10-4c9c-af49-3823fe5baf9e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "de2fb037a4a212697beb8609c4fbff73d8e93b29e73aa61c51b0e275cb083f13"
+  },
+  "nodeGroups": [],
+  "id": "Zc9GwbM4XLxsIrP4",
+  "tags": [
+    {
+      "name": "RAG Ingestion",
+      "id": "Hc40RYGjq5G8o6P7",
+      "updatedAt": "2026-07-02T12:28:31.028Z",
+      "createdAt": "2026-07-02T12:28:31.028Z"
+    }
+  ]
 }

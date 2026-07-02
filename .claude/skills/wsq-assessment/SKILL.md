@@ -52,3 +52,13 @@ The script lives **in this skill** and runs **in place** — do NOT copy it into
 - [ ] Cover page present (no version-control record); question paper has Trainee Information, Instructions, boxed answers, and For Official Use Only.
 - [ ] Answer-key wording is guidance ("award the mark where the candidate covers…"), not a rigid script.
 - [ ] Old/mismatched assessment files (previous versions, other courses) removed from the output folder.
+
+## Versioning rule (MANDATORY — every update)
+
+Every content update to a courseware artifact MUST, in the same change:
+
+1. **Bump the version number** (and the version date) in the generator/template — e.g. `VERSION="vNN"` for slide decks (the version is also part of the output filename), `VERSION = "N.N"` plus a new `VERSIONS` entry for DOCX documents.
+2. **Document the change in the Document Version Control Record** — add a row (Version Number | Effective Date of Release | Summary of Included Changes | Author) wherever the document carries one (Learner Guide / Lesson Plan). For slide decks the bumped version must appear on the cover page and in the filename.
+3. **Regenerate the outputs**, remove (`git rm`) the superseded versioned files, and update any references to the versioned filename (README, slides that cite the document, etc.).
+
+Never regenerate an artifact with content changes while keeping the old version number.
