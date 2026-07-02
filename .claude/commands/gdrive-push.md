@@ -22,7 +22,7 @@ Push this course repo's current courseware to the user's Google Drive courseware
    python3 <skill-dir>/gdrive_push.py "<folder-link>"             # real push
    ```
 3. Show the user the dry-run plan (what gets archived and uploaded per folder:
-   Master Trainer Slides / Learner Guide / Lesson Plan / Assessment), then do the real push.
+   Master Trainer Slides / Learner Guide / Lesson Plan / Assessment / Activities). Old files always land in each folder's lowercase archive/ subfolder (created/renamed automatically), then do the real push.
 4. Report per folder: files archived → `archive/`, files uploaded, and each file's
    **anyone-with-link view link** (printed by the script). Remind the user that assessment
    answer keys are among the shared files.

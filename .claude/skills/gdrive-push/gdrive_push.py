@@ -14,10 +14,12 @@ Routing (folders matched case-insensitively under the given root; created if mis
 Change detection: files whose MD5 already matches the Drive copy are SKIPPED (no
 re-upload, no archiving). Only changed/new files are pushed.
 
-Archiving: a changed courseware file's old Drive copies (same base name ignoring the
--vNN / vN version suffix, same extension) are MOVED server-side to an "Archive"
-subfolder first. For labs, files that were changed or removed locally are MOVED to
-Activities/Archive by rclone's --backup-dir — never deleted.
+Archiving: in each courseware folder, EVERY pre-existing file that is not identical
+to a file being pushed (old versions, old names, Google-native docs) is MOVED
+server-side into that folder's "archive" subfolder first. The archive folder is
+created if absent, and any "Archive"/"archives" variant is renamed to the canonical
+lowercase "archive". For labs, changed/removed files are MOVED to Activities/archive
+by rclone's --backup-dir. Nothing is ever deleted.
 
 Every newly uploaded courseware file is set to "anyone with the link can view".
 
@@ -75,49 +77,81 @@ def find_or_create_dir(root, parent_path, canonical, hint, dry):
     return path, canonical, True
 
 
-def family_prefix(filename):
-    stem, _ = os.path.splitext(filename)
-    m = re.match(r"^(.*?)\s*[-–]?\s*v\d+\s*$", stem, re.IGNORECASE)
-    return (m.group(1).rstrip(" -–") if m else stem).lower()
+def ensure_archive(root, folder_path, dry):
+    """Return <folder>/archive, creating it if absent and renaming any Archive/archives
+    variant to the canonical lowercase 'archive'."""
+    for d in list_dirs(root, folder_path):
+        name = d["Name"]
+        if not name.strip().lower().startswith("archiv"):
+            continue
+        if name == "archive":
+            return f"{folder_path}/archive"
+        print(f"    rename: {name}/  ->  archive/")
+        if not dry:
+            if name.lower() == "archive":  # case-only rename needs a two-step move
+                rc(["moveto", f"{REMOTE}:{folder_path}/{name}", f"{REMOTE}:{folder_path}/__archive_tmp__"], root)
+                rc(["moveto", f"{REMOTE}:{folder_path}/__archive_tmp__", f"{REMOTE}:{folder_path}/archive"], root)
+            else:
+                rc(["moveto", f"{REMOTE}:{folder_path}/{name}", f"{REMOTE}:{folder_path}/archive"], root)
+        return f"{folder_path}/archive"
+    print("    create: archive/")
+    if not dry:
+        rc(["mkdir", f"{REMOTE}:{folder_path}/archive"], root)
+    return f"{folder_path}/archive"
 
 
-def push_file(root, path, folder_path, remote_files, archive_path, dry):
-    """Skip if unchanged; otherwise archive same-family Drive copies, upload, share."""
-    fn = os.path.basename(path)
-    local_md5 = md5(path)
-    same = next((f for f in remote_files if f["Name"] == fn), None)
-    if same and (same.get("Hashes") or {}).get("md5") == local_md5:
-        print(f"    unchanged: {fn} — skipped")
-        return
-    prefix = family_prefix(fn)
-    ext = os.path.splitext(fn)[1].lower()
+def push_folder(root, folder_path, files, dry):
+    """Push files into folder_path. Unchanged files are kept in place; EVERY other
+    pre-existing file in the folder (old versions, old names, Google-native docs)
+    is moved to <folder>/archive first. Nothing is ever deleted."""
+    archive_path = ensure_archive(root, folder_path, dry)
+    remote_files = list_files(root, folder_path)
+    keep, to_upload = set(), []
+    for path in files:
+        fn = os.path.basename(path)
+        same = next((f for f in remote_files if f["Name"] == fn), None)
+        if same and (same.get("Hashes") or {}).get("md5") == md5(path):
+            print(f"    unchanged: {fn} — skipped")
+            keep.add(fn)
+        else:
+            to_upload.append(path)
     for f in remote_files:
         name = f["Name"]
-        if not name.lower().endswith(ext) or not family_prefix(name).startswith(prefix):
+        if name in keep:
             continue
-        print(f"    archive: {name}  ->  {archive_path}/")
+        print(f"    archive: {name}  ->  archive/")
         if not dry:
-            rc(["moveto", f"{REMOTE}:{folder_path}/{name}", f"{REMOTE}:{archive_path}/{name}"], root)
-    print(f"    upload:  {fn}")
-    if not dry:
-        rc(["copyto", path, f"{REMOTE}:{folder_path}/{fn}"], root)
-        link = rc(["link", f"{REMOTE}:{folder_path}/{fn}"], root).strip()
-        print(f"      view link (anyone with the link): {link}")
+            try:
+                rc(["moveto", f"{REMOTE}:{folder_path}/{name}", f"{REMOTE}:{archive_path}/{name}"], root)
+            except SystemExit as e:
+                print(f"      WARNING: could not archive '{name}' — {str(e)[:200]}; continuing")
+    for path in to_upload:
+        fn = os.path.basename(path)
+        print(f"    upload:  {fn}")
+        if not dry:
+            rc(["copyto", path, f"{REMOTE}:{folder_path}/{fn}"], root)
+            link = rc(["link", f"{REMOTE}:{folder_path}/{fn}"], root).strip()
+            print(f"      view link (anyone with the link): {link}")
 
 
 def push_labs(root, labs_dir, dry):
     folder_path, real_name, created = find_or_create_dir(root, "", "Activities", "activit", dry)
-    arch_name = "Archive"
+    arch_name = "archive"
+    excludes = {arch_name}
     if not created:
-        for d in list_dirs(root, folder_path):
-            if "archiv" in d["Name"].strip().lower():
-                arch_name = d["Name"]; break
+        # remember every archiv* variant so a pending (dry-run) rename can't leak
+        # the old archive's contents into the sync plan
+        excludes |= {d["Name"] for d in list_dirs(root, folder_path)
+                     if d["Name"].strip().lower().startswith("archiv")}
+        ensure_archive(root, folder_path, dry)
     print(f"  {real_name}{' (will be created)' if created else ''}:  syncing labs/ "
           f"(changed files only; replaced/removed files -> {real_name}/{arch_name}/)")
     args = ["sync", labs_dir, f"{REMOTE}:{folder_path}",
             "--backup-dir", f"{REMOTE}:{folder_path}/{arch_name}",
-            "--exclude", f"/{arch_name}/**", "--exclude", ".DS_Store",
+            "--exclude", ".DS_Store",
             "--checksum", "-v", "--stats-log-level", "NOTICE"]
+    for e in excludes:
+        args += ["--exclude", f"/{e}/**"]
     if dry:
         args.append("--dry-run")
     out = rc(args, root)
@@ -176,12 +210,7 @@ def main():
             print(f"  {canonical}: no local files found — skipped"); continue
         folder_path, real_name, created = find_or_create_dir(root, "", canonical, hint, dry)
         print(f"  {real_name}{' (will be created)' if created else ''}:")
-        arch_path = f"{folder_path}/Archive"
-        if not (created or dry):
-            arch_path, _, _ = find_or_create_dir(root, folder_path, "Archive", "archiv", dry)
-        remote_files = [] if created else list_files(root, folder_path)
-        for path in files:
-            push_file(root, path, folder_path, remote_files, arch_path, dry)
+        push_folder(root, folder_path, files, dry)
 
     labs_dir = os.path.join(repo, "labs")
     if os.path.isdir(labs_dir):
