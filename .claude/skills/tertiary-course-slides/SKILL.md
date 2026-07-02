@@ -56,3 +56,12 @@ Every WSQ slide deck built with this skill MUST satisfy all of the following:
 4. **Assessment admin pages repeated at the END**, immediately before Thank You, in this order: Assessment (reminder) → Assessment Flow (flow diagram) → Digital Attendance (Mandatory).
 5. **Briefing for Assessment comes BEFORE the Assessment slide** in the front admin section.
 6. **Use the wsq-slides visual components everywhere** (tile_grid, flow_h, trainer_slide, cards, flows — port them from the wsq-slides skill's reference/build_slides.py); never hand-roll plain bullet walls for admin slides (Ground Rules, Learning Outcomes, etc.).
+
+## GitHub Pages — NOT used for WSQ courseware repos
+
+WSQ courseware repositories (TGS-coded course repos with `courseware/` + `labs/`) do
+**not** deploy to GitHub Pages. Do not create a `deploy-pages.yml` workflow, do not
+enable the Pages site, and skip any "deploy static site" phase for these repos. The
+repo homepage should point to the course page on www.tertiarycourses.com.sg instead.
+Lab web apps are run locally by learners (or demoed via localhost) — they don't need
+a hosted deployment.
