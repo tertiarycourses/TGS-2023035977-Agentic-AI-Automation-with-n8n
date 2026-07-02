@@ -4,8 +4,9 @@ on:
   push:
     branches: [main]
     paths:
-      - 'labs/activity6-investment-advisor/**'
-      - 'labs/activity7-finance-advisor/**'
+      - 'labs/activity5-investment-advisor/**'
+      - 'labs/activity6-finance-advisor/**'
+      - 'labs/activity7-rag/website/**'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
@@ -28,15 +29,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Assemble site (Finance Advisor at root, Investment Advisor under /investment-advisor)
+      - name: Assemble site (Finance Advisor at root; Investment Advisor + Cook & Bake RAG demo under subpaths)
         run: |
-          mkdir -p _site/investment-advisor
-          # Root = Activity 7 Finance Advisor dashboard (self-contained)
-          cp "labs/activity7-finance-advisor/index.html" _site/index.html
-          # Activity 6 Investment Advisor lead-magnet site
-          cp labs/activity6-investment-advisor/index.html _site/investment-advisor/index.html
-          cp labs/activity6-investment-advisor/script.js  _site/investment-advisor/script.js
-          cp labs/activity6-investment-advisor/style.css  _site/investment-advisor/style.css
+          mkdir -p _site/investment-advisor _site/cook-bake
+          # Root = Activity 6 Finance Advisor dashboard (self-contained)
+          cp labs/activity6-finance-advisor/index.html _site/index.html
+          # Activity 5 Investment Advisor lead-magnet site
+          cp labs/activity5-investment-advisor/index.html _site/investment-advisor/index.html
+          cp labs/activity5-investment-advisor/script.js  _site/investment-advisor/script.js
+          cp labs/activity5-investment-advisor/style.css  _site/investment-advisor/style.css
+          # Activity 7b Cook & Bake Academy RAG chatbot site
+          cp labs/activity7-rag/website/index.html _site/cook-bake/index.html
+          cp labs/activity7-rag/website/script.js  _site/cook-bake/script.js
+          cp labs/activity7-rag/website/styles.css _site/cook-bake/styles.css
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
