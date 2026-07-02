@@ -30,6 +30,10 @@ the `-vNN` version suffix, same extension) are MOVED to `<subfolder>/Archive/`.
 Subfolders are matched case-insensitively (e.g. an existing "Assessments" folder is
 reused, not duplicated).
 
+Every uploaded file is then set to **"anyone with the link can view"** (via
+`rclone link`, which creates the reader permission) and its view link is printed —
+include the links in the report to the user.
+
 ## How to run
 
 ```bash
@@ -42,12 +46,12 @@ Report per-folder what was archived and uploaded.
 
 ## Transport / prerequisites
 
-The script talks to a local n8n webhook proxy (`POST http://localhost:5678/webhook/gdrive-ops`,
-workflow **"GDrive Courseware Push (proxy)"**) which signs Google Drive REST calls with the
-n8n **Google Drive account** OAuth2 credential.
+The script talks to Google Drive **directly via rclone** (remote name `gdrive`,
+override with env `GDRIVE_REMOTE`). All Drive operations are upload (`copyto`) or
+server-side move to Archive (`moveto`) — there is no delete anywhere.
 
-- If the proxy workflow is missing: recreate it with `python3 setup_proxy.py <n8n-email> <n8n-password>`.
-- If calls fail with "Unable to sign without access token": the n8n Drive credential has
-  not completed OAuth — the user must open n8n → Credentials → *Google Drive account* →
-  **Sign in with Google** once, then retry.
-- Override the proxy URL with env `GDRIVE_PROXY_URL` if n8n runs elsewhere.
+- One-time setup if the remote is missing: `brew install rclone` then
+  `rclone config create gdrive drive scope=drive` and complete the Google sign-in
+  in the browser (use the account that owns the courseware folder).
+- The `--drive-root-folder-id` flag scopes every call to the user-supplied folder,
+  so the script cannot touch anything outside it.

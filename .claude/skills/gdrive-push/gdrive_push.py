@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Push WSQ courseware to the user's Google Drive courseware folder, archiving old versions.
+"""Push WSQ courseware DIRECTLY to the user's Google Drive courseware folder via rclone,
+archiving old versions. Upload-and-move only — nothing on Drive is ever deleted.
 
 Usage:  python3 gdrive_push.py <drive-folder-link-or-id> [--repo DIR] [--dry-run]
 
@@ -10,84 +11,53 @@ Routing (folders matched case-insensitively under the given root; created if mis
   Assessment            : all assessment .docx (question papers + answer keys)
 
 Before each upload, any existing Drive file of the same "family" (same base name
-ignoring the -vNN / vN version suffix, same extension) is MOVED to an "Archive"
-subfolder inside that folder — nothing is ever deleted.
+ignoring the -vNN / vN version suffix, same extension) is MOVED (server-side) to an
+"Archive" subfolder inside that folder.
 
-Transport: a local n8n webhook proxy (workflow "GDrive Courseware Push (proxy)",
-path /gdrive-ops) that signs Google Drive REST calls with the n8n "Google Drive
-account" OAuth2 credential. See setup_proxy.py to (re)create it.
+Prerequisite (one-time): `rclone config create gdrive drive scope=drive`
+(sign in with the Google account that owns the courseware folder).
 """
 import glob
 import json
 import os
 import re
+import subprocess
 import sys
-import urllib.parse
-import urllib.request
-import uuid
 
-PROXY = os.environ.get("GDRIVE_PROXY_URL", "http://localhost:5678/webhook/gdrive-ops")
-API = "https://www.googleapis.com/drive/v3"
-COMMON = "supportsAllDrives=true"
+REMOTE = os.environ.get("GDRIVE_REMOTE", "gdrive")
 
 
-def multipart(fields, file_field=None, file_path=None):
-    boundary = uuid.uuid4().hex
-    body = b""
-    for k, v in fields.items():
-        body += (f"--{boundary}\r\nContent-Disposition: form-data; name=\"{k}\"\r\n\r\n{v}\r\n").encode()
-    if file_field and file_path:
-        fn = os.path.basename(file_path)
-        body += (f"--{boundary}\r\nContent-Disposition: form-data; name=\"{file_field}\"; "
-                 f"filename=\"{fn}\"\r\nContent-Type: application/octet-stream\r\n\r\n").encode()
-        body += open(file_path, "rb").read() + b"\r\n"
-    body += f"--{boundary}--\r\n".encode()
-    return body, f"multipart/form-data; boundary={boundary}"
+def rc(args, root, parse=False):
+    cmd = ["rclone", *args, "--drive-root-folder-id", root]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0:
+        err = r.stderr.strip()
+        if "couldn't fetch token" in err or "no such remote" in err.lower() or "config" in err.lower()[:60]:
+            raise SystemExit(f"rclone is not authorised yet.\nRun once:  rclone config create {REMOTE} drive scope=drive\n"
+                             f"and complete the Google sign-in in the browser.\n\nrclone said: {err[:300]}")
+        raise SystemExit(f"rclone {' '.join(args[:2])} failed: {err[:500]}")
+    return json.loads(r.stdout or "[]") if parse else r.stdout
 
 
-def drive(op, url, payload=None, file_path=None):
-    fields = {"op": op, "url": url}
-    if payload is not None:
-        fields["payload"] = json.dumps(payload)
-    body, ctype = multipart(fields, "file" if file_path else None, file_path)
-    req = urllib.request.Request(PROXY, data=body, headers={"Content-Type": ctype}, method="POST")
-    try:
-        with urllib.request.urlopen(req, timeout=300) as r:
-            raw = r.read().decode()
-    except urllib.error.HTTPError as e:
-        raise SystemExit(f"Drive proxy error ({op} {url}): HTTP {e.code} {e.read().decode()[:400]}")
-    if not raw.strip():
-        raise SystemExit(
-            "Empty response from the n8n Drive proxy — the Google Drive call failed inside n8n.\n"
-            "Most likely cause: the n8n 'Google Drive account' credential has not completed OAuth.\n"
-            "Fix: open n8n (http://localhost:5678) -> Credentials -> 'Google Drive account' -> "
-            "'Sign in with Google', then re-run this push.\n"
-            "Otherwise check n8n -> Executions for the failed 'GDrive Courseware Push (proxy)' run.")
-    try:
-        return json.loads(raw)
-    except json.JSONDecodeError:
-        raise SystemExit(f"Drive proxy returned non-JSON ({op}): {raw[:400]}")
+def list_dirs(root, path=""):
+    return rc(["lsjson", f"{REMOTE}:{path}", "--dirs-only"], root, parse=True)
 
 
-def q(query):
-    return urllib.parse.quote(query, safe="")
+def list_files(root, path):
+    return rc(["lsjson", f"{REMOTE}:{path}", "--files-only"], root, parse=True)
 
 
-def list_children(folder_id, extra=""):
-    query = f"'{folder_id}' in parents and trashed=false{extra}"
-    url = (f"{API}/files?q={q(query)}&fields=files(id,name,mimeType)&pageSize=1000"
-           f"&{COMMON}&includeItemsFromAllDrives=true")
-    return drive("get", url).get("files", [])
-
-
-def ensure_folder(name, parent_id, match_hint=None):
-    hint = (match_hint or name).lower()
-    for f in list_children(parent_id, " and mimeType='application/vnd.google-apps.folder'"):
-        if hint in f["name"].strip().lower():
-            return f["id"], f["name"], False
-    made = drive("post", f"{API}/files?{COMMON}", payload={
-        "name": name, "mimeType": "application/vnd.google-apps.folder", "parents": [parent_id]})
-    return made["id"], name, True
+def find_or_create_dir(root, parent_path, canonical, hint, dry):
+    dirs = list_dirs(root, parent_path)
+    match = next((d for d in dirs if d["Name"].strip().lower() == canonical.lower()), None) \
+        or next((d for d in dirs if hint in d["Name"].strip().lower()), None)
+    if match:
+        d = match
+        return (f"{parent_path}/{d['Name']}" if parent_path else d["Name"]), d["Name"], False
+    path = f"{parent_path}/{canonical}" if parent_path else canonical
+    if not dry:
+        rc(["mkdir", f"{REMOTE}:{path}"], root)
+    return path, canonical, True
 
 
 def family_prefix(filename):
@@ -96,40 +66,27 @@ def family_prefix(filename):
     return (m.group(1).rstrip(" -–") if m else stem).lower()
 
 
-def archive_old(folder_id, folder_name, archive_id, new_filename, dry):
+def archive_old(root, folder_path, archive_path, new_filename, dry):
     prefix = family_prefix(new_filename)
     ext = os.path.splitext(new_filename)[1].lower()
-    moved = []
-    for f in list_children(folder_id, " and mimeType!='application/vnd.google-apps.folder'"):
-        name = f["name"]
+    for f in list_files(root, folder_path):
+        name = f["Name"]
         if not name.lower().endswith(ext):
             continue
         if not family_prefix(name).startswith(prefix):
             continue
-        moved.append(name)
-        if dry:
-            continue
-        cur = drive("get", f"{API}/files/{f['id']}?fields=parents&{COMMON}")
-        parents = ",".join(cur.get("parents", [folder_id]))
-        drive("patch", f"{API}/files/{f['id']}?addParents={archive_id}&removeParents={parents}&{COMMON}")
-    for name in moved:
-        print(f"    archived: {name}  ->  {folder_name}/Archive/")
-    return moved
+        print(f"    archive: {name}  ->  {archive_path}/")
+        if not dry:
+            rc(["moveto", f"{REMOTE}:{folder_path}/{name}", f"{REMOTE}:{archive_path}/{name}"], root)
 
 
-def upload(path, folder_id, dry):
+def upload(root, path, folder_path, dry):
     fn = os.path.basename(path)
-    if dry:
-        print(f"    would upload: {fn}")
-        return
-    created = drive("upload", f"https://www.googleapis.com/upload/drive/v3/files?uploadType=media&{COMMON}",
-                    file_path=path)
-    fid = created.get("id") or SystemExit(f"upload failed: {created}")
-    cur = drive("get", f"{API}/files/{fid}?fields=parents&{COMMON}")
-    parents = ",".join(cur.get("parents", []))
-    drive("patch", f"{API}/files/{fid}?addParents={folder_id}&removeParents={parents}&{COMMON}",
-          payload={"name": fn})
-    print(f"    uploaded: {fn}")
+    print(f"    upload:  {fn}")
+    if not dry:
+        rc(["copyto", path, f"{REMOTE}:{folder_path}/{fn}"], root)
+        link = rc(["link", f"{REMOTE}:{folder_path}/{fn}"], root).strip()
+        print(f"      view link (anyone with the link): {link}")
 
 
 def newest(pattern):
@@ -143,6 +100,7 @@ def main():
     repo = "."
     if "--repo" in sys.argv:
         repo = sys.argv[sys.argv.index("--repo") + 1]
+        args = [a for a in args if a != repo]
     if not args:
         raise SystemExit("Usage: gdrive_push.py <drive-folder-link-or-id> [--repo DIR] [--dry-run]\n"
                          "The Google Drive courseware folder link MUST be supplied by the user.")
@@ -164,17 +122,21 @@ def main():
         ("Lesson Plan", "lesson plan", [lp_docx, lp_pdf]),
         ("Assessment", "assess", assessments),
     ]
-    print(f"Root folder: {root}{'  (DRY RUN)' if dry else ''}")
+    print(f"Root folder: {root}{'  (DRY RUN — no changes will be made)' if dry else ''}")
     for canonical, hint, files in routing:
         files = [f for f in files if f and os.path.exists(f)]
         if not files:
             print(f"  {canonical}: no local files found — skipped"); continue
-        fid, real_name, created = ensure_folder(canonical, root, hint)
-        aid, _, _ = ensure_folder("Archive", fid, "archiv")
-        print(f"  {real_name}{' (created)' if created else ''}:")
+        folder_path, real_name, created = find_or_create_dir(root, "", canonical, hint, dry)
+        print(f"  {real_name}{' (will be created)' if created else ''}:")
+        arch_path = f"{folder_path}/Archive"
+        if not (created or dry):
+            arch_path, _, _ = find_or_create_dir(root, folder_path, "Archive", "archiv", dry)
+        if not created:
+            for path in files:
+                archive_old(root, folder_path, arch_path, os.path.basename(path), dry)
         for path in files:
-            archive_old(fid, real_name, aid, os.path.basename(path), dry)
-            upload(path, fid, dry)
+            upload(root, path, folder_path, dry)
     print("Done." if not dry else "Dry run complete — nothing was modified.")
 
 
