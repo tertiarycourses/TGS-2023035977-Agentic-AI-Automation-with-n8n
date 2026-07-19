@@ -39,3 +39,6 @@ __pycache__/
 # WSQ assessment materials (confidential — never pushed)
 /assessment/
 /assessment\ /
+
+# Distribution archives (rebuildable — never pushed to GitHub)
+*.zip

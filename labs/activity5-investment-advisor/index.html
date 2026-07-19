@@ -21,6 +21,79 @@
         <a href="#why">Why Us</a>
         <a href="#guide">Free Guide</a>
         <a href="#enquiry">Consultation</a>
+        <!-- Learner setup: n8n webhook URLs + admin inbox (saved in this browser). -->
+        <div class="setup-menu">
+          <button
+            class="setup-trigger"
+            id="setupToggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="setupPanel"
+          >
+            <span class="setup-gear" aria-hidden="true">⚙</span>
+            <span>Setup</span>
+            <span class="setup-badge" id="setupBadge" hidden></span>
+          </button>
+
+          <div class="setup-panel" id="setupPanel" hidden>
+            <div class="setup-head">
+              <h2>n8n Connection</h2>
+              <button class="setup-close" id="setupClose" type="button" aria-label="Close setup">×</button>
+            </div>
+
+            <div class="setup-field">
+              <label for="enquiryWebhook">Enquiry form webhook</label>
+              <span class="setup-hint">Production URL of the <strong>Enquiry Webhook</strong> node</span>
+              <div class="setup-row">
+                <input
+                  id="enquiryWebhook"
+                  type="url"
+                  inputmode="url"
+                  spellcheck="false"
+                  placeholder="https://your-n8n/webhook/investment-enquiry"
+                />
+                <button class="setup-test" id="testEnquiry" type="button">Test</button>
+              </div>
+              <p class="setup-status" id="enquiryStatus" role="status" aria-live="polite"></p>
+            </div>
+
+            <div class="setup-field">
+              <label for="chatWebhook">Chatbot webhook</label>
+              <span class="setup-hint">Production URL of the <strong>Chat Webhook</strong> node</span>
+              <div class="setup-row">
+                <input
+                  id="chatWebhook"
+                  type="url"
+                  inputmode="url"
+                  spellcheck="false"
+                  placeholder="https://your-n8n/webhook/investment-chat"
+                />
+                <button class="setup-test" id="testChat" type="button">Test</button>
+              </div>
+              <p class="setup-status" id="chatStatus" role="status" aria-live="polite"></p>
+            </div>
+
+            <div class="setup-field">
+              <label for="adminEmail">Admin email</label>
+              <span class="setup-hint">Enquiries are emailed to this inbox</span>
+              <div class="setup-row">
+                <input
+                  id="adminEmail"
+                  type="email"
+                  inputmode="email"
+                  spellcheck="false"
+                  placeholder="advisor@yourcompany.com"
+                />
+              </div>
+              <p class="setup-status" id="adminStatus" role="status" aria-live="polite"></p>
+            </div>
+
+            <div class="setup-actions">
+              <button class="button primary" id="setupSave" type="button">Save settings</button>
+              <button class="setup-clear" id="setupClear" type="button">Clear</button>
+            </div>
+          </div>
+        </div>
       </nav>
     </header>
 
@@ -170,14 +243,8 @@
         General information only. Speak with a licensed advisor before making
         investment decisions.
       </p>
-      <p class="powered-by">
-        Powered by
-        <a href="https://www.tertiaryinfotech.com/" target="_blank" rel="noopener">
-          Tertiary Infotech Academy Pte Ltd.
-        </a>
-      </p>
       <p class="powered-by">Powered by <a href="https://www.tertiaryinfotech.com/" target="_blank" rel="noopener">Tertiary Infotech Academy Pte Ltd</a></p>
-</footer>
+    </footer>
 
     <section class="chat-widget" aria-label="Investment advisor chatbot">
       <button class="chat-toggle" id="chatToggle" aria-expanded="false" aria-controls="chatWindow">

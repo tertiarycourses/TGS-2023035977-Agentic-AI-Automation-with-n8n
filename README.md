@@ -38,7 +38,7 @@
 **Activity 4 — Telegram AI Agent** · Telegram-triggered AI agent with memory (4a) + a Data Table tool for HR lookups (4b).
 ![Activity 4](labs/activity4-telegram-agent/Activity4a-Telegram-Agent.png)
 
-**Activity 5 — Website Chatbot via Webhook (Investment Advisor)** · A public landing page with an enquiry form and a floating AI chatbot, both wired to one n8n webhook.
+**Activity 5 — Website Chatbot via Webhook (Investment Advisor)** · A public landing page with an enquiry form and a floating AI chatbot, both wired to n8n webhooks. A **Setup** menu in the top nav lets learners paste their own enquiry/chat webhook URLs and admin email (saved in the browser, with a Test button per webhook) — no code editing required.
 ![Activity 5](labs/activity5-investment-advisor/Activity5-website.png)
 
 **Activity 6 — Finance API → Telegram (AI Day Trader)** · Pulls Twelve Data candles + NewsAPI headlines, then replies with a Buy/Sell/Hold call. A live dashboard shows the chart and quote stats.

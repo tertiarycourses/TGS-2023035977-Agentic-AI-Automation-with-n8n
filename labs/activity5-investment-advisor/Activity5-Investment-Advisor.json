@@ -1,13 +1,14 @@
 {
-  "name": "Activity 5 — Website Chatbot via Webhook (Investment Advisor)",
+  "name": "Activity 5 \u2014 Website Chatbot via Webhook (Investment Advisor)",
   "nodes": [
     {
       "parameters": {
-        "path": "12663502-ff47-45b6-9a8f-c67c083603d9",
+        "path": "investment-enquiry",
         "responseMode": "responseNode",
         "options": {
           "allowedOrigins": "*"
-        }
+        },
+        "httpMethod": "POST"
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -21,7 +22,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const q = $json.query || {};\nconst lead = {\n  type: q.type || 'enquiry',\n  name: q.name || '',\n  email: q.email || '',\n  phone: q.phone || '',\n  goal: q.goal || '',\n  message: q.message || '',\n  submittedAt: new Date().toISOString(),\n};\n\nlead.emailSubject = `New investment enquiry from ${lead.name || 'website visitor'}`;\nlead.emailMessage = [\n  'New investment advisory enquiry received from the website.',\n  '',\n  `Name: ${lead.name}`,\n  `Email: ${lead.email}`,\n  `Phone: ${lead.phone}`,\n  `Investment Goal: ${lead.goal}`,\n  '',\n  'Message:',\n  lead.message,\n].join('\\n');\n\nlead.success = true;\nlead.responseMessage = 'Thank you. Your enquiry has been received.';\nreturn [{ json: lead }];"
+        "jsCode": "const q = $json.body || $json.query || {};\n\n// The website posts the destination inbox as adminEmail. Fall back to a\n// hard-coded address here if you prefer to fix it in the workflow instead.\nconst ADVISOR_FALLBACK = '';\nconst advisorEmail = (q.adminEmail || ADVISOR_FALLBACK || '').trim();\n\nconst lead = {\n  type: q.type || 'enquiry',\n  name: q.name || '',\n  email: q.email || '',\n  phone: q.phone || '',\n  goal: q.goal || '',\n  message: q.message || '',\n  advisorEmail,\n  submittedAt: new Date().toISOString(),\n};\n\nif (!advisorEmail) {\n  throw new Error('No advisor email supplied. Enter an Admin email in the website setup panel, or set ADVISOR_FALLBACK in this node.');\n}\n\nlead.emailSubject = `New investment enquiry from ${lead.name || 'website visitor'}`;\nlead.emailMessage = [\n  'New investment advisory enquiry received from the website.',\n  '',\n  `Name: ${lead.name}`,\n  `Email: ${lead.email}`,\n  `Phone: ${lead.phone}`,\n  `Investment Goal: ${lead.goal}`,\n  '',\n  'Message:',\n  lead.message,\n  '',\n  `Submitted: ${lead.submittedAt}`,\n].join('\\n');\n\nlead.success = true;\nlead.responseMessage = 'Thank you. Your enquiry has been received.';\nreturn [{ json: lead }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -34,7 +35,7 @@
     },
     {
       "parameters": {
-        "sendTo": "={{ $('Enquiry Webhook').item.json.query.email }}",
+        "sendTo": "={{ $json.advisorEmail }}",
         "subject": "={{ $json.emailSubject }}",
         "message": "={{ $json.emailMessage }}",
         "options": {}
@@ -86,7 +87,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "12663502-ff47-45b6-9a8f-c67c083603d9",
+        "path": "investment-chat",
         "responseMode": "responseNode",
         "options": {
           "allowedOrigins": "*"
