@@ -42,3 +42,6 @@ __pycache__/
 
 # Distribution archives (rebuildable — never pushed to GitHub)
 *.zip
+
+# Superseded courseware versions (kept locally + on Drive, not in git)
+courseware/archive/

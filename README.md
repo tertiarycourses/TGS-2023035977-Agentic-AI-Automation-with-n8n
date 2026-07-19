@@ -147,7 +147,7 @@ TGS-2023035977-Agentic-AI-Automation-with-n8n/
 │   └── mini-capstone/issue-tracking/ # Capstone: Form + image → Postgres + gallery
 │
 └── courseware/                       # Course slides, Lesson Plan + Learner Guide
-    ├── Agentic AI Automation with n8n-v45.pptx   # 3-day slide deck (+ PDF)
+    ├── Agentic AI Automation with n8n-v46.pptx   # 3-day slide deck (+ PDF)
     ├── LG-Agentic AI Automation with n8n.docx    # detailed step-by-step (+ PDF)
     └── LP-Agentic AI Automation with n8n.docx    # 3-day lesson plan (+ PDF)
 ```

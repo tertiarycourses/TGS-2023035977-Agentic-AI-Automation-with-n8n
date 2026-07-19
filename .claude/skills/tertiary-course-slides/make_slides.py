@@ -16,7 +16,7 @@ NAVY=RGBColor(0x0B,0x12,0x20); BLUE=RGBColor(0x1F,0x6F,0xEB); TEAL=RGBColor(0x10
 AMBER=RGBColor(0xF5,0x9E,0x0B); INK=RGBColor(0x16,0x1B,0x26); GREY=RGBColor(0x5B,0x63,0x72)
 LIGHT=RGBColor(0xF5,0xF8,0xFC); WHITE=RGBColor(0xFF,0xFF,0xFF); LINE=RGBColor(0xE2,0xE8,0xF0)
 VIOLET=RGBColor(0x7C,0x3A,0xED)
-VERSION="v45"; VERSION_DATE="3 July 2026"
+VERSION="v46"; VERSION_DATE="19 July 2026"
 # ─── EDIT PER COURSE ─────────────────────────────────────────────
 TITLE       = "Agentic AI Automation with n8n"   # <<Course Title>>
 COURSE_CODE = "TGS-2023035977"                    # <<Course Code, e.g. TGS-XXXXXXXXXX>>
@@ -281,10 +281,24 @@ tile_grid("Ground Rules",[
  "Mutual respect: agree to disagree.","One conversation at a time.",
  "Be punctual; return from breaks on time.","75% attendance is required."],
  kicker="HOUSEKEEPING",cols=2,size=15)
-content("LMS / TMS",[
- "Access your course materials, attendance and assessment on the LMS/TMS portal.",
- "Portal: https://lms-tms.tertiaryinfotech.com",
- "Download the slides and Learner Guide for reference during the open-book assessment."],kicker="COURSE PORTAL")
+website_slide("Download Course Material",
+ IMG(".claude/skills/tertiary-course-slides/assets/lms-tms-portal.png"),
+ ["Go to lms-tms.tertiaryinfotech.com.",
+  "Enter your registered email and click Send OTP.",
+  "Key in the one-time password from your inbox to log in.",
+  "Open this course to download the slides and Learner Guide.",
+  "Keep them open — the assessment is open book.",
+  "Attendance and assessment submission also happen here."],
+ kicker="COURSE PORTAL")
+website_slide("Practice Exam",
+ IMG(".claude/skills/tertiary-course-slides/assets/exams-portal.png"),
+ ["Go to exams.tertiaryinfotech.com for extra practice.",
+  "Search or browse by vendor — AWS, Microsoft, Cisco, CompTIA and more.",
+  "Try 10 questions free on any exam; Exam Mode is timed, Practice Mode is not.",
+  "Useful if you plan to take an IT certification after this course.",
+  "Practice attempts are not graded and are separate from this course.",
+  "Your graded WA and PP are submitted on the LMS/TMS portal."],
+ kicker="REVISION")
 tile_grid("Download the Course Flows (GitHub)",[
  "Open the course repo: github.com/tertiarycourses/TGS-2023035977-Agentic-AI-Automation-with-n8n",
  "Code ▾ → Download ZIP (or git clone) — all workflows are in the labs/ folder.",
@@ -348,26 +362,16 @@ content("Setting Up n8n",[
  "Option B — Local Docker Compose (persistent): docker compose up -d → http://localhost:5678.",
  "Trial Data Tables are not permanent — store anything you keep externally (Google Sheets).",
  "See labs/n8n-installation/docker-compose.yml in the course repo."],kicker="GET READY")
-# --- n8n Cloud Account Login Details ---
-_s=slide(); head(_s,"n8n Account Login Details",kicker="YOUR LOGIN · CLOUD INSTANCE")
-_TY=Inches(1.78); _RH=Inches(0.247); _bx=Inches(0.85)
-_wNo=Inches(0.55); _wUrl=Inches(4.95); _wEm=Inches(4.35); _wPw=Inches(1.75)
-_cols=[(_bx,_wNo,"No.",PP_ALIGN.CENTER),
-       (_bx+_wNo+Inches(0.1),_wUrl-Inches(0.1),"Workspace URL",PP_ALIGN.LEFT),
-       (_bx+_wNo+_wUrl+Inches(0.1),_wEm-Inches(0.1),"Login (Email)",PP_ALIGN.LEFT),
-       (_bx+_wNo+_wUrl+_wEm+Inches(0.1),_wPw-Inches(0.1),"Password",PP_ALIGN.LEFT)]
-rect(_s,_bx,_TY,_wNo+_wUrl+_wEm+_wPw,_RH,BLUE)
-for _cx,_cw2,_lbl,_al in _cols:
-    txt(_s,_cx,_TY,_cw2,_RH,[[(_lbl,11,WHITE,True)]],align=_al,anchor=MSO_ANCHOR.MIDDLE)
-for _ri in range(20):
-    _no=_ri+1; _acct=f"n8n{1000+_no:04d}"
-    _ry=_TY+_RH*(_ri+1)
-    rect(_s,_bx,_ry,_wNo+_wUrl+_wEm+_wPw,_RH,LIGHT if _ri%2==0 else WHITE,line=LINE)
-    for (_cx,_cw2,_lbl,_al),(_val,_c,_b) in zip(_cols,
-        [(str(_no),INK,True),(f"https://{_acct}.app.n8n.cloud/signin",BLUE,False),
-         (f"{_acct}@tertiaryinfotech.com",INK,False),("Tertiary@888",TEAL,False)]):
-        txt(_s,_cx,_ry,_cw2,_RH,[[(_val,10,_c,_b)]],align=_al,anchor=MSO_ANCHOR.MIDDLE)
-footer(_s)
+# --- n8n Cloud sign-up ---
+website_slide("Sign Up for n8n Cloud",
+ IMG(".claude/skills/tertiary-course-slides/assets/n8n-register.png"),
+ ["Go to app.n8n.cloud/register in your browser.",
+  "Enter your company email and click Submit.",
+  "Open the verification email from n8n and click the link to confirm.",
+  "Set your password and complete the short profile questions.",
+  "n8n creates your workspace at <name>.app.n8n.cloud and opens the editor.",
+  "The free trial runs 14 days — no credit card needed."],
+ kicker="YOUR LOGIN · CLOUD INSTANCE")
 content("Credential Setup",[
  "Add credentials once under Credentials → Add credential.",
  "Gmail / Outlook (OAuth2) for email; OpenAI / Gemini for AI.",
