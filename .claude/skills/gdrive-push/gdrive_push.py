@@ -171,7 +171,10 @@ def push_labs(root, labs_dir, dry):
 
 
 def newest(pattern):
-    hits = sorted(glob.glob(pattern), key=os.path.getmtime)
+    # Ignore Office owner/lock junk (~$foo.pptx) left while a document is open.
+    hits = sorted((h for h in glob.glob(pattern)
+                   if not os.path.basename(h).startswith(("~$", "."))),
+                  key=os.path.getmtime)
     return hits[-1] if hits else None
 
 

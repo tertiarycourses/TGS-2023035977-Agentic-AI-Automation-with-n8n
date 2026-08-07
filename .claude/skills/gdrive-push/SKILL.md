@@ -9,12 +9,17 @@ Uploads the course's current artifacts into the right subfolders of a Google Dri
 courseware folder, moving all superseded files into an `archive` subfolder first.
 **Upload-only: nothing on Drive is ever deleted.**
 
-## HARD RULE — user input required
+## Folder link resolution
 
-**NEVER push without the user-provided Google Drive folder link.** If the user did not
-include the courseware folder link (e.g. `/gdrive-push <link>`), ASK for it first
-(AskUserQuestion) and wait. Do not fall back to a remembered, default, or previously
-used folder. Confirm the link before the first real (non-dry-run) push of a session.
+The push target is the user's Google Drive courseware folder link, resolved in this order:
+
+1. A link passed explicitly (e.g. `/gdrive-push <link>`).
+2. **`GDRIVE_FOLDER_LINK` in the repo's `.env`** — the user saved it there on 8 Aug 2026
+   precisely so they would not be asked again; use it WITHOUT asking.
+3. Only if neither exists: ASK the user (AskUserQuestion) and wait — never guess.
+
+When a link is supplied explicitly and differs from `.env`, use the supplied link and
+update `.env` to match.
 
 ## Routing
 
