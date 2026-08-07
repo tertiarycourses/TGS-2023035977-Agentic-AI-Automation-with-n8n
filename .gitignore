@@ -45,3 +45,9 @@ __pycache__/
 
 # Superseded courseware versions (kept locally + on Drive, not in git)
 courseware/archive/
+
+# Source material the project was derived from — not ours to republish.
+**/reference/
+# ...but keep skill reference IMPLEMENTATIONS (builder scripts the skills run)
+!.claude/skills/**/reference/
+!.claude/skills/**/reference/**

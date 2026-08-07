@@ -316,6 +316,12 @@ h3("Concepts — Webhooks")
 bullets([
     "A **Webhook** is a URL that external systems (a website, another app) call to **trigger** your workflow.",
     "Use cases: website chat, form submissions, payment events, GitHub/Stripe notifications — any external trigger.",
+    "**GET vs POST:** GET carries data in the URL query string (read it as `{{ $json.query.field }}`); POST carries "
+    "a JSON body (read it as `{{ $json.body.field }}`). Website chat and forms POST; the Activity 8b dashboard GETs.",
+    "**Test URL vs Production URL:** the Test URL (`/webhook-test/…`) listens for ONE call while you click "
+    "*Listen for test event* and shows the run live on the canvas; the Production URL (`/webhook/…`) requires the "
+    "workflow to be **Active**, is always on, and logs runs in the **Executions** list. Websites must always call "
+    "the **Production URL** of an Active workflow.",
     "Pair the Webhook trigger with a **Respond to Webhook** node to send a reply back to the caller.",
 ])
 h3("Step-by-step")
@@ -697,7 +703,7 @@ p("You're done — congratulations! Keep your local n8n running to continue buil
 # ============================================================================
 # RENDERERS
 # ============================================================================
-VERSION = "6.3"
+VERSION = "6.4"
 VERSIONS = [
     ("1.0", "2 Feb 2023", "First version", "Dr. Alfred Ang"),
     ("2.0", "16 June 2025", "Updated course title and content", "Tertiary Infotech Pte Ltd"),
@@ -729,6 +735,10 @@ VERSIONS = [
      "Tertiary Infotech Academy Pte Ltd"),
     ("6.3", "3 July 2026", "Relocated courseware assets and build scripts into the .claude/skills folder; "
                            "updated embedded image links accordingly (no content changes)",
+     "Tertiary Infotech Academy Pte Ltd"),
+    ("6.4", "8 Aug 2026", "Aligned with slide deck v47 (restyled concept-card deck): the Learner Guide remains the "
+                          "single step-by-step source for all labs; expanded the Activity 5 webhook concepts with "
+                          "GET vs POST and the Test URL vs Production URL rule",
      "Tertiary Infotech Academy Pte Ltd"),
 ]
 

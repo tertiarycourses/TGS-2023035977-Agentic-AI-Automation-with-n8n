@@ -1,6 +1,6 @@
 # Agentic AI Automation with n8n — Step-by-Step Learner Guide
 
-**Course Code:** TGS-2023035977  ·  **Version 6.3**  ·  Tertiary Infotech Academy Pte Ltd
+**Course Code:** TGS-2023035977  ·  **Version 6.4**  ·  Tertiary Infotech Academy Pte Ltd
 
 ### Document Version Control Record
 
@@ -15,6 +15,7 @@
 | 6.1 | 1 July 2026 | Added a page-numbered Table of Contents; embedded real n8n flow screenshots and activity website screenshots for every activity (5, 6, 7a, 7b, 8, capstone); expanded step-by-step detail; aligned the Learner Guide (DOCX + Markdown) with the slides, Lesson Plan and lab workflows | Tertiary Infotech Academy Pte Ltd |
 | 6.2 | 3 July 2026 | Updated Activity 7b to the fixed lab flows: Pinecone ingestion + CX Agent now use Google Gemini gemini-embedding-001 embeddings (3072-dim index) with whole-brochure chunks (one brochure = one vector); CX Agent webhook fixed to POST + Respond to Webhook with a Pinecone retriever tool and Gemini chat model; added the matching upload/retrieval namespace rule; new workflow screenshots | Tertiary Infotech Academy Pte Ltd |
 | 6.3 | 3 July 2026 | Relocated courseware assets and build scripts into the .claude/skills folder; updated embedded image links accordingly (no content changes) | Tertiary Infotech Academy Pte Ltd |
+| 6.4 | 8 Aug 2026 | Aligned with slide deck v47 (restyled concept-card deck): the Learner Guide remains the single step-by-step source for all labs; expanded the Activity 5 webhook concepts with GET vs POST and the Test URL vs Production URL rule | Tertiary Infotech Academy Pte Ltd |
 
 ## Table of Contents
 
@@ -333,6 +334,8 @@ Expose an AI agent to a **public website** using a **Webhook**. The provided one
 
 - A **Webhook** is a URL that external systems (a website, another app) call to **trigger** your workflow.
 - Use cases: website chat, form submissions, payment events, GitHub/Stripe notifications — any external trigger.
+- **GET vs POST:** GET carries data in the URL query string (read it as `{{ $json.query.field }}`); POST carries a JSON body (read it as `{{ $json.body.field }}`). Website chat and forms POST; the Activity 8b dashboard GETs.
+- **Test URL vs Production URL:** the Test URL (`/webhook-test/…`) listens for ONE call while you click *Listen for test event* and shows the run live on the canvas; the Production URL (`/webhook/…`) requires the workflow to be **Active**, is always on, and logs runs in the **Executions** list. Websites must always call the **Production URL** of an Active workflow.
 - Pair the Webhook trigger with a **Respond to Webhook** node to send a reply back to the caller.
 
 #### Step-by-step
