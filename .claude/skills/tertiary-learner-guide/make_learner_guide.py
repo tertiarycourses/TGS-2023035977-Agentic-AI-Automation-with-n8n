@@ -83,9 +83,11 @@ h2("0. Before You Start — Setup & Prerequisites")
 h3("0.1 Accounts & API keys you will need")
 table([
     ["Service", "Used for", "Where to get it"],
-    ["n8n", "The automation platform (all activities)", "Cloud trial at n8n.io, or local Docker (see 0.2)"],
+    ["LMS / TMS", "Course slides, Learner Guide, attendance, assessment", "lms-tms.tertiaryinfotech.com — registered email + OTP"],
+    ["n8n", "The automation platform (all activities)", "Assigned n8n training account (given in class), or local Docker (see 0.2)"],
     ["Gmail or Outlook", "Sending emails (Activities 1-3, 8a)", "Your existing mailbox; connected via OAuth2"],
-    ["OpenAI API key", "LLM for AI agents (Activities 4-8)", "platform.openai.com/api-keys (provided in class)"],
+    ["n8n Gateway credits", "Free LLM usage for AI agents — no API key", "Included with the n8n Cloud trial (see 0.3)"],
+    ["OpenAI API key", "LLM for AI agents (Activities 4-8), if not using Gateway credits", "platform.openai.com/api-keys"],
     ["Google Gemini API key", "Alternative LLM", "aistudio.google.com/app/apikey (provided in class)"],
     ["Telegram", "Chat trigger for AI agents (Activities 4, 6, 7)", "Telegram app + @BotFather"],
     ["Google account", "Google Sheets storage (Activity 3b)", "Your Google account (training account provided)"],
@@ -93,13 +95,21 @@ table([
     ["NewsAPI", "Headlines & sentiment (Activity 6)", "newsapi.org — free API key"],
 ])
 
-h3("0.2 Run n8n — Cloud trial OR local Docker")
-p("You have two ways to run n8n. For the course we start everyone on a **cloud trial** so we are productive "
+h3("0.2 Run n8n — Training account (cloud) OR local Docker")
+p("You have two ways to run n8n. For the course we start everyone on an n8n **cloud** training account so we are productive "
   "immediately, and we also show how to **self-host locally with Docker** so you can keep your workflows after "
   "the trial ends.")
-p("**Option A — Cloud trial (fastest).** Sign up at n8n.io, create a workspace, and you land directly in the "
-  "workflow editor. Note: trial **Data Tables are not permanent** — for anything you want to keep, store it "
-  "externally (e.g. Google Sheets, see Activity 3b).")
+p("**Option A — n8n training account (in class).** Each learner is assigned ONE n8n Cloud training account "
+  "(e.g. `n8n18oct5@tertiaryinfotech.com`); the password is given by your trainer. The account is already set up — "
+  "do not change the password or save real credentials in it. Note: trial **Data Tables are not permanent** — for "
+  "anything you want to keep, store it externally (e.g. Google Sheets, see Activity 3b).")
+steps([
+    "Go to **app.n8n.cloud/login** — or open your own instance URL directly.",
+    "Enter your assigned account email and the password your trainer gives you.",
+    "Open your instance from the dashboard — a free 14-day trial, active through the training.",
+    "You land in n8n — open **Assistant** or **Overview** to start building.",
+])
+p("After the course you can sign up for your own free trial at n8n.io, or keep your work by self-hosting (Option B).")
 p("**Option B — Local install with Docker Compose (persistent).** Install Docker Desktop, then create a file "
   "named `docker-compose.yml` (a ready-made copy is in `labs/n8n-installation/`):")
 code(
@@ -130,7 +140,11 @@ p("Credentials are stored separately from workflows so you never paste secrets i
   "**Credentials → Add credential**:")
 bullets([
     "**Gmail / Microsoft Outlook (OAuth2)** — sign in and authorise n8n to send mail on your behalf.",
-    "**OpenAI** — paste your OpenAI API key. (Gemini: add a *Google Gemini (PaLM) API* credential instead.)",
+    "**AI models — free Gateway credits** — on an AI node (e.g. AI Agent → Gemini or OpenAI Chat Model), choose "
+    "**Use Gateway credits** in the Credential field; your balance shows beside it, and in **Admin Panel → Gateway credits**. "
+    "No provider account or API key is needed. (A red \"Free AI credits — Enable to claim credits\" toast is the legacy "
+    "OpenAI offer — Gateway instances don't get it; use Gateway credits.)",
+    "**OpenAI** (optional) — paste your own OpenAI API key instead. (Gemini: add a *Google Gemini (PaLM) API* credential.)",
     "**Telegram** — paste the bot token from @BotFather (see Activity 4a, Step 1).",
     "**Google Sheets (OAuth2)** — authorise access to your Google Sheets (Activity 3b).",
     "**HTTP Header Auth / query params** — for Twelve Data & NewsAPI keys (Activity 6).",
@@ -248,41 +262,63 @@ topic("Topic 2: AI Agents")
 p("**Day 1 afternoon.** Build your first AI agent — a Telegram chatbot — and progressively give it tools "
   "so it can answer questions from real data.")
 
-act("Activity 4a — Telegram-Triggered AI Agent (Customer Service)")
-p("**Folder:** `labs/activity4-telegram-agent/`")
+act("Activity 4a — HR Policy Chatbot on Telegram (built with n8n Assistant)")
+p("**Folder:** `labs/activity4-telegram-agent/`  ·  **Reference solution:** `Activity4a-Telegram-HR-Agent.json`")
 h3("Goal")
-p("Build your first **AI Agent**: a simple customer-service chatbot you talk to from **Telegram**. The agent "
-  "uses an LLM, short-term memory, and a system instruction that defines its persona.")
+p("Build your first **AI Agent**: **Ava**, an HR policy chatbot that staff talk to on **Telegram**. Instead of "
+  "dragging every node yourself, you describe the workflow to **n8n Assistant** in one prompt and it builds the "
+  "first draft — then you review it, connect the credentials, publish and chat.")
 h3("Concepts — what makes an AI Agent")
 bullets([
-    "**LLM** — the model that generates replies (OpenAI `gpt-4.1-mini` or Google Gemini).",
+    "**LLM** — the chat model that writes replies (free n8n **Gateway credits** — no API key needed).",
     "**Memory** — remembers the recent conversation so follow-up questions make sense.",
     "**Tools** — optional actions the agent can call (added in Activity 4b).",
-    "**System Instruction** — the agent's role, tone, and rules.",
+    "**System Instruction** — Ava's role, the sample HR policies and her rules (answer only from the policies, never "
+    "invent a number, refer salary, medical or disciplinary questions to HR).",
 ])
-h3("Step 1 — Create the Telegram bot")
+h3("Step 1 — Create the Telegram bot with BotFather")
 steps([
-    "In Telegram, open **@BotFather** → `/newbot`, give it a name and username, and copy the **bot token**.",
-    "In n8n add a **Telegram** credential and paste the token.",
+    "Open the Telegram app and search for the verified account named **BotFather** (look for the blue checkmark).",
+    "Start a chat and send the command `/newbot`.",
+    "Type a display name for your bot (e.g. My Free Helper Bot).",
+    "Choose a unique username that ends in `bot` (e.g. `my_free_helper_bot`).",
+    "Copy the **HTTP API token** BotFather replies with (it looks like `123456789:AAH…`). Treat it like a password — "
+    "if it leaks, send `/revoke` to BotFather.",
 ])
-h3("Step 2 — Build the workflow")
+h3("Step 2 — Build the workflow with n8n Assistant")
+B.append(("img",".claude/skills/tertiary-course-slides/assets/n8n-build-with-ai.png",
+          "An empty canvas offers Add first step or Build with AI — Build with AI opens n8n Assistant"))
 steps([
-    "Add a **Telegram Trigger** node (it fires on each incoming message). Select your Telegram credential.",
-    "Add an **AI Agent** node connected after the trigger.",
-    "Attach an **OpenAI Chat Model** (or **Google Gemini Chat Model**) as the agent's model.",
-    "Attach a **Simple Memory** node so the agent recalls the conversation.",
-    "Write the **System Instruction**, e.g. \"You are a friendly customer-service assistant for MyCompany. "
-    "Answer concisely and politely.\"",
-    "Add a **Telegram → Send Message** node after the agent; set **Chat ID** = `{{ $json.message.chat.id }}` and "
-    "**Text** = the agent's output.",
-    "**Save** and toggle **Active**.",
+    "Create a new workflow and click **Build with AI** (or open **Assistant** in the left sidebar).",
+    "Paste the prompt below and let n8n Assistant plan the workflow. Review the plan before it builds.",
 ])
-B.append(("test", "Message your bot in Telegram (e.g. \"What are your opening hours?\") and confirm it replies."))
+code("Create a 3-node workflow:\n- A user posts a message to a Telegram bot.\n- Telegram sends the data to an HR agent.\n- The HR agent responds to the user on the company HR policies. Create a\n   system instruction for the HR agent with sample company policies in\n   it. The HR agent has a memory.\n- Respond to Telegram.")
+p("Then:")
+bullets([
+    "Read the system instruction it wrote — edit the sample policies if you like.",
+    "Check that a **memory** node is attached to the HR agent.",
+    "Stuck? Import `Activity4a-Telegram-HR-Agent.json` from the folder instead (it includes the memory node).",
+])
+B.append(("img",".claude/skills/tertiary-course-slides/assets/n8n-flow-telegram-demo.png",
+          "The workflow: Telegram Trigger → HR Agent → Reply on Telegram (shown before memory was added — attach a memory node under the HR Agent)"))
+h3("Step 3 — Connect the bot, publish and chat")
+steps([
+    "Open the **Telegram Trigger** node → **Credential → Create new credential**, paste the BotFather token as the Access Token and save.",
+    "Open the Telegram node that sends the reply and select the **same** Telegram credential.",
+    "Open the chat model under the HR agent and choose **Use Gateway credits** as its credential.",
+    "Click **Publish** — n8n registers the workflow's Production webhook with Telegram. (A bot has ONE webhook at a "
+    "time; testing in the editor swaps in the Test URL, so publish again when you are done.)",
+    "Open `t.me/<your bot username>`, tap **Start** and chat.",
+])
+B.append(("img",".claude/skills/tertiary-course-slides/assets/telegram-chat-demo.png",
+          "Chatting with Ava — she quotes the leave policy and keeps the context of the conversation"))
+B.append(("test", "Ask \"How many days of annual leave do I get?\" (the answer must quote the policy), ask a follow-up "
+          "(memory keeps the context), then ask about a colleague's salary — Ava must refer you to HR."))
 
 act("Activity 4b — Telegram Agent + Data Table Tool (HR Admin)")
 p("**Folder:** `labs/activity4-telegram-agent/`")
 h3("Goal")
-p("Give the agent a **tool**: an employee **Data Table** it can look up. Now the same Telegram bot can answer "
+p("Give Ava a **tool**: an employee **Data Table** she can look up. Now the same Telegram bot can answer "
   "HR-admin questions like \"What department is Alice in?\" by querying real data.")
 h3("Step-by-step")
 steps([
@@ -292,8 +328,8 @@ steps([
     "Add a **Data Table Tool** and attach it to the AI Agent's **Tool** input.",
     "Point the tool at the `Employees` table and describe it in the tool description, e.g. "
     "\"Look up employee details by name or department.\"",
-    "Update the **System Instruction**: \"You are an HR admin assistant. Use the Employees tool to answer "
-    "questions about staff. If the data is not found, say so.\"",
+    "Add to Ava's **System Instruction**: \"Use the Employees tool to answer questions about staff "
+    "(department, role, contact). If the data is not found, say so. Never reveal salaries.\"",
     "**Save** and keep **Active**.",
 ])
 B.append(("test", "Ask the bot \"Which department is <a name from the CSV> in?\" and confirm it answers from the table."))
@@ -652,13 +688,45 @@ rule()
 h2("Mini Capstone Project")
 p("**Folder:** `labs/mini-capstone/`")
 h3("Goal")
-p("Bring it together. In small groups, design and build an end-to-end automation that uses what you learned: a "
-  "trigger (form/Telegram/webhook), an AI agent with at least one **tool** or **RAG** source, an external "
-  "**API** or storage, and a **guardrail** or human-in-the-loop step. A worked example — an **Issue Reporting** "
-  "flow (form + image → Postgres, with a retrieval API and gallery) — is provided in the folder.")
+p("Bring it together with **AI-assisted workflow creation**. In small groups, pick one end-to-end business process, "
+  "describe it to **n8n Assistant**, and let it build the first draft. Then review every node, connect the "
+  "credentials, test it and add a control. Your build must include a trigger (form/Telegram/webhook/schedule), an AI "
+  "agent with at least one **tool** or **RAG** source, an external **API** or storage, and a **guardrail** or "
+  "human-in-the-loop step.")
+B.append(("img",".claude/skills/tertiary-course-slides/assets/n8n-assistant.png",
+          "n8n Assistant — open Assistant in the left sidebar and answer 'What do you want to automate?'"))
+h3("Step-by-step")
+steps([
+    "Pick a process — one painful, repeatable job in your work.",
+    "Write the prompt: name the trigger and its inputs, number the steps in order, and say where a human must approve.",
+    "Open **Assistant** (or **Build with AI** on an empty canvas), paste the prompt and review the plan before it builds.",
+    "Connect the credentials each node asks for; choose **Use Gateway credits** on the AI nodes.",
+    "Test with real inputs, then refine in the same chat — e.g. 'add an approval step', 'log every run to a Google Sheet'.",
+    "Export the workflow (`.json`) and prepare a 3–5 minute presentation.",
+])
+h3("Example prompt — an end-to-end video creation workflow")
+p("Topic → research → video script → video production → publish, with a human approval gate before anything goes live:")
+code("Create an end-to-end workflow that turns a topic into a published\n  YouTube video:\n1. Start from a form where I enter a video topic, target audience and\n   length (60-90 seconds).\n2. Research the topic on the web and summarise 5 key facts with their\n   sources.\n3. Write a video script from the research: a hook, 3 key points and a\n   call to action, under 200 words.\n4. Send the script to a video-generation API with an HTTP Request node,\n   and wait until the video is ready.\n5. Email me the script and the video link, and wait for my approval.\n6. If approved, upload the video to YouTube with a title, description\n   and tags; if rejected, log my feedback in a Google Sheet.\nUse Gateway credits for the AI models. Ask me before publishing.")
+note("For the video-production step, add your video API key (e.g. HeyGen, Runway or Google Veo) as a credential, "
+     "and connect Gmail, Google Sheets and YouTube when n8n Assistant asks.")
+h3("More example prompts")
+bullets([
+    "**Weekly newsletter** — \"Every Monday at 9am, search the web for this week's news on <your industry>. Pick the 5 "
+    "most relevant stories and write a short newsletter with a summary and link for each. Email me the draft for "
+    "approval; if approved, send it to the subscribers in my Google Sheet.\"",
+    "**Invoice processing** — \"When an email with a PDF invoice arrives in Gmail, extract the supplier, invoice number, "
+    "date and amount. Add a row to my Invoices Google Sheet. If the amount is over $5,000, email the finance manager to "
+    "approve before marking it 'ready to pay'.\"",
+    "**Customer-support triage** — \"From a website chat webhook, classify each message as billing, technical or sales. "
+    "Answer FAQs from my policy documents (RAG); never invent a price. Hand anything else to a human by posting it to "
+    "Telegram, and log every conversation.\"",
+])
+p("Another worked example — an **Issue Reporting** flow (form + image → Postgres, with a retrieval API and gallery) — "
+  "is provided in the folder.")
 B.append(("img","labs/mini-capstone/issue-tracking/Capstone-website.png","Worked capstone example — Issue Reporting: paste your n8n Form URL to generate a QR code people scan to submit issues (with photos) into Postgres + a gallery"))
 h3("Deliverables")
 bullets([
+    "The prompt(s) you gave n8n Assistant.",
     "A working n8n workflow (exported `.json`).",
     "A short demo of the happy path and at least one safety/guardrail case.",
     "A 3-5 minute presentation: problem, design, what you'd improve.",
@@ -703,7 +771,7 @@ p("You're done — congratulations! Keep your local n8n running to continue buil
 # ============================================================================
 # RENDERERS
 # ============================================================================
-VERSION = "6.4"
+VERSION = "6.5"
 VERSIONS = [
     ("1.0", "2 Feb 2023", "First version", "Dr. Alfred Ang"),
     ("2.0", "16 June 2025", "Updated course title and content", "Tertiary Infotech Pte Ltd"),
@@ -739,6 +807,12 @@ VERSIONS = [
     ("6.4", "8 Aug 2026", "Aligned with slide deck v47 (restyled concept-card deck): the Learner Guide remains the "
                           "single step-by-step source for all labs; expanded the Activity 5 webhook concepts with "
                           "GET vs POST and the Test URL vs Production URL rule",
+     "Tertiary Infotech Academy Pte Ltd"),
+    ("6.5", "17 Oct 2026", "Aligned with slide deck v48: LMS/TMS OTP login added to setup; assigned n8n training "
+                           "accounts and sign-in steps replace self sign-up; free n8n Gateway credits added as the "
+                           "default LLM option (API keys now optional); Activity 4a rebuilt as the HR Policy "
+                           "Chatbot (Ava) on Telegram, built with n8n Assistant from one prompt; mini capstone now built "
+                           "with n8n Assistant, with an end-to-end video creation example prompt and more example prompts",
      "Tertiary Infotech Academy Pte Ltd"),
 ]
 
@@ -856,6 +930,7 @@ def render_docx(blocks):
         elif k == "code":
             pr = doc.add_paragraph(); _shade_para(pr)
             r = pr.add_run(b[1]); r.font.name = "Consolas"; r.font.size = Pt(9)
+            pr.paragraph_format.keep_together = True   # never split a code block across pages
         elif k == "table":
             rows = b[1]
             t = doc.add_table(rows=0, cols=len(rows[0])); t.style = "Table Grid"; t.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -957,8 +1032,7 @@ ACT_IMG = {
     "Activity 2 ": ("labs/activity2-data-table/Activity2-Data-Table.png",          "Activity 2 workflow — Form to Gmail + Data Table"),
     "Activity 3a": ("labs/activity3-conditional/Activity3a-Conditional-Data-Table.png", "Activity 3a workflow — IF routing to Data Table / email"),
     "Activity 3b": ("labs/activity3-conditional/Activity3b-Conditional-Google-Sheets.png", "Activity 3b workflow — IF routing to Google Sheets / email"),
-    "Activity 4a": ("labs/activity4-telegram-agent/Activity4a-Telegram-Agent.png", "Activity 4a workflow — Telegram-triggered AI Agent"),
-    "Activity 4b": ("labs/activity4-telegram-agent/Activity4b-Telegram-Data-Table.png", "Activity 4b workflow — Agent with a Data Table tool"),
+    "Activity 4b": ("labs/activity4-telegram-agent/Activity4b-Telegram-Data-Table.png", "Activity 4b reference layout — the agent (Ava in your build) with a Data Table tool"),
     "Activity 5 ": ("labs/activity5-investment-advisor/Activity5-Investment-Advisor.png", "Activity 5 workflow — Webhook chatbot + enquiry"),
     "Activity 6 ": ("labs/activity6-finance-advisor/Activity6-Finance-Advisor.png", "Activity 6 workflow — Finance API to Telegram day trader"),
     "Activity 8a": ("labs/activity8-guardrails/Activity8 - Leave Application & Manager Approval (Human-in-the-Loop).png",

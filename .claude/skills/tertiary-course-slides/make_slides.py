@@ -20,7 +20,7 @@ NAVY=RGBColor(0x0B,0x12,0x20); BLUE=RGBColor(0x1F,0x6F,0xEB); TEAL=RGBColor(0x10
 AMBER=RGBColor(0xF5,0x9E,0x0B); INK=RGBColor(0x16,0x1B,0x26); GREY=RGBColor(0x5B,0x63,0x72)
 LIGHT=RGBColor(0xF5,0xF8,0xFC); WHITE=RGBColor(0xFF,0xFF,0xFF); LINE=RGBColor(0xE2,0xE8,0xF0)
 VIOLET=RGBColor(0x7C,0x3A,0xED); GREEN=RGBColor(0x12,0x7A,0x3E); RED=RGBColor(0xC6,0x2F,0x2F)
-VERSION="v47"; VERSION_DATE="8 Aug 2026"
+VERSION="v48"; VERSION_DATE="17 Oct 2026"
 # ─── EDIT PER COURSE ─────────────────────────────────────────────
 TITLE       = "Agentic AI Automation with n8n"   # <<Course Title>>
 COURSE_CODE = "TGS-2023035977"                    # <<Course Code, e.g. TGS-XXXXXXXXXX>>
@@ -174,8 +174,8 @@ def website_lab(kicker,title,img,items,band=None,color=BLUE):
     pic_fit(s,img,Inches(6.5),Inches(2.0),Inches(6.0),Inches(3.95))
     if band: lab_band(s,band[0],band[1],band[2])
     footer(s); return s
-def concept(kicker,title,intro=None):
-    s=slide(); head(s,title,kicker)
+def concept(kicker,title,intro=None,kcolor=BLUE):
+    s=slide(); head(s,title,kicker,kcolor=kcolor)
     if intro: intro_line(s,intro)
     return s
 def section(kicker,title,n,sub="",applied="",color=BLUE):
@@ -190,14 +190,14 @@ def section(kicker,title,n,sub="",applied="",color=BLUE):
     footer(s)
 def content(title,items,kicker=None,size=20):
     s=slide(); head(s,title,kicker); bullets(s,Inches(0.85),Inches(1.9),Inches(11.6),Inches(4.9),items,size=size); footer(s); return s
-def two_panel(title,ltitle,litems,rtitle,ritems,kicker=None,lcolor=BLUE,rcolor=VIOLET,take=None):
+def two_panel(title,ltitle,litems,rtitle,ritems,kicker=None,lcolor=BLUE,rcolor=VIOLET,take=None,size=13.5):
     """Reference-style two-column comparison: colored header bars + outlined bullet panels."""
     s=slide(); head(s,title,kicker)
     for (x,w,t,items,col) in ((Inches(0.85),Inches(5.68),ltitle,litems,lcolor),(Inches(6.8),Inches(5.68),rtitle,ritems,rcolor)):
         rect(s,x,Inches(1.95),w,Inches(0.5),col)
         txt(s,x,Inches(1.95),w,Inches(0.5),[[(t,14,WHITE,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
         box(s,x,Inches(2.45),w,Inches(3.7),col,lw=1.25,round_=False)
-        bullets(s,x+Inches(0.3),Inches(2.7),w-Inches(0.6),Inches(3.3),items,size=13.5,mcolor=col,gap=9)
+        bullets(s,x+Inches(0.3),Inches(2.7),w-Inches(0.6),Inches(3.3),items,size=size,mcolor=col,gap=9 if size>=13 else 6)
     if take: takeaway(s,take)
     footer(s); return s
 def img_slide(title,img,caption,kicker="WORKFLOW",kcolor=TEAL):
@@ -220,6 +220,77 @@ def gallery_slide(title,imgs,captions,kicker):
         pic_fit(s,im,x0+Inches(0.1),Inches(2.0),cell-Inches(0.3),Inches(3.7))
         txt(s,x0,Inches(5.95),cell,Inches(0.5),[[(cap,13,GREY,False)]],align=PP_ALIGN.CENTER)
     footer(s); return s
+ASSET=lambda n: IMG(f".claude/skills/tertiary-course-slides/assets/{n}")
+def shots_slide(kicker,title,imgs,caption,color=TEAL):
+    """Screenshots side by side at a common height (widths follow each aspect ratio), plus a caption."""
+    from PIL import Image
+    s=slide(); head(s,title,kicker,kcolor=color)
+    paths=[p for p in imgs if _os.path.exists(p)]
+    ars=[(lambda im:(im.size[0]/im.size[1]))(Image.open(p)) for p in paths]
+    gap=Inches(0.3); W=Inches(11.63); top=Inches(1.75); MAXH=Inches(4.45)
+    H=min(MAXH,int((W-gap*(len(paths)-1))/sum(ars)))
+    ws=[int(H*a) for a in ars]
+    x=int(Inches(0.85)+(W-sum(ws)-gap*(len(paths)-1))/2); y=int(top+(MAXH-H)/2)
+    for p,w in zip(paths,ws):
+        pic_fit(s,p,x,y,w,H); x+=w+gap
+    if caption: txt(s,Inches(0.85),Inches(6.35),Inches(11.63),Inches(0.6),[[(caption,12,GREY,False)]],align=PP_ALIGN.CENTER)
+    footer(s); return s
+def side_cards(s,items,x,y,w,h,bsz=10):
+    """Numbered cards stacked in one column — items: (color, title, body)."""
+    n=len(items); gy=Inches(0.16); ch=int((h-gy*(n-1))/n)
+    for i,(col,t,body) in enumerate(items):
+        yy=int(y+(ch+gy)*i)
+        box(s,x,yy,w,ch,col)
+        bd=Inches(0.3)
+        oval(s,x+Inches(0.18),yy+Inches(0.14),bd,bd,col)
+        txt(s,x+Inches(0.18),yy+Inches(0.14),bd,bd,[[(str(i+1),12,WHITE,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
+        txt(s,x+Inches(0.6),yy+Inches(0.14),w-Inches(0.78),bd,[[(t,12.5,col,True)]],anchor=MSO_ANCHOR.MIDDLE)
+        txt(s,x+Inches(0.2),yy+Inches(0.54),w-Inches(0.4),ch-Inches(0.62),[[(body,bsz,INK,False)]],space=2)
+def annotated_slide(kicker,title,intro,img,cards,take,color=TEAL):
+    """A real screenshot on the left, numbered explanation cards stacked beside it, and a takeaway."""
+    s=slide(); head(s,title,kicker,kcolor=color); intro_line(s,intro)
+    pic_fit(s,img,Inches(0.85),Inches(1.95),Inches(6.75),Inches(4.2))
+    side_cards(s,cards,Inches(7.9),Inches(1.95),Inches(4.58),Inches(4.2))
+    takeaway(s,take); footer(s); return s
+def chat_shot(kicker,title,img,items,take,color=TEAL):
+    """Explanation bullets on the left, an app screenshot on the right, and a takeaway."""
+    s=slide(); head(s,title,kicker,kcolor=color)
+    bullets(s,Inches(0.85),Inches(2.0),Inches(6.4),Inches(4.0),items,size=14,gap=10,mcolor=color)
+    pic_fit(s,img,Inches(7.6),Inches(1.85),Inches(4.88),Inches(4.3))
+    takeaway(s,take); footer(s); return s
+def prompt_slide(kicker,title,intro,prompt,then,take,chev=None,color=VIOLET,psz=10.5):
+    """A prompt to paste into n8n Assistant (left), what to do next (right), optional chevron strip on top."""
+    s=concept(kicker,title,intro,kcolor=color)
+    y=Inches(2.0)
+    if chev:
+        chev_strip(s,chev,y=y,h=Inches(0.95),color=color,tsz=11.5,ssz=8.5); y=Inches(3.15)
+    h=Inches(6.1)-y
+    box(s,Inches(0.85),y,Inches(7.6),h,VIOLET)
+    txt(s,Inches(1.1),y+Inches(0.12),Inches(7.1),Inches(0.3),[[("THE PROMPT",11,VIOLET,True)]])
+    txt(s,Inches(1.1),y+Inches(0.45),Inches(7.15),h-Inches(0.5),[[(ln,psz,INK,False)] for ln in prompt],space=2)
+    box(s,Inches(8.7),y,Inches(3.78),h,TEAL)
+    txt(s,Inches(8.95),y+Inches(0.12),Inches(3.4),Inches(0.3),[[("THEN YOU",11,TEAL,True)]])
+    bullets(s,Inches(8.95),y+Inches(0.47),Inches(3.35),h-Inches(0.55),then,size=11.5,mcolor=TEAL,gap=6)
+    takeaway(s,take); footer(s); return s
+def source_note(s,text,y=Inches(5.9)):
+    txt(s,Inches(0.85),y,Inches(11.63),Inches(0.3),[[(text,9,GREY,False)]],align=PP_ALIGN.RIGHT)
+def principle_cols(s,items,y=Inches(2.05),h=Inches(4.0)):
+    """Five numbered columns — items: (color, title, kicker, body)."""
+    n=len(items); X0=Inches(0.85); TOTW=Inches(11.63); gx=Inches(0.22)
+    cw=int((TOTW-gx*(n-1))/n); bd=Inches(0.5)
+    for i,(col,t,k,body) in enumerate(items):
+        x=int(X0+(cw+gx)*i)
+        box(s,x,y,cw,h,col)
+        oval(s,int(x+cw/2-bd/2),y+Inches(0.22),bd,bd,col)
+        txt(s,int(x+cw/2-bd/2),y+Inches(0.22),bd,bd,[[(str(i+1),16,WHITE,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
+        txt(s,x+Inches(0.12),y+Inches(0.85),cw-Inches(0.24),Inches(0.62),[[(t,13.5,col,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
+        txt(s,x+Inches(0.12),y+Inches(1.5),cw-Inches(0.24),Inches(0.3),[[(k,9,GREY,True)]],align=PP_ALIGN.CENTER)
+        txt(s,x+Inches(0.18),y+Inches(1.9),cw-Inches(0.36),h-Inches(2.0),[[(body,11,INK,False)]],align=PP_ALIGN.CENTER,space=3)
+
+# n8n training accounts for this class — replace when the class changes.
+# The password is never written here (the repo is public): the trainer gives it in class.
+N8N_ACCOUNTS=[f"n8n18oct{i}@tertiaryinfotech.com" for i in range(1,13)]
+
 def brk(kind,dur,color):
     s=slide(); rect(s,0,0,SW,SH,WHITE)
     rect(s,0,0,SW,Inches(0.22),color); rect(s,0,Inches(7.28),SW,Inches(0.22),color)
@@ -280,7 +351,7 @@ def tile_grid(title,items,kicker=None,cols=2,size=15,icons=None,accent=BLUE):
         tx=x+Inches(1.08); tw=cw-Inches(1.32)
         txt(s,tx,int(y+Inches(0.1)),tw,int(ch-Inches(0.16)),[[(it,size,INK,False)]],anchor=MSO_ANCHOR.MIDDLE)
     footer(s); return s
-def flow_h(title,steps,kicker=None,color=BLUE):
+def flow_h(title,steps,kicker=None,color=BLUE,size=14):
     s=slide(); head(s,title,kicker=kicker,kcolor=color)
     n=len(steps); X0=Inches(0.85); TOTW=Inches(11.63); gap=Inches(0.34)
     cw=int((TOTW-gap*(n-1))/n); y=Inches(2.55); ch=Inches(3.15); bd=Inches(0.82)
@@ -289,7 +360,7 @@ def flow_h(title,steps,kicker=None,color=BLUE):
         rect(s,x,y,cw,ch,LIGHT); rect(s,x,y,cw,Inches(0.1),color)
         oval(s,int(x+cw/2-bd/2),int(y+Inches(0.42)),bd,bd,color)
         txt(s,int(x+cw/2-bd/2),int(y+Inches(0.42)),bd,bd,[[(str(i+1),30,WHITE,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
-        txt(s,x+Inches(0.16),int(y+Inches(1.55)),cw-Inches(0.32),int(ch-Inches(1.7)),[[(st,14,INK,False)]],align=PP_ALIGN.CENTER)
+        txt(s,x+Inches(0.16),int(y+Inches(1.55)),cw-Inches(0.32),int(ch-Inches(1.7)),[[(ln,size,INK,False)] for ln in st.split("\n")],align=PP_ALIGN.CENTER,space=0)
         if i<n-1:
             txt(s,int(x+cw-Inches(0.04)),int(y+ch/2-Inches(0.3)),int(gap+Inches(0.08)),Inches(0.6),
                 [[("▶",15,color,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
@@ -323,21 +394,24 @@ tile_grid("Ground Rules",[
  "Mutual respect: agree to disagree.","One conversation at a time.",
  "Be punctual; return from breaks on time.","75% attendance is required."],
  kicker="HOUSEKEEPING",cols=2,size=15)
-website_slide("Download Course Material",
- IMG(".claude/skills/tertiary-course-slides/assets/lms-tms-portal.png"),
- ["Go to lms-tms.tertiaryinfotech.com.",
-  "Enter your registered email and click Send OTP.",
-  "Key in the one-time password from your inbox to log in.",
-  "Open this course to download the slides and Learner Guide.",
-  "Keep them open — the assessment is open book.",
-  "Attendance and assessment submission also happen here."],
- kicker="COURSE PORTAL")
+img_slide("Login to LMS and Download Course Material",ASSET("lms-login.png"),
+ "Log in at lms-tms.tertiaryinfotech.com with your registered email + the OTP from your inbox, then download the slides and Learner Guide.",
+ kicker="COURSE PORTAL",kcolor=BLUE)
+flow_h("Download Course Material",[
+ "Go to lms-tms.\ntertiaryinfotech.com",
+ "Enter your registered email and click Send OTP",
+ "Key in the one-time password from your inbox",
+ "Open this course and download the slides + Learner Guide",
+ "Keep them open — the assessment is open book"],kicker="COURSE PORTAL · STEPS")
 tile_grid("Download the Course Flows (GitHub)",[
  "Open the course repo: github.com/tertiarycourses/TGS-2023035977-Agentic-AI-Automation-with-n8n",
  "Code ▾ → Download ZIP (or git clone) — all workflows are in the labs/ folder.",
  "In n8n: Workflows → Add workflow → ... → Import from File → pick the activity .json.",
  "After importing, re-select YOUR OWN credentials on each node, then Save & Publish."],
  kicker="GET THE WORKFLOWS",cols=1,size=15)
+img_slide("Import a Workflow from File",ASSET("n8n-import-from-file.png"),
+ "Create a NEW workflow, open the '...' menu → Import → From File and pick the activity .json, so your own build is not overwritten.",
+ kicker="GET THE WORKFLOWS",kcolor=BLUE)
 # Lesson plan — three day cards
 s=slide(); head(s,"Lesson Plan — 3 Days, 9:30am–6:30pm",kicker="SCHEDULE")
 _days=[(BLUE,"Day 1 — Automate, then add AI",
@@ -369,7 +443,7 @@ tile_grid("Twelve Connected Labs",[
  "Act 1 — Form → Email: your first automation, on a real flyer.",
  "Act 2 — Data Table: store every submission, not just forward it.",
  "Act 3a/3b — IF logic: route Yes/No to storage or a thank-you.",
- "Act 4a — Telegram AI agent: model + memory + instruction.",
+ "Act 4a — Telegram HR policy agent, built with n8n Assistant.",
  "Act 4b — Agent + tool: answers HR questions from a Data Table.",
  "Act 5 — Webhook: your agent behind a public website chatbot.",
  "Act 6 — APIs: live candles + news → Buy / Sell / Hold calls.",
@@ -398,19 +472,153 @@ flow_h("Assessment Flow",[
 K1="TOPIC 1 · WORKFLOW AUTOMATION"
 K1L="TOPIC 1 · LAB WORKFLOW"
 section("TOPIC 1","Workflow Automation with n8n","01",
- "What n8n is · triggers · data-processing nodes · JSON and expressions · executions",
+ "Why agentic AI · workflow first vs agent first · AI security · what n8n is · sign-in and free AI credits · n8n Assistant · triggers · data nodes",
  "Applied in Activities 1, 2, 3a and 3b")
-s=concept(K1,"What Is n8n?","A workflow automation platform: connect apps, data and AI on one visual canvas — no-code to full-code.")
+# --- why agentic AI, and why workflow first (before n8n is introduced) ---
+# a brief history of AI, 2023–2026
+s=concept("TOPIC 1 · A BRIEF HISTORY OF AI","A Brief History of AI, 2023–2026",
+ "Each year moved the skill that matters — from the words you type to the system you build.")
+chev_strip(s,[("Prompt Engineering","2023"),("Context Engineering","2024"),
+              ("Harness Engineering","2025"),("AI Agents","2026")],y=Inches(2.05),h=Inches(1.0),color=VIOLET)
+ncards(s,[(BLUE,"Wording the prompt","ChatGPT goes mainstream. Results depend on how well you word the prompt."),
+ (TEAL,"Curating the context","Models call tools and MCP launches. Results depend on the documents, data and tools you supply."),
+ (VIOLET,"Building the harness","Claude Code and Codex: systems that plan, act and check their own work in a loop."),
+ (AMBER,"Agents at work","Always-on agents work 24/7 — OpenClaw, Hermes Agent and agent teams take on whole jobs.")],
+ y=Inches(3.35),h=Inches(2.7),cols=4,numbered=False)
+takeaway(s,"From wording one prompt → curating context → engineering the harness → AI agents that work around the clock.")
+footer(s)
+two_panel("Generative AI vs Agentic AI",
+ "GENERATIVE AI — answers",["You ask; it writes one answer.","No memory of your systems, no actions.","Quality depends on what you paste into the prompt.","Example: ChatGPT summarising a document."],
+ "AGENTIC AI — acts",["Works toward a goal, not just one reply.","Calls tools: looks up data, calls APIs, writes records.","Holds a conversation with memory.","Example: a bot that checks the Employees table and answers."],
+ kicker="TOPIC 1 · GENERATIVE VS AGENTIC AI",lcolor=BLUE,rcolor=VIOLET,
+ take="Generative AI produces content. Agentic AI decides and does — which is why it needs governance.")
+two_panel("Agentic AI vs AI Agents",
+ "Agentic AI — the broad category",[
+  "Any AI system that pursues a goal over many steps: plans, acts through tools, checks the result",
+  "Usually started by a person or a trigger, and stops when the task is done",
+  "Built as a workflow with AI steps, or around an LLM loop",
+  "Includes the orchestration, guardrails and human approvals",
+  "Examples: a Claude Code or Codex session; an n8n workflow with AI steps"],
+ "AI Agents — always-on agentic AI",[
+  "A special type of agentic AI system that exists 24/7",
+  "Usually installed in the cloud, so it serves all the time — no laptop needs to be open",
+  "Waits for events — messages, emails, webhooks, schedules — and acts on them around the clock",
+  "Keeps its memory across conversations and days",
+  "Examples: OpenClaw, Hermes Agent, an n8n agent on a cloud instance behind a webhook"],
+ kicker="TOPIC 1 · AGENTIC AI VS AI AGENTS",lcolor=BLUE,rcolor=VIOLET,size=12,
+ take="Every AI agent is agentic AI, but not every agentic AI is an AI agent — an AI agent is always on, serving 24/7.")
+# workflow first vs agent first
+s=concept("TOPIC 1 · WORKFLOW FIRST VS AGENT FIRST","Workflow First vs Agent First",
+ "Workflow first evolves rule-based (RPA) automation: the workflow owns the path, and its steps can be AI or AI agents, as in n8n.")
+data_table(s,[2.5,4.55,4.58],["","Workflow First","Agent First"],[
+ ["Who decides the path","The workflow — steps may be AI nodes or AI Agent nodes","The agent decides the steps and tools at run time"],
+ ["Behaviour","Deterministic — same input, same path, every time","Probabilistic — the path can change between runs"],
+ ["Efficiency","More effort to design every branch up front","Efficient — one instruction replaces many hand-built branches"],
+ ["Reliability & testing","Easy to test, debug and certify step by step","Harder to test; edge cases surface in production"],
+ ["Cost & speed","An LLM call only where needed — cheap and fast","An LLM call at every step — more tokens, more latency"],
+ ["Best for","Repeatable, regulated, high-volume processes","Open-ended tasks with unpredictable inputs"]],
+ y=Inches(2.05),rh=Inches(0.5),hcolor=VIOLET,fsz=10)
+source_note(s,"Source: n8n, In The Loop 2026 — opening keynote and product direction (youtube.com/watch?v=KQRe5UurLQ0)")
+takeaway(s,"Workflow first is more deterministic; agent first is more efficient. Companies make as much deterministic as they can.")
+footer(s)
+# the trend: AI-assisted workflow creation
+s=concept("TOPIC 1 · THE MODERN VIEW","The Trend: AI-Assisted Workflow Creation",
+ "AI-powered coding has flipped the trade-off — the agent's efficiency goes into BUILDING the workflow, not running it.")
+chev_strip(s,[("Describe","the process in plain English"),("n8n Assistant","or Claude Code / Codex drafts it"),
+              ("You review","test and approve it"),("Workflow runs","deterministic and logged"),
+              ("AI and agent nodes","where judgement is needed")],y=Inches(2.05),h=Inches(1.0),color=VIOLET,tsz=11.5,ssz=8.5)
+ncards(s,[(BLUE,"Companies want determinism","Reliability, compliance and audit push businesses to make as much of a process deterministic as possible."),
+ (VIOLET,"AI coding made it cheap","n8n Assistant, Claude Code and Codex are AI agents themselves — they make designing, building and changing workflows fast and cheap."),
+ (TEAL,"The best of both","An AI agent BUILDS the workflow; a deterministic workflow RUNS the process, with AI and AI Agent nodes where judgement is needed.")],
+ y=Inches(3.35),h=Inches(2.7),cols=3)
+takeaway(s,"The trend: AI-assisted workflow creation — the AI builds the workflow, and the workflow runs the business process.")
+footer(s)
+# platform tiers — AI now assists every tier
+s=concept("TOPIC 1 · COMPLEXITY VS CUSTOMISATION","Where AI Agent Platforms Sit",
+ "Three tiers — and AI now helps build at every one of them. This course teaches the middle one.")
+TIERS=[(BLUE,"No-code",[("HOW YOU BUILD","Drag and drop in a fully visual builder."),
+                        ("CUSTOMISATION","Lowest. Fastest route to a working agent, least control over the internals.")]),
+       (TEAL,"Low-code  ·  n8n",[("HOW YOU BUILD","AI-assisted: n8n Assistant, Claude Code or Codex drafts the workflow on a visual canvas."),
+                        ("CODE WHEN NEEDED","Add JavaScript or Python in a Code node where a built-in node is not enough."),
+                        ("CUSTOMISATION","High. 400+ integrations, self-host or cloud. This course's platform.")]),
+       (VIOLET,"Full-code",[("HOW YOU BUILD","AI generates the code — Claude Code or Codex write it, instead of coding manually."),
+                        ("CUSTOMISATION","Highest — the most customisable tier. SDKs and frameworks such as LangChain, with real engineering effort to test and run.")])]
+X0=Inches(0.85); gx=Inches(0.32); cw=int((Inches(11.63)-gx*2)/3); y0=Inches(2.05); ch=Inches(3.55)
+for i,(col,t,rows) in enumerate(TIERS):
+    x=int(X0+(cw+gx)*i); box(s,x,y0,cw,ch,col)
+    bd=Inches(0.34); oval(s,x+Inches(0.2),y0+Inches(0.16),bd,bd,col)
+    txt(s,x+Inches(0.2),y0+Inches(0.16),bd,bd,[[(str(i+1),13,WHITE,True)]],align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
+    txt(s,x+Inches(0.68),y0+Inches(0.17),cw-Inches(0.9),Inches(0.34),[[(t,14,col,True)]])
+    paras=[]
+    for lab_,val in rows: paras+=[[(lab_,9,col,True)],[(val,11,INK,False)]]
+    txt(s,x+Inches(0.22),y0+Inches(0.66),cw-Inches(0.44),ch-Inches(0.8),paras,space=4)
+ar=s.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW,X0,Inches(5.72),Inches(11.63),Inches(0.4))
+ar.fill.solid(); ar.fill.fore_color.rgb=LIGHT; ar.line.color.rgb=LINE; ar.shadow.inherit=False
+txt(s,X0+Inches(0.3),Inches(5.72),Inches(10.8),Inches(0.4),
+    [[("Less control, less effort   ·   more customisation, more engineering effort  →",10.5,GREY,True)]],
+    align=PP_ALIGN.CENTER,anchor=MSO_ANCHOR.MIDDLE)
+takeaway(s,"AI drafts the workflow in low-code and writes the code in full-code. n8n: analysts build it, engineers extend it.")
+footer(s)
+# business value of workflow-first agentic automation
+s=concept("TOPIC 1 · WHY ORGANISATIONS ADOPT IT","Business Value of Workflow-First Agentic Automation",
+ "The modern view: what a business gains when AI builds the workflow and the workflow runs the process.")
+ncards(s,[(BLUE,"Reliable and predictable","The same input follows the same path every time, so the process can be tested and trusted like software."),
+ (TEAL,"Secure by design","Each step holds only the data and credentials it needs; risky actions wait at an approval gate."),
+ (VIOLET,"Auditable end to end","Every run is logged node by node — you can explain, replay and correct any decision."),
+ (AMBER,"Lower running cost","Deterministic steps cost nothing in tokens; the LLM is called only where judgement is needed."),
+ (GREEN,"Faster to build and change","n8n Assistant, Claude Code and Codex draft the workflow in minutes; your team reviews, tests and owns it."),
+ (RED,"Scale around the clock","Triggers respond in real time, 24/7 — ten times the volume costs compute, not ten more hires.")],
+ y=Inches(1.98),h=Inches(4.15),cols=3)
+takeaway(s,"AI where judgement is needed, workflow everywhere else — reliability you can audit, at a cost you can predict.")
+footer(s)
+# use cases
+s=concept("TOPIC 1 · USE CASES","Where Agentic Automation Is Used",
+ "The same pattern — trigger, agent, tools, oversight — recurs across every function.")
+ncards(s,[(BLUE,"Customer service","Answer enquiries from your own documents, capture leads, and escalate what needs a person."),
+ (TEAL,"Finance & accounting","Invoice processing, bank reconciliation, accounts-payable routing and exception handling."),
+ (VIOLET,"Risk & compliance","Screen applications, flag anomalies, and route sensitive cases for human review."),
+ (AMBER,"HR & people ops","Onboarding, leave applications, policy questions and approval chains."),
+ (GREEN,"Sales & marketing","Lead qualification, follow-up sequencing, CRM enrichment and content drafting."),
+ (RED,"Operations","Order processing, status notifications, document generation and reporting.")],
+ y=Inches(1.98),h=Inches(4.15),cols=3)
+takeaway(s,"Every one of these is a front door, an agent, some tools and a decision about where the human belongs.")
+footer(s)
+s=slide(); head(s,"5 Principles of AI Security","TOPIC 1 · AI SECURITY",kcolor=RED)
+intro_line(s,"Agents act on your behalf. These five controls keep what they can see and do safe, reviewable and accountable.")
+principle_cols(s,[(BLUE,"Data Control","WHAT AI CAN SEE",
+   "Classify your data — public, internal, confidential — and decide exactly which data the AI may access."),
+ (TEAL,"Permission Control","WHAT AI CAN DO",
+   "Grant only the rights needed — read, write, edit, delete. Ask before anything destructive."),
+ (VIOLET,"Human in the Loop","WHO APPROVES",
+   "A person reviews and approves high-impact actions — payments, deletions, customer emails."),
+ (AMBER,"Traceability","WHAT HAPPENED",
+   "Log every prompt, tool call and change so actions can be audited, explained and rolled back."),
+ (RED,"Right-Sized Models","NOT THE MOST POWERFUL",
+   "The smallest model that does the job carries less autonomy and less risk than the most powerful one.")])
+takeaway(s,"In n8n: scoped credentials per node, approval gates (Send and Wait), the Executions log, and a small model per AI step.")
+footer(s)
+s=slide(); head(s,"Workflow First vs Agent First — AI Security","TOPIC 1 · AI SECURITY",kcolor=RED)
+intro_line(s,"A fixed path limits the blast radius: a manipulated AI step cannot reach tools that are not wired to it.")
+data_table(s,[2.5,4.55,4.58],["Principle","Workflow First","Agent First"],[
+ ["Data control","Each node sees only the fields wired into it","The agent can reach any data its tools expose"],
+ ["Permission control","Each credential is scoped to one node and one action","The agent holds every tool's rights at once"],
+ ["Human in the loop","The approval gate sits at a fixed, designed step","Depends on the agent choosing to ask"],
+ ["Traceability","Every run is logged node by node in Executions","Reasoning varies run to run and is harder to explain"],
+ ["Right-sized models","A small model for each narrow AI step","One capable model with broad autonomy"]],
+ y=Inches(2.05),rh=Inches(0.56),hcolor=RED)
+takeaway(s,"The path is fixed, so every control is designed in rather than hoped for — that is why regulated processes stay workflow first.")
+footer(s)
+s=concept(K1,"What Is n8n?","A workflow-first agentic AI platform: the workflow owns the path, and AI and AI Agent nodes sit inside it.")
 ncards(s,[(BLUE,"Build visually","Drag nodes onto a canvas and wire them together. 400+ app integrations, plus HTTP and Code nodes when no integration exists."),
  (TEAL,"Run anywhere","Free cloud trial at n8n.io, or self-host with Docker. Webhooks, schedules and chat triggers work the same in both."),
  (VIOLET,"AI-native","AI Agent and LangChain nodes are built in — attach any LLM (OpenAI, Gemini, Claude), memory, tools and vector stores.")],
  y=Inches(2.2),h=Inches(3.6),cols=3)
-takeaway(s,"One canvas to connect apps, data and AI — automation and agents without gluing code by hand.")
+takeaway(s,"n8n is workflow-first agentic AI — deterministic workflows with AI and agents built in, on one canvas.")
 footer(s)
 website_slide("n8n.io",IMG(".claude/skills/tertiary-course-slides/assets/site-n8n.png"),
  ["n8n is an open, fair-code workflow automation platform.","Free cloud trial at n8n.io, or self-host with Docker.","Same visual editor in both.",
   "This course: start on the cloud trial, keep the Docker option for after."],
- kicker="THE PLATFORM")
+ kicker="TOPIC 1 · WHAT IS n8n")
 s=concept(K1,"What Automation Removes","Automation is not 'the same work faster' — it removes the hand-offs where a person re-types what another system already knows.")
 txt(s,Inches(0.85),Inches(2.1),Inches(1.4),Inches(0.8),[[("MANUAL",12,RED,True)]],anchor=MSO_ANCHOR.MIDDLE)
 chev_strip(s,[("Form filled in",""),("Someone reads it",""),("Re-typed into Excel",""),("Someone remembers to reply","")],y=Inches(2.05),h=Inches(0.8),color=RED,x0=Inches(2.3),tw=Inches(10.18),tsz=11)
@@ -429,6 +637,61 @@ ncards(s,[(BLUE,"One trigger","A workflow has exactly one entry point. Change th
  (VIOLET,"Data flows as JSON","Every node passes a list of JSON items to the next — the same structure in every lab.")],
  y=Inches(3.5),h=Inches(2.55),cols=3)
 takeaway(s,"Trigger, actions, output. Learn this once in Activity 1 and every later lab is a variation.")
+footer(s)
+# --- your n8n training account ---
+s=concept("TOPIC 1 · TRAINING ACCOUNTS","n8n Training Accounts",
+ "Each learner signs in to n8n with ONE assigned account. Use only the account your trainer gives you.")
+_h=len(N8N_ACCOUNTS)//2
+data_table(s,[0.8,5.0,0.8,5.03],["#","Account (email)","#","Account (email)"],
+ [[str(i+1),N8N_ACCOUNTS[i],str(i+1+_h),N8N_ACCOUNTS[i+_h]] for i in range(_h)],
+ y=Inches(2.05),rh=Inches(0.52),hcolor=BLUE,fsz=12)
+takeaway(s,"Password: provided by your trainer in class   ·   Do not change the password or save real credentials in it.")
+footer(s)
+s=flow_h("Sign In to n8n",[
+ "Go to app.n8n.cloud/login — or open your own instance URL directly",
+ "Enter your assigned account email, e.g. n8n18oct5@tertiaryinfotech.com",
+ "Enter the password your trainer gives you",
+ "Open your instance from the dashboard — a free 14-day trial, active through the training",
+ "You land in n8n — open Assistant or Overview to start building"],
+ kicker="TOPIC 1 · SIGN IN")
+takeaway(s,"Your account is already set up — the name is your email prefix and onboarding is done. Do not change the password.")
+img_slide("The n8n Editor",IMG(".claude/skills/tertiary-course-slides/assets/n8n-editor.png"),
+ "n8n canvas: left sidebar navigation · centre canvas · node toolbar · Editor / Executions / Evaluations tabs",
+ kicker=K1,kcolor=BLUE)
+s=flow_h("Claim Your Free AI Credits",[
+ "Sign in to n8n Cloud with your training account — the free trial includes Gateway credits",
+ "Open a workflow and add an AI node, e.g. AI Agent → Gemini or OpenAI Chat Model",
+ "In the node's Credential field, choose Use Gateway credits — your balance shows beside it",
+ "Pick a supported model and run the node — no provider account or API key needed",
+ "Track the balance on the node, or in Admin Panel → Gateway credits"],
+ kicker="TOPIC 1 · FREE AI CREDITS",color=TEAL)
+takeaway(s,"A red \"Free AI credits — Enable to claim credits\" toast is the legacy OpenAI offer: Gateway instances don't get it. Use Gateway credits.")
+img_slide("n8n Assistant — Describe It, n8n Builds It",ASSET("n8n-assistant.png"),
+ "Open Assistant in the sidebar and answer \"What do you want to automate?\" — it builds a normal workflow you can edit and publish.",kicker="TOPIC 1 · AI-ASSISTED WORKFLOW CREATION",kcolor=VIOLET)
+# demo: AI-assisted workflow creation (same as the BPA deck)
+DEMO_PROMPT=[
+ "Create a workflow for a social media marketing campaign:",
+ "1. Start from a form where I enter a campaign topic.",
+ "2. Research the topic on the web and summarise 3 key points.",
+ "3. Draft a LinkedIn post under 150 words from the research.",
+ "4. Email me the draft and wait for my approval before posting.",
+ "5. If approved, schedule the post for 9am the next weekday;",
+ "    if rejected, log my feedback in a Google Sheet.",
+ "Use Gateway credits for the AI model. Ask me before publishing."]
+s=concept("TOPIC 1 · DEMO","Demo: n8n Assistant Builds a Social Media Campaign",
+ "Give n8n Assistant one clear prompt — it plans and builds the workflow below, with a human approval gate.")
+chev_strip(s,[("Form Trigger","you enter a topic"),("Research","AI Agent + web search"),
+              ("Draft post","AI writes the copy"),("Human in the loop","email approve / reject"),
+              ("Schedule post","wait, then publish")],y=Inches(2.0),h=Inches(0.95),color=BLUE,tsz=11.5,ssz=8.5)
+box(s,Inches(0.85),Inches(3.15),Inches(7.2),Inches(2.95),VIOLET)
+txt(s,Inches(1.1),Inches(3.27),Inches(6.8),Inches(0.3),[[("THE PROMPT",11,VIOLET,True)]])
+txt(s,Inches(1.1),Inches(3.6),Inches(6.8),Inches(2.45),[[(ln,10.5,INK,False)] for ln in DEMO_PROMPT],space=2)
+box(s,Inches(8.3),Inches(3.15),Inches(4.18),Inches(2.95),TEAL)
+txt(s,Inches(8.55),Inches(3.27),Inches(3.8),Inches(0.3),[[("THEN YOU",11,TEAL,True)]])
+bullets(s,Inches(8.55),Inches(3.62),Inches(3.75),Inches(2.4),[
+ "Review the plan before it builds","Connect Gmail and the social account when it asks",
+ "Test with a real topic and approve the draft","Publish only when the run looks right"],size=11.5,mcolor=TEAL,gap=6)
+takeaway(s,"The AI built it; the workflow runs it — and nothing is posted until a person approves the draft.")
 footer(s)
 # --- Triggers ---
 s=concept(K1,"Trigger Nodes — What Is Allowed to Start a Workflow","The trigger you choose is a statement about who or what may start the process.")
@@ -516,22 +779,10 @@ footer(s)
 img_slide("Execution History",IMG(".claude/skills/tertiary-course-slides/assets/n8n-execution-history.png"),
  "Executions tab — each run shows status, duration, ID and the full data at every node",
  kicker=K1,kcolor=BLUE)
-img_slide("The n8n Editor",IMG(".claude/skills/tertiary-course-slides/assets/n8n-editor.png"),
- "n8n canvas: left sidebar navigation · centre canvas · node toolbar · Editor / Executions / Evaluations tabs",
- kicker=K1,kcolor=BLUE)
-# --- setup ---
-website_slide("Sign Up for n8n Cloud",
- IMG(".claude/skills/tertiary-course-slides/assets/n8n-register.png"),
- ["Go to app.n8n.cloud/register in your browser.",
-  "Enter your company email and click Submit.",
-  "Open the verification email from n8n and click the link to confirm.",
-  "Set your password and complete the short profile questions.",
-  "n8n creates your workspace at <name>.app.n8n.cloud and opens the editor.",
-  "The free trial runs 14 days — no credit card needed."],
- kicker="YOUR LOGIN · CLOUD INSTANCE")
+# --- credentials (last fundamentals slide before Lab 1, as in the BPA deck) ---
 s=concept(K1,"Credentials — Connect Your Accounts Once","Nodes reference credentials by name; set them up once under Credentials → Add credential.")
 ncards(s,[(BLUE,"Email","Gmail or Outlook via OAuth2 — used from Activity 1 onward."),
- (TEAL,"LLM","OpenAI / Google Gemini API key — powers every AI agent from Activity 4."),
+ (TEAL,"LLM","Free n8n Gateway credits (no key needed), or your own OpenAI / Google Gemini API key — powers every AI agent from Activity 4."),
  (VIOLET,"Telegram","Bot token from @BotFather — the chat front door for Activities 4, 6, 7a."),
  (AMBER,"Google Sheets","OAuth2 to your Google account — persistent storage in Activity 3b.")],
  y=Inches(2.0),h=Inches(3.7),cols=2)
@@ -543,16 +794,25 @@ lab_slide(K1L,"ACT 1","Activity 1 — Flyer with QR Code (Form → Email)",
  [[("Form Trigger","visitor submits the RSVP"),("Gmail — Send","admin receives the details")]],
  IMG("labs/activity1-flyer-form/Activity1-Flyer-Form.png"),
  "Form Trigger → Gmail  ·  Gmail OAuth2 credential  ·  full steps in the Learner Guide")
-gallery_slide("Sample Flyers from Past Students",
- [IMG("labs/activity1-flyer-form/flyer-sample1-preview.png"),
-  IMG("labs/activity1-flyer-form/flyer-sample2-preview.png"),
-  IMG("labs/activity1-flyer-form/flyer-sample3.jpeg")],
- ["Network event","Event poster","Bowling party"],kicker="ACT 1 · GROUP ACTIVITY")
+shots_slide("ACT 1 · IN n8n","Activity 1 — Add the n8n Form Trigger",
+ [ASSET("lab1-add-trigger.png"),ASSET("lab1-form-trigger.png")],
+ "Click Add first step (+), search 'form' and choose n8n Form → On new n8n Form event. "
+ "Then add the Name, Email, Phone and Message fields.")
+shots_slide("ACT 1 · IN n8n","Activity 1 — Gmail: Send a Message with Expressions",
+ [ASSET("lab1-gmail-actions.png"),ASSET("lab1-gmail-expression.png")],
+ "Add Gmail → Send a message. Switch Message to Expression and drag in the form fields — "
+ "the Result panel previews the email before you run it.")
+shots_slide("ACT 1 · GROUP ACTIVITY","Sample Flyers from Past Students",
+ [ASSET("lab1-flyer-learner1.png"),ASSET("lab1-flyer-learner2.png"),
+  ASSET("lab1-flyer-learner3.png"),ASSET("site-lab1-flyer.png")],
+ "Each QR code encodes the form's Production URL — scan it, register, and the event "
+ "administrator receives the details by email.")
 lab_slide(K1L,"ACT 2","Activity 2 — Capture Submissions in a Data Table",
  "Extend Activity 1 so every submission is also saved — your first taste of storing data, not just forwarding it.",
  [[("Form Trigger","same RSVP form"),("Data Table — Insert Row","every submission saved"),("Gmail — Send","admin still notified")]],
  IMG("labs/activity2-data-table/Activity2-Data-Table.png"),
  "Form Trigger → Data Table + Gmail  ·  columns mapped with {{ $json.… }} expressions  ·  steps in the Learner Guide")
+brk("Lunch Break","1 hour  ·  see you at 2:00 pm",AMBER)
 lab_slide(K1L,"ACT 3a","Activity 3a — Conditional Response (Data Table)",
  "Add decision-making: attending guests are saved; everyone else gets a polite thank-you email.",
  [[("Form Trigger","+ Attending? Yes/No field"),("IF","Attending = Yes ?"),("Data Table","YES → save the RSVP"),("Gmail","NO → thank-you email")]],
@@ -563,19 +823,13 @@ lab_slide(K1L,"ACT 3b","Activity 3b — Conditional Response (Google Sheets)",
  [[("Form Trigger","same form"),("IF","Attending = Yes ?"),("Google Sheets — Append","YES → a spreadsheet you keep"),("Gmail","NO → thank-you email")]],
  IMG("labs/activity3-conditional/Activity3b-Conditional-Google-Sheets.png"),
  "Form → IF → Google Sheets / Gmail  ·  Google Sheets OAuth2  ·  steps in the Learner Guide")
-brk("Lunch Break","1 hour  ·  see you at 2:00 pm",AMBER)
 
 # ---------- TOPIC 2: AI AGENTS ----------
 K2="TOPIC 2 · AI AGENTS"
 K2L="TOPIC 2 · LAB WORKFLOW"
 section("TOPIC 2","AI Agents","02",
- "Generative vs agentic AI · model, memory, tools, instructions · model parameters · MCP",
+ "Components of an agent · model, memory, tools, instructions · model parameters · MCP",
  "Applied in Activities 4a and 4b",color=VIOLET)
-two_panel("Generative AI vs Agentic AI",
- "GENERATIVE AI — answers",["You ask; it writes one answer.","No memory of your systems, no actions.","Quality depends on what you paste into the prompt.","Example: ChatGPT summarising a document."],
- "AGENTIC AI — acts",["Works toward a goal, not just one reply.","Calls tools: looks up data, calls APIs, writes records.","Holds a conversation with memory.","Example: a bot that checks the Employees table and answers."],
- kicker=K2,lcolor=BLUE,rcolor=VIOLET,
- take="Generative AI produces content. Agentic AI decides and does — which is why it needs governance.")
 # anatomy of an agent
 s=concept(K2,"Components of an AI Agent","Four parts, one hub: the agent node wires them together — and only some are under your direct control.")
 box(s,Inches(4.7),Inches(3.3),Inches(3.9),Inches(1.15),VIOLET,lw=2)
@@ -666,16 +920,71 @@ two_panel("MCP in n8n",
  kicker=K2,lcolor=VIOLET,rcolor=BLUE,
  take="Two directions, one protocol: n8n can serve tools to other agents, and borrow tools for its own.")
 # labs 4a/4b
-lab_slide(K2L,"ACT 4a","Activity 4a — Telegram AI Agent (Customer Service)",
- "Your first agent: a customer-service bot on Telegram — model + memory + a system instruction.",
- [[("Telegram Trigger","each message to your bot"),("AI Agent","gpt-4.1-mini + window memory + instruction"),("Telegram — Send","reply lands in the chat")]],
- IMG("labs/activity4-telegram-agent/Activity4a-Telegram-Agent.png"),
- "Telegram bot via @BotFather  ·  OpenAI + Telegram credentials  ·  steps in the Learner Guide",color=VIOLET)
+# Activity 4a — the HR Policy Agent on Telegram, built with n8n Assistant (same demo as the BPA deck)
+K4A="TOPIC 2 · ACTIVITY 4a"
+s=concept(K2L,"Activity 4a — An HR Policy Chatbot on Telegram",
+ "What is a chatbot? An agent behind a chat channel. Your first agent, Ava, answers staff questions on company HR policies.",kcolor=VIOLET)
+chev_strip(s,[("Telegram Trigger","an employee messages the bot"),("HR Agent — Ava","HR policies + memory"),
+              ("Chat model","Gateway credits, no API key"),("Reply on Telegram","back to the same chat")],
+           y=Inches(2.0),h=Inches(0.95),color=VIOLET,tsz=12.5,ssz=8.5)
+ncards(s,[(BLUE,"What Ava knows","Sample HR policies written into the system instruction — leave, sick leave, claims, hours, probation."),
+ (RED,"Guardrails in the prompt","Answer only from the policies, never invent a number, and refer salary, medical or disciplinary questions to HR."),
+ (TEAL,"Then give her a tool","Activity 4b attaches an Employees Data Table, so Ava can also answer from real staff records.")],
+ y=Inches(3.3),h=Inches(2.75),cols=3)
+takeaway(s,"You will: create a bot with BotFather  →  build the workflow with n8n Assistant  →  connect, publish and chat.")
+footer(s)
+s=flow_h("Step 1: Create a Telegram Bot with BotFather",[
+ "Open Telegram and search for BotFather (blue checkmark)",
+ "Start a chat and send /newbot",
+ "Type a display name, e.g. My Free Helper Bot",
+ "Choose a unique username ending in bot, e.g. my_free_helper_bot",
+ "Copy the HTTP API token BotFather sends back"],kicker=K4A,color=VIOLET,size=12)
+takeaway(s,"The token is the bot's password — never share or commit it. If it leaks, send /revoke to BotFather for a new one.")
+chat_shot(K4A,"Step 2a: Open n8n Assistant with Build with AI",ASSET("n8n-build-with-ai.png"),
+ ["Create a new workflow. The empty canvas offers two starts: Add first step, or Build with AI.",
+  "Click Build with AI — this opens n8n Assistant, which builds the workflow from a plain-English prompt.",
+  "Add first step is the manual route: it opens the node search, here filtered to 'ai agent'.",
+  "Either way you get the same nodes. The Assistant just writes the first draft for you."],
+ "Build with AI drafts the workflow; you still review every node before you publish.",color=VIOLET)
+prompt_slide(K4A,"Step 2b: Paste the Prompt into n8n Assistant",
+ "Create a new workflow, open n8n Assistant and paste this prompt — it plans and builds the chatbot for you.",
+ ["Create a 3-node workflow:",
+  "•  A user posts a message to a Telegram bot.",
+  "•  Telegram sends the data to an HR agent.",
+  "•  The HR agent responds to the user on the company HR policies. Create a system instruction for the HR agent with sample company policies in it. The HR agent has a memory.",
+  "•  Respond to Telegram."],
+ ["Review the plan before it builds","Read the system instruction it wrote — edit the sample policies if you like",
+  "Check a memory node is attached to the HR agent","Stuck? Import the reference solution instead"],
+ "Reference solution: labs/activity4-telegram-agent/Activity4a-Telegram-HR-Agent.json",psz=12.5)
+s=concept(K4A,"The Workflow n8n Assistant Builds",
+ "Your canvas should look like this: trigger, agent, reply — with the chat model and memory hanging under the agent.",kcolor=VIOLET)
+pic_fit(s,ASSET("n8n-flow-telegram-demo.png"),Inches(0.85),Inches(1.95),Inches(11.63),Inches(2.55))
+ncards(s,[(BLUE,"Telegram Trigger","Updates: message — every message sent to the bot starts one execution."),
+ (VIOLET,"HR Agent","Ava's role, rules and sample HR policies live in the system instruction n8n Assistant wrote."),
+ (TEAL,"Model and memory","Chat model on Gateway credits; memory keeps each employee's conversation, keyed on the chat ID."),
+ (AMBER,"Reply out","Reply on Telegram sends back to the chat ID the trigger received, so the reply lands in the same chat.")],
+ y=Inches(4.65),h=Inches(1.5),cols=4)
+takeaway(s,"Shown before memory was added — check yours has a memory node (the reference file has one).")
+footer(s)
+s=flow_h("Step 3: Connect the Bot, Publish and Chat",[
+ "Telegram Trigger → Credential → Create new → paste the token",
+ "Telegram reply node → select the same credential",
+ "Chat model → Use Gateway credits",
+ "Publish — n8n registers its webhook with Telegram",
+ "Open t.me/<username>, tap Start, ask about annual leave"],kicker=K4A,color=VIOLET,size=12.5)
+takeaway(s,"A Telegram bot has ONE webhook at a time — testing in the editor swaps in the Test URL, so publish again when you are done.")
+chat_shot(K4A,"Chatting with Ava on Telegram",ASSET("telegram-chat-demo.png"),
+ ["/start opens the chat — Ava introduces herself exactly as her system message tells her to.",
+  "Ask how many days of leave you get: the answer quotes the policy — 14, 18 or 21 days by length of service.",
+  "Ask a follow-up — memory keeps the context. Then ask about a colleague's salary: Ava must refer you to HR.",
+  "Every message is one workflow run — open Executions in n8n to watch it happen."],
+ "The bot is only as safe as its system message. Activity 4b gives Ava a tool: the Employees Data Table.",color=VIOLET)
 lab_slide(K2L,"ACT 4b","Activity 4b — Agent + Data Table Tool (HR Admin)",
- "Give the same agent a tool: an Employees Data Table (100 records) it can query — answers now come from real data.",
+ "Give Ava a tool: an Employees Data Table (100 records) she can query — answers now come from real staff records.",
  [[("Telegram Trigger","same bot"),("AI Agent","+ Employees Data Table tool"),("Telegram — Send","answers grounded in the table")]],
  IMG("labs/activity4-telegram-agent/Activity4b-Telegram-Data-Table.png"),
- "Tool description tells the agent WHEN to use it  ·  instruction updated to route staff questions  ·  steps in the Learner Guide",color=VIOLET)
+ "Tool description tells the agent WHEN to use it  ·  instruction updated to route staff questions  ·  steps in the Learner Guide",color=VIOLET,
+ cap="Reference layout — in your build the agent is Ava (HR Agent) and the reply node is Reply on Telegram.")
 content("End of Day 1 — Recap",[
  "You built form automations, conditional logic and storage (Data Table → Google Sheets).",
  "You met the agent's four parts — model, memory, tools, instructions — and MCP.",
@@ -869,11 +1178,21 @@ lab_slide(K5L,"ACT 7b","Activity 7b — CX Agent: Grounded Support Chatbot",
  IMG("labs/activity7-rag/Activity7b-CX-Agent.png"),
  "Same index, same embeddings, same namespace as ingestion  ·  steps in the Learner Guide",color=AMBER)
 website_lab("ACT 7b · THE WEBSITE","Cook & Bake Academy — Support Chatbot",
- IMG("labs/activity7-rag/Activity7b-website.png"),
- ["A one-page training-center site with a floating chat widget.",
+ ASSET("site-lab5.png"),
+ ["The Cook & Bake Academy site with the course assistant open.",
   "Visitors ask about any course — duration, fee, location, schedule.",
   "Answers are grounded in the 20 ingested brochures.",
   "Set WEBHOOK_URL in script.js to your n8n CX Agent Production URL."])
+annotated_slide("ACT 7b · THE WEBSITE","Activity 7b — The Course Assistant in Action",
+ "A real conversation on the Cook & Bake Academy site. Every fee in the reply came from a retrieved brochure.",
+ ASSET("lab5-site-chat.png"),
+ [(BLUE,"A typo still finds it","The visitor typed 'patries'. Embeddings match meaning, not spelling, so the pastry "
+   "brochures BAK-102 and BAK-109 still come back."),
+  (VIOLET,"Facts quoted, not invented","Fees and durations are quoted exactly: BAK-102 is SGD $1480 for 8 weeks / 48 hours — the "
+   "same S$1480 shown on the course card behind the chat."),
+  (AMBER,"It admits a gap","It did not give BAK-104's fee and said so instead of guessing. The brochure does list "
+   "SGD $420, so check what the tool returned: that is a retrieval gap.")],
+ "'I don't have that' is grounding working — fix gaps in retrieval, never by loosening the prompt.",color=AMBER)
 brk("Tea Break","15 minutes",TEAL)
 
 # ---------- TOPIC 6: SECURITY ----------
@@ -933,16 +1252,66 @@ brk("Lunch Break","1 hour",AMBER)
 
 # ---------- TOPIC 7: CAPSTONE ----------
 K7="TOPIC 7 · MINI CAPSTONE"
-section("TOPIC 7","Mini Capstone Project","07","Design · Build · Present","Everything from Activities 1–8, your problem",color=GREEN)
-s=concept(K7,"Your Build — What It Must Include","In small groups, design and build an end-to-end automation for a problem you choose.")
+section("TOPIC 7","Mini Capstone Project","07","Describe it · n8n Assistant builds it · review · present",
+ "Everything from Activities 1–8 — built with AI-assisted workflow creation",color=GREEN)
+s=concept(K7,"Your Capstone — Let n8n Assistant Build It",
+ "In small groups, pick one end-to-end business process, describe it to n8n Assistant, then review, test and own the workflow it builds.",kcolor=GREEN)
+chev_strip(s,[("Pick a process","one painful, repeatable job"),("Write the prompt","trigger → steps → output"),
+              ("n8n Assistant builds","plan, nodes, wiring"),("You review & connect","credentials, Gateway credits"),
+              ("Test, add a control","guardrail or approval"),("Present","demo + 3–5 min talk")],
+           y=Inches(2.05),h=Inches(1.0),color=GREEN,tsz=11,ssz=8.5)
 ncards(s,[(BLUE,"A trigger","Form, webhook, Telegram or schedule — who or what starts your process?"),
  (VIOLET,"An AI agent","With at least one tool or a RAG source — the judgement in the middle."),
- (TEAL,"External data or storage","An API you call, or storage you write — Sheets, a vector DB, a Data Table."),
+ (TEAL,"Data or storage","An API you call, or storage you write — Sheets, a vector DB, a Data Table."),
  (RED,"A control","A guardrail or a human-in-the-loop step — decide where the human belongs and defend it.")],
- y=Inches(1.95),h=Inches(3.7),cols=2)
-takeaway(s,"Deliverables: a working workflow, a short demo, and a 3–5 minute presentation.")
+ y=Inches(3.35),h=Inches(2.75),cols=4)
+takeaway(s,"Deliverables: the prompt(s) you used, a working workflow (.json), a short demo and a 3–5 minute presentation.")
 footer(s)
-website_lab("CAPSTONE · WORKED EXAMPLE","Capstone Example — Issue Reporting",
+annotated_slide(K7,"Step 1: Describe Your Process to n8n Assistant",
+ "Open Assistant in the left sidebar (or Build with AI on an empty canvas) and answer 'What do you want to automate?'",
+ ASSET("n8n-assistant.png"),
+ [(BLUE,"Say what starts it","Name the trigger and its inputs — 'a form where I enter a topic, audience and length'."),
+  (VIOLET,"List the steps in order","Number them. One step per line becomes one node or one AI step on the canvas."),
+  (TEAL,"Say where the human decides","Ask for an approval gate before anything is published, sent or paid.")],
+ "A numbered prompt gives a numbered workflow — the clearer the steps, the closer the first draft.",color=GREEN)
+prompt_slide(K7,"Example: An End-to-End Video Creation Workflow",
+ "One prompt turns a topic into a published video — research, script, production and publishing, with a human approval gate.",
+ ["Create an end-to-end workflow that turns a topic into a published YouTube video:",
+  "1. Start from a form where I enter a video topic, target audience and length (60–90 seconds).",
+  "2. Research the topic on the web and summarise 5 key facts with their sources.",
+  "3. Write a video script from the research: a hook, 3 key points and a call to action, under 200 words.",
+  "4. Send the script to a video-generation API with an HTTP Request node, and wait until the video is ready.",
+  "5. Email me the script and the video link, and wait for my approval.",
+  "6. If approved, upload the video to YouTube with a title, description and tags;",
+  "    if rejected, log my feedback in a Google Sheet.",
+  "Use Gateway credits for the AI models. Ask me before publishing."],
+ ["Review the plan before it builds","Add your video API key as a credential (e.g. HeyGen, Runway or Google Veo)",
+  "Connect Gmail, Google Sheets and YouTube","Test with a real topic — approve the draft video"],
+ "The AI writes and produces; the workflow runs it — and nothing is published until a person approves it.",
+ chev=[("Topic","form: topic, audience, length"),("Research","AI Agent + web search"),("Video script","hook · 3 points · CTA"),
+       ("Video production","video API via HTTP Request"),("Publish","approve, then YouTube upload")],color=GREEN,psz=12)
+s=concept(K7,"More Example Prompts for Your Capstone",
+ "Start from one of these, or write your own. Each names the trigger, numbers the steps and puts a human at the risky step.",kcolor=GREEN)
+_ideas=[(BLUE,"Weekly newsletter",
+  ["Every Monday at 9am, search the web for this week's news on <your industry>.",
+   "Pick the 5 most relevant stories and write a short newsletter with a summary and link for each.",
+   "Email me the draft for approval; if approved, send it to the subscribers in my Google Sheet."]),
+ (VIOLET,"Invoice processing",
+  ["When an email with a PDF invoice arrives in Gmail, extract the supplier, invoice number, date and amount.",
+   "Add a row to my Invoices Google Sheet.",
+   "If the amount is over $5,000, email the finance manager to approve before marking it 'ready to pay'."]),
+ (AMBER,"Customer-support triage",
+  ["From a website chat webhook, classify each message as billing, technical or sales.",
+   "Answer FAQs from my policy documents (RAG); never invent a price.",
+   "Hand anything else to a human by posting it to Telegram, and log every conversation."])]
+X0=Inches(0.85); gx=Inches(0.3); cw=int((Inches(11.63)-gx*2)/3)
+for k,(col,t,lines) in enumerate(_ideas):
+    x=int(X0+(cw+gx)*k); box(s,x,Inches(2.0),cw,Inches(4.1),col)
+    txt(s,x+Inches(0.22),Inches(2.15),cw-Inches(0.44),Inches(0.32),[[(t,13.5,col,True)]])
+    txt(s,x+Inches(0.22),Inches(2.6),cw-Inches(0.44),Inches(3.4),[[(f"{n+1}. {ln}",11,INK,False)] for n,ln in enumerate(lines)],space=6)
+takeaway(s,"Then refine in the same chat: 'add an approval step', 'use Gateway credits', 'log every run to a Google Sheet'.")
+footer(s)
+website_lab("TOPIC 7 · WORKED EXAMPLE","Capstone Example — Issue Reporting",
  IMG("labs/mini-capstone/issue-tracking/Capstone-website.png"),
  ["Paste your n8n Form production URL to generate a QR code.",
   "People scan the QR with a phone to open the submission form.",

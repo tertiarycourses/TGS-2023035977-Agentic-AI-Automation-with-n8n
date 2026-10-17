@@ -43,6 +43,11 @@ LP_VERSIONS = [
                             "footer page numbers; aligned the Lesson Plan with the slides, Learner Guide and lab "
                             "workflows (activities 1–8 + capstone)",
      "Tertiary Infotech Academy Pte Ltd"),
+    ("3.2", "17 Oct 2026", "Aligned with slide deck v48: learners sign in with assigned n8n training accounts "
+                            "(no self sign-up) and use the free n8n Gateway credits for AI agents (API keys optional); Topic 1 now "
+                            "opens with why agentic AI and workflow first vs agent first before n8n is introduced; Activity 4a is "
+                            "the HR Policy Chatbot built with n8n Assistant; the mini capstone is built with n8n Assistant",
+     "Tertiary Infotech Academy Pte Ltd"),
 ]
 
 BRAND = RGBColor(0x1F, 0x6F, 0xEB)
@@ -83,7 +88,7 @@ def add_heading(text, size=15, color=BRAND, space_before=12, space_after=6):
 
 # ============================ COVER + FRONT MATTER ============================
 prodoc.style_headings(doc)
-prodoc.add_cover_page(doc, "LESSON PLAN", TITLE, "3.1", course_code=COURSE_CODE,
+prodoc.add_cover_page(doc, "LESSON PLAN", TITLE, "3.2", course_code=COURSE_CODE,
     org_logo=_logo("tertiary-infotech-logo.png"),
     course_logo=_logo("n8n-course-logo.png"))
 prodoc.add_version_control(doc, LP_VERSIONS)
@@ -99,7 +104,7 @@ info = [
     ("Breaks", "Short tea breaks are scheduled within each day's training hours"),
     ("Delivery Mode", "Instructor-led, hands-on labs with group work and presentations"),
     ("Prerequisites", "Basic computer literacy; a Google/Gmail account; no coding experience required"),
-    ("Tools & Accounts", "n8n (trial + local Docker), OpenAI & Gemini API keys, Telegram, "
+    ("Tools & Accounts", "n8n (assigned training accounts + local Docker), free n8n Gateway credits (API keys optional), Telegram, "
                          "Gmail/Outlook, Google Sheets, Twelve Data & NewsAPI, Claude Code"),
 ]
 tbl = doc.add_table(rows=0, cols=2); tbl.style = "Table Grid"; tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -174,9 +179,9 @@ day_header("Day 1", "Workflow Automation with n8n  ·  AI Agents")
 session_label("Morning Session  ·  9:30 AM – 1:00 PM")
 schedule_table([
     ("9:30 – 9:45",  f"Welcome, course objectives & overview ({COURSE_CODE})", 15, "normal"),
-    ("9:45 – 12:25", "Topic 1: Workflow Automation with n8n", None, "topic"),
-    ("9:45 – 10:05", "Overview of n8n", 20, "normal"),
-    ("10:05 – 10:35","Set up n8n — create trial accounts (15 learners) and install locally with Docker Compose", 30, "normal"),
+    ("9:45 – 1:00", "Topic 1: Workflow Automation with n8n", None, "topic"),
+    ("9:45 – 10:15", "Why agentic AI, and why workflow first — history of AI, generative vs agentic AI, agentic AI vs AI agents, workflow first vs agent first, business value, AI security; overview of n8n", 30, "normal"),
+    ("10:15 – 10:35","Set up n8n — sign in with the assigned n8n training accounts, claim the free AI (Gateway) credits, n8n Assistant demo; local install with Docker Compose shown", 20, "normal"),
     ("10:35 – 10:50","Explore the n8n UI", 15, "normal"),
     ("10:50 – 11:10","Key concepts of n8n — Triggers, Actions, Nodes, Flows", 20, "normal"),
     ("11:10 – 11:35","Activity 1: QR Code form (name, email, phone, message) + email to admin via Gmail/Outlook (2 nodes)", 25, "normal"),
@@ -192,8 +197,8 @@ schedule_table([
     ("3:20 – 3:35",  "Tea Break", 15, "break"),
     ("3:35 – 6:05",  "Topic 2: AI Agents", None, "topic"),
     ("3:35 – 4:05",  "Overview of AI Agents — LLM, Memory, Tools and System Instruction", 30, "normal"),
-    ("4:05 – 4:50",  "Activity 4a: Telegram-triggered AI Agent — simple customer-service chatbot (OpenAI / Gemini API key provided)", 45, "normal"),
-    ("4:50 – 6:05",  "Activity 4b: Telegram-triggered AI Agent (customer service / HR admin) — attach a Data Table as a tool; reuse Activity 2 data or upload a 100-record employee CSV", 75, "normal"),
+    ("4:05 – 4:50",  "Activity 4a: Telegram HR Policy Chatbot (Ava) — create the bot with BotFather, build it with n8n Assistant from one prompt, connect, publish and chat (free n8n Gateway credits)", 45, "normal"),
+    ("4:50 – 6:05",  "Activity 4b: Give Ava a tool — attach an Employees Data Table (reuse Activity 2 data or upload a 100-record employee CSV) so she answers from real staff records", 75, "normal"),
     ("6:05 – 6:30",  "Day 1 recap, Q&A and wrap-up", 25, "normal"),
 ])
 
@@ -245,8 +250,8 @@ schedule_table([("1:00 – 2:00", "Lunch Break", 60, "break")])
 session_label("Afternoon Session  ·  2:00 PM – 6:30 PM")
 schedule_table([
     ("2:00 – 6:30",  "Topic 7: Mini Capstone Project", None, "topic"),
-    ("2:00 – 2:30",  "Capstone briefing — requirements, scope and assessment criteria", 30, "normal"),
-    ("2:30 – 4:15",  "Mini capstone build (supervised lab time)", 105, "normal"),
+    ("2:00 – 2:30",  "Capstone briefing — requirements, scope and assessment criteria; AI-assisted workflow creation with n8n Assistant (example prompt: end-to-end video creation — topic, research, script, production, publish)", 30, "normal"),
+    ("2:30 – 4:15",  "Mini capstone build (supervised lab time) — describe the process to n8n Assistant, review and connect credentials, test and add a guardrail or approval step", 105, "normal"),
     ("4:15 – 4:30",  "Tea Break", 15, "break"),
     ("4:30 – 5:45",  "Presentation of mini capstone projects", 75, "normal"),
     ("5:45 – 6:30",  "Assessment and course closing", 45, "normal"),
@@ -260,7 +265,7 @@ res = [
     ("Finance API reference — Activity 6: Finance Advisor", "https://alfredang.github.io/n8n-financeadvisor/"),
     ("Finance Data API — Twelve Data", "https://twelvedata.com/login"),
     ("News API — NewsAPI", "https://newsapi.org/"),
-    ("LLM API keys", "OpenAI API key & Google Gemini API key (provided to learners)"),
+    ("LLM access", "Free n8n Gateway credits on each training account; OpenAI / Google Gemini API keys optional"),
     ("Local n8n", "Docker Compose self-hosted install (see Learner Guide)"),
 ]
 rt = doc.add_table(rows=0, cols=2); rt.style = "Table Grid"; rt.alignment = WD_TABLE_ALIGNMENT.CENTER

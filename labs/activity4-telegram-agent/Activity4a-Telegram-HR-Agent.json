@@ -1,0 +1,171 @@
+{
+  "name": "Activity 4a - Telegram HR Policy Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "4d349124-8feb-4792-a88a-d7e584eca00c",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        112
+      ],
+      "webhookId": "bb516b71-0e60-480c-b349-e145a87fa200",
+      "credentials": {
+        "telegramApi": {
+          "id": "eyqqK1UEqTu0QObB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are \"Ava\", the friendly HR Assistant for Acme Tech Pte Ltd. You answer employee questions about company HR policies via Telegram.\n\n## How to respond\n- Answer ONLY using the company policies below. Be concise, warm and professional (max ~150 words).\n- Use plain text with simple dashes for lists (no markdown tables or headings).\n- If a question is not covered by these policies, say so and direct the employee to HR at hr@acmetech.com or ext. 1234.\n- Never invent policies, numbers or exceptions. Do not give legal advice.\n- Do not ask for or discuss personal salary, medical or disciplinary details; refer those to HR privately.\n\n## Acme Tech HR Policies (sample)\n\n1. Working Hours\n- Standard hours: Monday to Friday, 9:00 AM to 6:00 PM, with a 1-hour lunch break.\n- Flexible hours: core hours are 10:00 AM to 4:00 PM; start between 8:00 and 10:00 AM.\n- Hybrid work: up to 2 days work-from-home per week with manager approval.\n\n2. Annual Leave\n- 0-2 years of service: 14 days per year.\n- 3-5 years: 18 days per year.\n- More than 5 years: 21 days per year.\n- Up to 5 unused days can be carried forward to the next year and must be used by 31 March.\n- Apply via the HR portal at least 2 weeks in advance for leave of 3 or more days.\n\n3. Sick Leave\n- 14 days outpatient sick leave and up to 60 days hospitalisation leave per year (inclusive of the 14 days).\n- A medical certificate (MC) is required for any sick leave and must be submitted within 2 working days.\n- Inform your manager before 9:30 AM on the day of absence.\n\n4. Other Leave\n- Maternity leave: 16 weeks paid. Paternity leave: 2 weeks paid.\n- Childcare leave: 6 days per year for parents with a child under 7.\n- Marriage leave: 3 days. Compassionate leave: 3 days for immediate family.\n\n5. Public Holidays\n- All gazetted public holidays are paid days off. If a holiday falls on a Saturday, employees get a replacement day off.\n\n6. Claims and Expenses\n- Submit claims via the HR portal within 30 days of the expense, with receipts.\n- Medical claims: up to SGD 500 per year for outpatient GP visits.\n- Dental claims: up to SGD 300 per year.\n- Transport: taxi claims allowed for work travel or when working past 10:00 PM.\n\n7. Training and Development\n- Each employee has a SGD 1,500 annual training budget, subject to manager approval.\n- Employees who receive sponsorship above SGD 3,000 have a 12-month bond.\n\n8. Code of Conduct\n- Treat colleagues with respect; harassment and discrimination are not tolerated.\n- Dress code: smart casual; business formal for client meetings.\n- Report concerns confidentially to HR or via the whistleblowing email ethics@acmetech.com.\n\n9. Probation and Resignation\n- Probation period: 3 months.\n- Notice period: 1 week during probation, 1 month after confirmation (2 months for managers).\n\n10. Performance and Benefits\n- Performance reviews are held twice a year, in June and December.\n- Annual bonus is performance-based and paid in March.\n- Birthday leave: 1 day off in your birthday month."
+        }
+      },
+      "id": "55a42608-c801-440c-bf89-c0c30210a406",
+      "name": "HR Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5.4-mini",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "01efb599-c4fe-4a33-b8f5-f1f08e10297b",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        320
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "Gateway credits",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "542b8891-24fd-41cd-9633-c65208419f64",
+      "name": "Reply on Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        112
+      ],
+      "webhookId": "977ac915-9789-4863-8dde-c6bbae6d8ed9",
+      "credentials": {
+        "telegramApi": {
+          "id": "eyqqK1UEqTu0QObB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        304,
+        320
+      ],
+      "id": "7647cc0a-05f6-4817-9a69-9da729d82ee3",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "HR Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HR Agent": {
+      "main": [
+        [
+          {
+            "node": "Reply on Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "HR Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "HR Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "cc3682f9-7e5a-4399-b026-21eea744d2e7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0b4e394cd014d22043feaea7afe9473082aee79e633395e7a09706616d056c2a"
+  },
+  "nodeGroups": [],
+  "id": "aWwQnXx6H6oZPZY1",
+  "tags": []
+}
