@@ -60,14 +60,15 @@ Each activity folder holds the importable n8n workflow (`.json`), a screenshot o
 | Slide deck — v48 | [PowerPoint](courseware/Agentic%20AI%20Automation%20with%20n8n-v48.pptx) · [PDF](courseware/Agentic%20AI%20Automation%20with%20n8n-v48.pdf) |
 | Learner Guide — v6.5 | [Word](courseware/LG-Agentic%20AI%20Automation%20with%20n8n.docx) · [PDF](courseware/LG-Agentic%20AI%20Automation%20with%20n8n.pdf) · [Markdown](LEARNER-GUIDE.md) |
 | Lesson Plan — v3.2 | [Word](courseware/LP-Agentic%20AI%20Automation%20with%20n8n.docx) · [PDF](courseware/LP-Agentic%20AI%20Automation%20with%20n8n.pdf) |
+| Facilitator Guide — v5.0 | [Word](courseware/FG_TGS-2023035977_Agentic%20AI%20Automation%20with%20n8n_v5.docx) · [PDF](courseware/FG_TGS-2023035977_Agentic%20AI%20Automation%20with%20n8n_v5.pdf) |
 
 **Using the workflows:** in n8n, create a new workflow, open the **⋯** menu → **Import from File**, pick the activity `.json`, then re-select your own credentials on each node (imported workflows carry credential names, never secrets). For AI nodes, choose **Use Gateway credits** on n8n Cloud, or your own OpenAI / Gemini key.
 
 ## What is public and what is not
 
-This repository is public. It contains the slides, Learner Guide, Lesson Plan, lab workflows, lab data and web pages, and the scripts that build the courseware.
+This repository is public. It contains the slides, Learner Guide, Lesson Plan, Facilitator Guide, lab workflows, lab data and web pages, and the scripts that build the courseware.
 
-It does **not** contain the WSQ assessment (written assessment and practical performance papers and their answer keys), source reference material, superseded courseware versions, or any credentials. Training-account passwords and API keys are given in class and are never committed.
+It does **not** contain the WSQ assessment (written assessment and practical performance papers and their answer keys), the Assessment Plan (which reproduces them with the marking rubric), source reference material, superseded courseware versions, or any credentials. Training-account passwords and API keys are given in class and are never committed.
 
 ## Provider
 

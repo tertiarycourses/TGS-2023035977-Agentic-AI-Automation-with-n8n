@@ -51,3 +51,6 @@ courseware/archive/
 # ...but keep skill reference IMPLEMENTATIONS (builder scripts the skills run)
 !.claude/skills/**/reference/
 !.claude/skills/**/reference/**
+
+# Assessment Plan — embeds the assessment papers, answer keys and rubric (trainer-only; never pushed)
+Assessment_Plan_*
